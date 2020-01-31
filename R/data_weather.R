@@ -205,7 +205,7 @@ thredds_get_forecast <- function() {
 #' Updates the weather db tables
 #' @export
 #'
-#' 
+#'
 data_weather <- function(data, argset, schema) {
 
   weather <- schema$output
@@ -247,14 +247,14 @@ data_weather <- function(data, argset, schema) {
     for (i in download_years) {
       msg(glue::glue("Downloading weather for {i}"))
       d <- thredds_get_data(year = i)
-      d <- add_date_info(d)
+      d <- add_info_for_weather(d)
       weather$db_upsert_load_data_infile(d)
     }
   }
 
   if (!is.null(download_dates) | !is.null(download_years)) {
     d <- thredds_get_forecast()
-    d <- add_date_info(d)
+    d <- add_info_for_weather(d)
     weather$db_upsert_load_data_infile(d)
   }
 
@@ -265,17 +265,21 @@ data_weather <- function(data, argset, schema) {
 }
 
 
-add_date_info <- function(da){
+add_info_for_weather <- function(da){
   dates <- unique(da[, "date", with = F])
-  dates[, datex := date]
-  dates[, yrwk := format.Date(datex, "%G-%V")] # Week-based year, instead of normal year (%Y)
-  dates[, week := as.numeric(format.Date(datex, "%V"))]
-  dates[, year := as.numeric(format.Date(date, "%G"))]
-  dates[, month := as.numeric(format.Date(date, "%m"))]
+  dates[, yrwk := fhi::isoyearweek(date)]
+  dates[, week := fhi::isoweek_n(date)]
+  dates[, year := fhi::isoyear_n(date)]
   dates[, season := fhi::season(yrwk)]
   dates[, x := fhi::x(week)]
   da <- merge(da, dates, by = "date")
-  da[, granularity_time:="daily"]
-  da[, granularity_geo:="municip"]
+  da[, granularity_time:="day"]
+  da[, granularity_geo:=dplyr::case_when(
+    stringr::str_detect(location_code,"municip") ~ "municip",
+    stringr::str_detect(location_code,"county") ~ "county",
+    stringr::str_detect(location_code,"norge") ~ "nation",
+  )]
+  da[, age:="totalt"]
+  da[, sex:="totalt"]
   return(da)
 }
