@@ -49,6 +49,9 @@ set_db <- function(){
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
         "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
         "season" = "TEXT",
         "year" = "INTEGER",
         "week" = "INTEGER",
@@ -59,8 +62,7 @@ set_db <- function(){
         "tx" = "DOUBLE",
         "tn" = "DOUBLE",
         "rr" = "DOUBLE",
-        "forecast" = "BOOLEAN",
-        "border" = "INTEGER"
+        "forecast" = "BOOLEAN"
       ),
       db_load_folder = "/xtmp/",
       keys =  c(
@@ -68,7 +70,7 @@ set_db <- function(){
         "date"
       )
     ),
-      
+
     results_normomo_standard = schema$new(
       db_config = config$db_config,
       db_table = "results_normomo_standard",

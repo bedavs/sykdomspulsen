@@ -9,7 +9,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
   locs <- unique(fd::norway_locations()[, c("county_code", "county_name")])
 
   table <- schema$input$dplyr_tbl()
-  
+
   for (tag in argset$tags) {
     fd::msg(glue::glue("sykdomspulspdf {tag}"), slack = T)
     # setup
@@ -112,7 +112,7 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
     dplyr::collect() %>%
     fd::latin1_to_utf8()
   # remove last 3 weeks
-  yrwks <- rev(unique(data_long$yrwk))[-c(1:3)]
+  yrwks <- rev(sort(unique(data_long$yrwk)))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]
   data_long[, location_name:=get_location_name(location_code)]
   data_long[, season := fhi::season(yrwk)]

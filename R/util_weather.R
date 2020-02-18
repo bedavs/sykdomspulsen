@@ -3,8 +3,8 @@
 #' @param impute_missing Do you want missing data imputed?
 #' @export
 get_weather <- function(impute_missing = FALSE) {
-  
-  temp <- config$schema$data_weather$dplyr_tbl() %>%
+
+  temp <- tbl("data_weather") %>%
     dplyr::collect() %>%
     fd::latin1_to_utf8()
 
@@ -87,9 +87,12 @@ get_weather <- function(impute_missing = FALSE) {
   temp[, county_code := NULL]
   temp <- rbind(temp, temp_county, temp_national)
 
-  temp[, yrwk := fhi::isoyearweek(date)]
-
   temp[, forecast := as.logical(forecast)]
+  temp[, border:=config$border]
+
+  temp <- add_info_for_weather(temp)
+  setcolorder(temp,names(config$schema$data_weather$db_field_types))
+  setorder(temp,location_code,date)
 
   return(temp)
 }

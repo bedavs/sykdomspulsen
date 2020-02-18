@@ -16,7 +16,7 @@ set_tasks <- function() {
       )
     )
   )
-  
+
   config$tasks$add_task(
     task_from_config(
       list(
@@ -362,6 +362,22 @@ set_tasks <- function() {
  config$tasks$add_task(
    task_from_config(
      list(
+       name = "ui_normomo_ssi",
+       type = "single",
+       action = "ui_normomo_ssi",
+       schema = list(input=config$schema$results_normomo_standard),
+       dependencies = c("results_normomo_standard"),
+       args = list(
+         filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
+         folder = "normomo/{today}/graphs_status"
+       )
+     )
+   )
+ )
+
+ config$tasks$add_task(
+   task_from_config(
+     list(
        name = "ui_normomo_thresholds_1yr_5yr",
        type = "ui",
        action = "ui_normomo_thresholds_1yr_5yr",
@@ -371,7 +387,7 @@ set_tasks <- function() {
        dependencies = c("results_normomo_standard"),
        args = list(
          filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
-         folder = "normomo/{today}/graphs_status"
+         folder = "normomo/{today}/graphs_thresholds"
        )
      )
    )

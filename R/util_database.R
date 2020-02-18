@@ -57,8 +57,7 @@ write_data_infile <- function(
     na = na,
     col.names=colnames,
     eol=eol,
-    quote = quote,
-    scipen=12
+    quote = quote
   )
 }
 
