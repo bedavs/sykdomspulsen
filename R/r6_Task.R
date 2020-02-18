@@ -25,7 +25,7 @@ task_from_config <- function(conf) {
   cores <- get_list(conf, "cores", 1)
   chunk_size <- get_list(conf, "chunk_size", 1)
   task <- NULL
-  if (conf$type == "data") {
+  if (conf$type %in% c("data","single")) {
     plan <- plnr::Plan$new()
     arguments <- list(fn = get(conf$action), name = name,
                       today=Sys.Date())
