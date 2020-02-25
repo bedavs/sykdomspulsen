@@ -15,26 +15,37 @@ source("number_weekly.R")
 source("number_daily.R")
 source("meminfluensa.R")
 
-ui <- navbarPage("Sykdomspulsen",
+ui <- navbarPage(
+  title="Sykdomspulsen",
+  theme = "bootstrap.css",
   tabPanel("Nyheter", icon = icon("newspaper"),
     fluidRow(
       column(2),
       column(8,
         wellPanel(
-          strong("2019-09-20 / Ny nettside"),
-          p("Vi har byttet ut den gamle nettsiden med en ny for å gi dere en raskere opplevelse og for å være mer i tråd med kommunikasjonsavdelingens anbefalinger om grafer. Håper dere liker det!")
+          h3("Ny nettside"),
+          p("Vi har byttet ut den gamle nettsiden med en ny for å gi dere en raskere opplevelse og for å være mer i tråd med kommunikasjonsavdelingens anbefalinger om grafer. Håper dere liker det!"),
+          p("Publisert: 01.05.2020")
         ),
         wellPanel(
-          strong("2019-09-11 / MeM terskler til influensa tilsatt"),
-          p("Nå kan du se på MeM terskler til influensa under fanen 'MeM-Influensa'.")
+          h3("Kommunesammenslåing 2020 trer i kraft"),
+          p("Alle resultater vises etter de nye kommunene og fylkene."),
+          p("Publisert: 01.01.2020")
         ),
         wellPanel(
-          strong("2016-08-01 / Økning i aldersgruppen 15-19 år"),
-          p("Fra august 2016 er det en økning i antall konsultasjoner i aldersgruppen 15-19 år grunnet behov for sykemelding ved fravær i den videregående skole.")
+          h3("MeM terskler til influensa tilsatt"),
+          p("Nå kan du se på MeM terskler til influensa under fanen 'MeM-Influensa'."),
+          p("Publisert: 11.09.2019")
         ),
         wellPanel(
-          strong("2015-01-01 / Lansering av Sykdomspulsen"),
-          p("Velkommen til Sykdomspulsen!")
+          h3("Økning i aldersgruppen 15-19 år"),
+          p("Fra august 2016 er det en økning i antall konsultasjoner i aldersgruppen 15-19 år grunnet behov for sykemelding ved fravær i den videregående skole."),
+          p("Publisert: 01.08.2016")
+        ),
+        wellPanel(
+          h3("Lansering av Sykdomspulsen"),
+          p("Velkommen til Sykdomspulsen!"),
+          p("Publisert: 01.01.2015")
         )
       )
     )
@@ -58,10 +69,10 @@ ui <- navbarPage("Sykdomspulsen",
 
 server <- function(input, output) {
   callModule(barometerServer, "barometer", GLOBAL=GLOBAL)
-  callModule(signalsServer, "signals", GLOBAL=GLOBAL)
-  callModule(number_weeklyServer, "number_weekly", GLOBAL=GLOBAL)
-  callModule(number_dailyServer, "number_daily", GLOBAL=GLOBAL)
-  callModule(meminfluensaServer, "meminfluensa", GLOBAL=GLOBAL)
+  #callModule(signalsServer, "signals", GLOBAL=GLOBAL)
+  #callModule(number_weeklyServer, "number_weekly", GLOBAL=GLOBAL)
+  #callModule(number_dailyServer, "number_daily", GLOBAL=GLOBAL)
+  #callModule(meminfluensaServer, "meminfluensa", GLOBAL=GLOBAL)
 }
 
 shinyApp(ui, server)

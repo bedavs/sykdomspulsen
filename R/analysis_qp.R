@@ -5,32 +5,35 @@
 #' @export
 analysis_qp <- function(data, argset, schema){
   # tm_update_plans("analysis_norsyss_qp_gastro")
-  # data <- tm_get_data("analysis_norsyss_qp_gastro")
-  # argset <- tm_get_argset("analysis_norsyss_qp_gastro")
+  # data <- tm_get_data("analysis_norsyss_qp_gastro", index_plan = 1)
+  # argset <- tm_get_argset("analysis_norsyss_qp_gastro", index_plan = 1, index_argset = 90)
   # schema <- tm_get_schema("analysis_norsyss_qp_gastro")
 
   # arguments start
-  data <- copy(data$data)
+  d <- data$data[location_code == argset$location_code]
 
-  data[, denominator:=get(argset$denominator)]
-  argset$granularity_geo <- data[1, granularity_geo]
+
+  d[, denominator:=get(argset$denominator)]
+  argset$granularity_geo <- d[1, granularity_geo]
   if(argset$granularity_time == "weekly"){
-    data <- data[,
+    d <- d[,
                  .(n=sum(n),
                    denominator=argset$weeklyDenominatorFunction(denominator),
                    holiday=mean(holiday)
                   ),
                  by=.(yrwk)]
-    data <- data[fhidata::days, on = "yrwk", date := sun]
+    d <- d[fhidata::days, on = "yrwk", date := sun]
   }
 
   years <- argset$years
 
-  for(year in years){
+  retval <- vector("list",length=length(years))
+  for(i in seq_along(years)){
+    year <- years[i]
     predict_start <- as.Date(glue::glue("{year}-01-01"))
     predict_end <- as.Date(glue::glue("{year}-12-31"))
 
-    min_year_data <- year(min(data[, date]))
+    min_year_data <- year(min(d[, date]))
     if(min_year_data > year - argset$train_length){
       train_start <- as.Date(glue::glue("{min_year_data}-01-01"))
       train_end <-  as.Date(glue::glue("{min_year_data + argset$train_length-1}-12-31"))
@@ -38,8 +41,8 @@ analysis_qp <- function(data, argset, schema){
       train_start <- as.Date(glue::glue("{year - argset$train_length}-01-01"))
       train_end <- predict_start-1
     }
-    run_data_train <- data[date >=  train_start & date < train_end]
-    run_data_predict <- data[date >= predict_start & date <= predict_end]
+    run_data_train <- d[date >=  train_start & date < train_end]
+    run_data_predict <- d[date >= predict_start & date <= predict_end]
     diagnostics <- new_diagnostics_df()
     argset$year_run <- year
     ret <- QuasipoissonTrainPredictData(
@@ -49,10 +52,13 @@ analysis_qp <- function(data, argset, schema){
       weeklyDenominatorFunction = argset$weeklyDenominatorFunction
     )
     diagnostics <- update_diagnostics(attr(ret, "diagnostics"),argset)
-    ret <- clean_post_analysis(ret, argset)
-    schema$output$db_upsert_load_data_infile(ret, verbose=F)
+    retval[[i]] <- clean_post_analysis(ret, argset)
     #schema$output$db_load_data_infile(ret, verbose=F)
   }
+  retval <- rbindlist(retval)
+
+  #schema$output$db_upsert_load_data_infile(retval, verbose=F)
+  return(retval)
 }
 
 
@@ -250,7 +256,7 @@ QuasipoissonTrainPredictData <- function(
     datasetPredict[, n_baseline_thresholdu1 := 10.0]
     datasetPredict[, n_baseline_thresholdu2 := 15.0]
     datasetPredict[, n_zscore := 0.0]
-
+    datasetPredict[, stderr := 0.0]
     datasetPredict[, failed := TRUE]
   } else {
     # REFIT THE REGRESSION USING RESIDUAL WEIGHTS (TO DOWNWEIGHT PREVIOUS OUTBREAKS):
@@ -281,6 +287,7 @@ QuasipoissonTrainPredictData <- function(
       datasetPredict[, n_baseline_thresholdu1 := 10.0]
       datasetPredict[, n_baseline_thresholdu2 := 15.0]
       datasetPredict[, n_zscore := 0.0]
+      datasetPredict[, stderr := 0.0]
       datasetPredict[, failed := TRUE]
       regression_diagnostics$failed <- 1
     } else{

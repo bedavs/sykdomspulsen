@@ -5,15 +5,23 @@ barometerUI <- function(id, label = "Counter", GLOBAL) {
       width=2,
       selectInput(ns("weeklyBarometerType"), "Sykdom/Symptom", as.list(GLOBAL$weeklyTypes), selected = GLOBAL$weeklyTypes[1]),
       selectInput(ns("weeklyBarometerAge"), "Alder", as.list(GLOBAL$weeklyAges), selected = "Totalt"),
-      selectInput(ns("weeklyBarometerCounty"), "Fylke", as.list(GLOBAL$weeklyCounties), selected = GLOBAL$weeklyCounties[1])
+      selectInput(ns("weeklyBarometerCounty"), "Fylke", as.list(GLOBAL$weeklyCounties), selected = GLOBAL$weeklyCounties[1]),
+      sliderInput(
+        inputId=ns("weeklyBarometerPlotBrush"),
+        label="Dato",
+        min=as.Date(GLOBAL$dateMinRestrictedRecent),
+        max=as.Date(GLOBAL$dateMax),
+        value = c(as.Date(GLOBAL$dateMinRestrictedRecent), as.Date(GLOBAL$dateMax)),
+        step=7,
+        timeFormat="%d.%m")
     ),
     column(
       width=10,
       tabsetPanel(
         tabPanel(title="Figur",
           br(),
-          div(style='height:60vh;text-align: center',plotOutput(ns("weeklyBarometerPlot"), height="100%")),
-          div(style='height:200px;text-align: center',plotOutput(ns("weeklyBarometerPlotBrush"), height="100%", brush = brushOpts(ns("weeklyBarometerBrush"), direction="x", opacity=0.4)))
+          div(style='height:75vh;text-align: center',plotOutput(ns("weeklyBarometerPlot"), height="100%"))#,
+          #div(style='height:200px;text-align: center',plotOutput(ns("weeklyBarometerPlotBrush"), height="100%", brush = brushOpts(ns("weeklyBarometerBrush"), direction="x", opacity=0.4)))
         ),
         tabPanel(
           title="Info",
@@ -31,28 +39,6 @@ barometerUI <- function(id, label = "Counter", GLOBAL) {
 barometerServer <- function(input, output, session, GLOBAL) {
   start_date <- GLOBAL$dateMinRestrictedRecent
 
-  weeklyBarometerPlotBrushData <- reactive({
-    req(input$weeklyBarometerType)
-    req(input$weeklyBarometerCounty)
-    req(input$weeklyBarometerAge)
-
-    x_tag <- input$weeklyBarometerType
-    x_location <- input$weeklyBarometerCounty
-    x_age <- input$weeklyBarometerAge
-    retData <- pool %>% tbl("results_qp") %>%
-      filter(
-        date >= start_date &
-          tag_outcome == x_tag &
-          source == "data_norsyss" &
-        location_code== x_location &
-        granularity_time =="weekly" &
-        age== x_age
-      ) %>% collect()
-    setDT(retData)
-    return(retData)
-  })
-
-
   weeklyBarometerPlotData <- reactive({
     req(input$weeklyBarometerCounty)
     req(input$weeklyBarometerType)
@@ -64,8 +50,8 @@ barometerServer <- function(input, output, session, GLOBAL) {
     x_county <- input$weeklyBarometerCounty
 
     if(x_county=="norge"){
-      retData <- pool %>% tbl(x_table) %>%
-        filter(
+      retData <- pool %>% dplyr::tbl(x_table) %>%
+        dplyr::filter(
           date >= start_date &
           tag_outcome == x_tag &
           granularity_time == "weekly" &
@@ -73,43 +59,40 @@ barometerServer <- function(input, output, session, GLOBAL) {
           (granularity_geo == "county" | granularity_geo == "Norge") &
           age==x_age
         ) %>%
-        select(date, location_code, n_status) %>%
-        collect()
+        dplyr::select(date, location_code, n_status) %>%
+        dplyr::collect()
     } else {
-      retData <- pool %>% tbl(x_table) %>%
-        filter(
+      x_location_code <- sykdomspulsen::get_municips_county(x_county)
+      print(x_county)
+      print(start_date)
+      print(x_tag)
+      print(x_age)
+      retData <- pool %>% dplyr::tbl(x_table) %>%
+        dplyr::filter(
           date >= start_date &
           tag_outcome == x_tag &
           age==x_age &
           source == "data_norsyss" &
           granularity_time == "weekly" &
-          location_code %in% sykdomspulsen::get_municips_county(x_county)
+          location_code %in% x_location_code
         ) %>%
-        select(date, location_code, n_status) %>%
-        collect()
+        dplyr::select(date, location_code, n_status) %>%
+        dplyr::collect()
     }
     setDT(retData)
     retData[, location_name:=sykdomspulsen::get_location_name(location_code)]
     return(retData)
   })
 
-  output$weeklyBarometerPlotBrush <- renderCachedPlot({
-    pd <- weeklyBarometerPlotBrushData()
-
-    fhiplot::make_line_brush_plot(pd,x="date",dataVal="n",L2="n_baseline_thresholdu0",L3="n_baseline_thresholdu1", GetCols=GetCols)
-  }, cacheKeyExpr={list(
-    input$weeklyBarometerCounty,
-    input$weeklyBarometerType,
-    input$weeklyBarometerAge,
-    GLOBAL$dateMax
-  )})
-
   output$weeklyBarometerPlot <- renderCachedPlot({
-    pd <- weeklyBarometerPlotData()
 
-    if(!is.null(input$weeklyBarometerBrush)){
-      pd <- pd[pd$date>=input$weeklyBarometerBrush$xmin & pd$date<=input$weeklyBarometerBrush$xmax,]
+    pd <- weeklyBarometerPlotData()
+    print(pd)
+    max_val <- min_val <- input$weeklyBarometerPlotBrush[1]
+    if(length(input$weeklyBarometerPlotBrush)==2){
+      max_val <- input$weeklyBarometerPlotBrush[2]
     }
+    pd <- pd[pd$date>=min_val & pd$date<=max_val,]
 
     pd <- pd[,c("date","location_name","n_status"),with=F]
     t1 <- names(GLOBAL$weeklyTypes)[GLOBAL$weeklyTypes==input$weeklyBarometerType]
@@ -121,7 +104,7 @@ barometerServer <- function(input, output, session, GLOBAL) {
     input$weeklyBarometerCounty,
     input$weeklyBarometerType,
     input$weeklyBarometerAge,
-    input$weeklyBarometerBrush,
+    input$weeklyBarometerPlotBrush,
     GLOBAL$dateMax
   )})
 }
@@ -197,5 +180,6 @@ MakeBarometerPlot <- function(pd, title, GetCols){
     "Forventet"))
   q <- q + coord_cartesian(xlim=limits,expand = FALSE)
   q <- q + labs(title=title)
+  q <- q + fhiplot::set_x_axis_vertical()
   q
 }

@@ -35,13 +35,13 @@ signalsServer <- function(input, output, session, GLOBAL) {
   output$table1 <- renderTable({
     x_wkyr <- input$weeklyOutbreakWeek
 
-    data_county <- pool %>% tbl("results_qp") %>%
+    data_county <- pool %>% dplyr::tbl("results_qp") %>%
       filter(tag_outcome != "influensa" &
                granularity_time == "weekly" &
                source == "data_norsyss" &
                granularity_geo == "county" &
                yrwk==x_wkyr) %>% collect()
-    data_municipality <- pool %>% tbl("results_qp") %>%
+    data_municipality <- pool %>% dplyr::tbl("results_qp") %>%
       filter(tag_outcome != "influensa" &
                granularity_time == "weekly" &
                source == "data_norsyss" &
@@ -79,13 +79,13 @@ signalsServer <- function(input, output, session, GLOBAL) {
   output$table2 <- renderTable({
     x_wkyr <- input$weeklyOutbreakWeek
 
-    data_county <- pool %>% tbl("results_qp") %>%
+    data_county <- pool %>% dplyr::tbl("results_qp") %>%
       filter(tag_outcome != "influensa" &
                granularity_time == "weekly" &
                source == "data_norsyss" &
                granularity_geo == "county" &
                yrwk==x_wkyr) %>% collect()
-    data_municipality <- pool %>% tbl("results_qp") %>%
+    data_municipality <- pool %>% dplyr::tbl("results_qp") %>%
       filter(tag_outcome != "influensa" &
                granularity_time == "weekly" &
                source == "data_norsyss" &
@@ -149,7 +149,7 @@ GenerateOutbreakListInternal <- function(df,dk,useType = FALSE) {
                "n_status", "n_zscore","n", "n_baseline_expected"), with = F]
   dk[, county_code:=sykdomspulsen::get_county_code(location_code)]
   dk[, county_name:=sykdomspulsen::get_location_name(county_code)]
-  
+
 
   setorder(df, n_status, -yrwk, -age)
   setorder(dk, n_status, -yrwk, -age, county_code, location_code)

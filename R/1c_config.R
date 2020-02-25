@@ -9,7 +9,8 @@ set_config <- function() {
   set_dev_options()
   set_border()
   set_db()
- 
+  set_progressr()
+
 
   config$def <- list(
     smallMunicips = c(
@@ -79,4 +80,10 @@ set_border <- function() {
   }
 }
 
+set_progressr <- function(){
+  progressr::handlers(progressr::handler_progress(
+    format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
+    clear = FALSE
+  ))
+}
 

@@ -62,12 +62,12 @@ number_weeklyServer <- function(input, output, session, GLOBAL) {
       x_location <- input$weeklyMunicip
       x_age <- input$weeklyAge
     }
-    retData <- pool %>% tbl(x_tbl) %>%
+    retData <- pool %>% dplyr::tbl(x_tbl) %>%
       filter(
         tag_outcome == x_tag &
         location_code== x_location &
         granularity_time=="weekly" &
-        source=="data_norsyss" & 
+        source=="data_norsyss" &
         age == x_age) %>%
       select(date, n, n_baseline_thresholdu0, n_baseline_thresholdu1, n_status,yrwk,n_denominator) %>%
       collect()
@@ -76,7 +76,7 @@ number_weeklyServer <- function(input, output, session, GLOBAL) {
     retData[, granularity_time:="weekly"]
     retData[, age:=x_age]
     retData <- sykdomspulsen::calculate_confidence_interval(retData, last_weeks=8)
-    
+
     retData$top <- max(c(retData$n, retData$n_baseline_thresholdu1), na.rm = T) + 2
     retData$bottom <- 0
 
