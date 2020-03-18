@@ -22,8 +22,8 @@ set_db <- function(){
         "task",
         "date_run"),
       check_fields_match = TRUE
-    ),   
-    
+    ),
+
     datar_normomo = schema$new(
       db_config = config$db_config,
       db_table = "datar_normomo",
@@ -299,6 +299,7 @@ set_db <- function(){
       keys = c("season", "tag_outcome", "age", "location_code")
     )
   )
-  config$schema$rundate$db_connect()
+
+  try(config$schema$rundate$db_connect(),TRUE)
 }
 

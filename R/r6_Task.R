@@ -15,6 +15,28 @@ data_function_factory <- function(table_name, filter){
   }
 }
 
+get_filters <- function(for_each, table_name, filter=""){
+  retval <- list()
+  for (t in names(for_each)) {
+    message(glue::glue("{Sys.time()} Starting pulling plan data for {t} from {table_name}"))
+    if (for_each[t] == "all") {
+      table <- tbl(table_name)
+      if (filter != "") {
+        table <- table %>% dplyr::filter(!!!rlang::parse_exprs(filter))
+      }
+      options <- table %>%
+        dplyr::distinct(!!as.symbol(t)) %>%
+        dplyr::collect() %>%
+        dplyr::pull(!!as.symbol(t))
+    } else {
+      options <- for_each[[t]]
+    }
+    retval[[t]] <- options
+    message(glue::glue("{Sys.time()} Finished pulling plan data for {t} from {table_name}"))
+  }
+  return(retval)
+}
+
 #' task_from_config
 #'
 #' @export
@@ -27,8 +49,11 @@ task_from_config <- function(conf) {
   task <- NULL
   if (conf$type %in% c("data","single")) {
     plan <- plnr::Plan$new()
-    arguments <- list(fn = get(conf$action), name = name,
-                      today=Sys.Date())
+    arguments <- list(
+      fn = get(conf$action),
+      name = name,
+      today=Sys.Date()
+    )
     if ("args" %in% names(conf)) {
       arguments <- c(arguments, conf$args)
     }
@@ -41,8 +66,8 @@ task_from_config <- function(conf) {
       schema = schema,
       dependencies = get_list(conf, "dependencies", c()),
       cores = cores,
-      chunk_size = chunk_size
-
+      chunk_size = chunk_size,
+      upsert_at_end_of_each_plan = get_list(conf, "upsert_at_end_of_each_plan", FALSE)
     )
   } else if (conf$type %in% c("analysis", "ui")) {
     task <- Task$new(
@@ -52,47 +77,39 @@ task_from_config <- function(conf) {
       schema = schema,
       dependencies = get_list(conf, "dependencies", c()),
       cores = cores,
-      chunk_size = chunk_size
-
+      chunk_size = chunk_size,
+      upsert_at_end_of_each_plan = get_list(conf, "upsert_at_end_of_each_plan", FALSE)
     )
 
     task$update_plans_fn <- function() {
       table_name <- conf$db_table
       x_plans <- list()
 
-      filters <- list()
-      for (t in names(conf$for_each)) {
-        message(glue::glue("{Sys.time()} Starting pulling plan data for {t} from {table_name}"))
-        if (conf$for_each[t] == "all") {
-          filter <- get_list(conf, "filter", default = "")
-          table <- tbl(table_name)
-          if (filter != "") {
-            table <- table %>% dplyr::filter(!!!rlang::parse_exprs(filter))
-          }
-          options <- table %>%
-            dplyr::distinct(!!as.symbol(t)) %>%
-            dplyr::collect() %>%
-            dplyr::pull(!!as.symbol(t))
-        } else {
-          options <- conf$for_each[[t]]
-        }
-        filters[[t]] <- options
-        message(glue::glue("{Sys.time()} Finished pulling plan data for {t} from {table_name}"))
-      }
+      filters_plan <- get_filters(
+        for_each = conf$for_each_plan,
+        table_name = table_name,
+        filter = get_list(conf, "filter", default = "")
+      )
+      filters_argset <- get_filters(
+        for_each = conf$for_each_argset,
+        table_name = table_name,
+        filter = get_list(conf, "filter", default = "")
+      )
 
-      filters <- do.call(tidyr::crossing, filters)
+      filters_plan <- do.call(tidyr::crossing, filters_plan)
+      filters_argset <- do.call(tidyr::crossing, filters_argset)
 
-      for (i in 1:nrow(filters)) {
+      for (i in 1:nrow(filters_plan)) {
         current_plan <- plnr::Plan$new()
         fs <- c()
         arguments <- list(
-          fn = get(conf$action), name = glue::glue("{name}{i}"),
+          fn = get(conf$action), name = glue::glue("{name}_{i}"),
           source_table = table_name,
           today = Sys.Date()
         )
-        for (n in names(filters)) {
-          arguments[n] <- filters[i, n]
-          fs <- c(fs, glue::glue("{n}=='{filters[i,n]}'"))
+        for (n in names(filters_plan)) {
+          arguments[n] <- filters_plan[i, n]
+          fs <- c(fs, glue::glue("{n}=='{filters_plan[i,n]}'"))
         }
         extra_filter <- get_list(conf, "filter", default = "")
 
@@ -105,7 +122,18 @@ task_from_config <- function(conf) {
         if ("args" %in% names(conf)) {
           arguments <- c(arguments, conf$args)
         }
-        do.call(current_plan$add_analysis, arguments)
+
+        if(nrow(filters_argset)==0){
+          do.call(current_plan$add_analysis, arguments)
+        } else {
+          for(j in 1:nrow(filters_argset)){
+            for (n in names(filters_argset)) {
+              arguments[n] <- filters_argset[j, n]
+            }
+            arguments$name <- glue::glue("{arguments$name}_{j}")
+            do.call(current_plan$add_analysis, arguments)
+          }
+        }
         x_plans[[i]] <- current_plan
       }
       return(x_plans)
@@ -130,9 +158,20 @@ Task <- R6::R6Class(
     dependencies = list(),
     cores = 1,
     chunk_size = 100,
+    upsert_at_end_of_each_plan = FALSE,
     name = NULL,
     update_plans_fn = NULL,
-    initialize = function(name, type, plans=NULL, update_plans_fn=NULL, schema, dependencies = c(), cores = 1, chunk_size = 100) {
+    initialize = function(
+      name,
+      type,
+      plans=NULL,
+      update_plans_fn=NULL,
+      schema,
+      dependencies = c(),
+      cores = 1,
+      chunk_size = 100,
+      upsert_at_end_of_each_plan = FALSE
+      ) {
       self$name <- name
       self$type <- type
       self$plans <- plans
@@ -141,6 +180,7 @@ Task <- R6::R6Class(
       self$cores <- cores
       self$dependencies <- dependencies
       self$chunk_size <- chunk_size
+      self$upsert_at_end_of_each_plan <- upsert_at_end_of_each_plan
     },
     update_plans = function() {
       if (!is.null(self$update_plans_fn)) {
@@ -156,8 +196,12 @@ Task <- R6::R6Class(
       return(retval)
     },
     run = function(log = TRUE, cores = self$cores) {
-      # task <- config$tasks$task_get("analysis_normomo")
+      # task <- tm_get_task("analysis_norsyss_qp_gastro")
+
       message(glue::glue("task: {self$name}"))
+
+      upsert_at_end_of_each_plan <- self$upsert_at_end_of_each_plan
+
       if (log == FALSE | can_run()) {
         self$update_plans()
 
@@ -209,7 +253,12 @@ Task <- R6::R6Class(
           for(s in schema) s$db_connect()
           for(x in self$plans){
             x$set_progress(pb)
-            x$run_all(schema = schema)
+            retval <- x$run_all(schema = schema)
+            if(upsert_at_end_of_each_plan){
+              retval <- rbindlist(retval)
+              schema$output$db_upsert_load_data_infile(retval, verbose=F)
+            }
+            rm("retval")
           }
           for(s in schema) s$db_disconnect()
 
@@ -222,13 +271,17 @@ Task <- R6::R6Class(
           progressr::with_progress(
             {
               pb <- progressr::progressor(steps = self$num_argsets())
-              y <- foreach(x = self$plans, .options.future = list(chunk.size = self$chunk_size)) %dopar% {
+              y <- foreach(x = self$plans) %dopar% {
                 data.table::setDTthreads(1)
 
                 for(s in schema) s$db_connect()
                 x$set_progressor(pb)
-                #x$run_all(schema = schema, chunk_size = self$chunk_size)
-                x$run_all(schema = schema)
+                retval <- x$run_all(schema = schema)
+                if(upsert_at_end_of_each_plan){
+                  retval <- rbindlist(retval)
+                  schema$output$db_upsert_load_data_infile(retval, verbose=F)
+                }
+                rm("retval")
                 for(s in schema) s$db_disconnect()
 
                 #################################
@@ -271,7 +324,7 @@ Task <- R6::R6Class(
       if(curr_date <= last_run_date){
         return(FALSE)
       }
-      
+
       for(dependency in self$dependencies){
         dep_run_date <- get_rundate(task=dependency)
         if(nrow(dep_run_date) == 0){

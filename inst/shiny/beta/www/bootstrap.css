@@ -1,0 +1,56 @@
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-weight: normal;
+    font-family: "CrimsonText", helvetica, arial, sans-serif;
+}
+
+.p, p {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-weight: normal;
+    font-family: "CrimsonText", helvetica, arial, sans-serif;
+}
+
+a {
+  font-family: "CrimsonText", helvetica, arial, sans-serif;
+}
+
+.well {
+  padding: 1rem 1.25rem;
+  border-radius: 0;
+  background-color: #dbe6ec;
+}
+
+.selectize-input,
+.nav-tabs>li>a,
+.irs-from,
+.irs-to,
+.irs-single,
+.irs-min,
+.irs-max {
+  border-radius: 0;
+}
+
+.navbar {
+  color: #fff;
+  border-radius: 0;
+  background-color: #393c61;
+}
+
+.navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a:hover {
+  color: white;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+  color: #393c61;
+  background-color: white;
+}
+
+.navbar-default .navbar-brand {
+  color: white;
+  font-weight: bold;
+  font-family: "CrimsonText", helvetica, arial, sans-serif;
+}
+
+/*#*/

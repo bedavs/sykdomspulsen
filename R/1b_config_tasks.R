@@ -103,14 +103,16 @@ set_tasks <- function() {
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
-        cores = min(6, parallel::detectCores()),
-        chunk_size= 100,
+        cores = min(7, parallel::detectCores()),
+        chunk_size= 1000,
         action = "analysis_qp",
         filter = "tag_outcome=='gastro'",
-        for_each = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
+        for_each_plan = list("age" = "all", "sex" = "Totalt"),
+        for_each_argset = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_qp
         ),
+        upsert_at_end_of_each_plan = TRUE,
         args = list(
           tag = "gastro",
           train_length = 5,
@@ -133,7 +135,7 @@ set_tasks <- function() {
         chunk_size= 100,
         action = "analysis_qp",
         filter = "tag_outcome=='gastro' & (granularity_geo=='county' | granularity_geo=='national')",
-        for_each = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
+        for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
         schema = list(
           output = config$schema$results_qp
         ),
@@ -157,7 +159,7 @@ set_tasks <- function() {
         dependencies = c("data_norsyss"),
         action = "analysis_mem",
         filter = "(granularity_geo=='county' | granularity_geo=='national') & tag_outcome=='influensa'",
-        for_each = list("location_code" = "all"),
+        for_each_plan = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_mem,
           output_limits = config$schema$results_mem_limits
@@ -182,7 +184,7 @@ set_tasks <- function() {
         dependencies = c("data_norsyss"),
         action = "analysis_mem",
         filter = "(granularity_geo=='county' | granularity_geo=='norge') & tag_outcome=='influensa_all'",
-        for_each = list("location_code" = "all"),
+        for_each_plan = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_mem,
           output_limits = config$schema$results_mem_limits
@@ -210,7 +212,7 @@ set_tasks <- function() {
         action = "analysis_simple",
         dependencies = c("data_msis"),
         schema = list(output = config$schema$results_simple),
-        for_each = list("location_code" = "all", "tag_outcome" = c("Kikoste", "Campylobacteriose")),
+        for_each_plan = list("location_code" = "all", "tag_outcome" = c("Kikoste", "Campylobacteriose")),
         args = list(
           group_by = "month",
           past_years = 5
@@ -229,7 +231,7 @@ set_tasks <- function() {
         action = "ui_create_threshold_plot",
         db_table = "results_simple",
         schema = NULL,
-        for_each = list("location_code" = "all", "tag_outcome" = c("Kikoste", "Campylobacteriose")),
+        for_each_plan = list("location_code" = "all", "tag_outcome" = c("Kikoste", "Campylobacteriose")),
         dependencies = c("norsyss_mem_influensa"),
         args = list(
           filename = "{location_code}.png",
@@ -248,7 +250,7 @@ set_tasks <- function() {
         action = "ui_mem_plots",
         db_table = "results_mem",
         schema = NULL,
-        for_each = list(tag_outcome = c("influensa_all")),
+        for_each_plan = list(tag_outcome = c("influensa_all")),
         dependencies = c("norsyss_mem_influensa_all"),
         args = list(
           tag = "influensa",
@@ -270,7 +272,7 @@ set_tasks <- function() {
         action = "ui_mem_plots",
         db_table = "results_mem",
         schema = NULL,
-        for_each = list(tag_outcome = c("influensa")),
+        for_each_plan = list(tag_outcome = c("influensa")),
         dependencies = c("simple_analysis_msis"),
         args = list(
           tag = "influensa",
@@ -383,7 +385,7 @@ set_tasks <- function() {
        action = "ui_normomo_thresholds_1yr_5yr",
        db_table = "results_normomo_standard",
        schema = list(input=config$schema$results_normomo_standard),
-       for_each = list("location_code" = "all", "age" = "all"),
+       for_each_plan = list("location_code" = "all", "age" = "all"),
        dependencies = c("results_normomo_standard"),
        args = list(
          filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
@@ -392,5 +394,35 @@ set_tasks <- function() {
      )
    )
  )
+
+ p <- plnr::Plan$new(use_foreach=T)
+ for(i in 1:30){
+   p$add_analysis(fn = function(data, argset, schema){Sys.sleep(1)})
+ }
+ config$tasks$add_task(
+   Task$new(
+     name = "test_parallel_1",
+     type = "analysis",
+     plans = list(p),
+     schema = c("output" = config$schema$results_normomo_standard),
+     cores = min(6, parallel::detectCores()),
+     chunk_size = 1
+   )
+ )
+
+ config$tasks$add_task(
+   Task$new(
+     name = "test_parallel_2",
+     type = "analysis",
+     plans = list(p,p),
+     schema = c("output" = config$schema$results_normomo_standard),
+     cores = min(6, parallel::detectCores()),
+     chunk_size = 1
+   )
+ )
+
+}
+
+test_parallel <- function(data, argset, schema){
 
 }

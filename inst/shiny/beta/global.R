@@ -51,7 +51,7 @@ GetCols <- function(){
   return(retval)
 }
 
-GLOBAL <- new.env(parent = emptyenv())
+GLOBAL <- new.env()
 val <- pool %>% dplyr::tbl("results_qp") %>%
   dplyr::summarize(date=max(date,na.rm=T)) %>%
   dplyr::collect() %>%
@@ -73,7 +73,7 @@ GLOBAL$dailyAges <- names(sykdomspulsen::config$def$age$norsyss)
 
 
 syndromes_to_include <- c("gastro")
-long_names <- sykdomspulsen::config$def$long_names[syndromes_to_include]
+long_names <- sykdomspulsen::config$def$short_names[syndromes_to_include]
 select_syndromes <- list()
 for(n in names(long_names)){
   select_syndromes[long_names[[n]]] <- n

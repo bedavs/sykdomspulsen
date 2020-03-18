@@ -28,25 +28,25 @@ meminfluensaUI <- function(id, label = "Counter", GLOBAL) {
 meminfluensaServer <- function(input, output, session, GLOBAL) {
   current_season <- fhi::season(GLOBAL$outbreaksyrwk[1], start_week=30)
   seasons <- pool %>%
-    tbl("results_mem") %>%
+    dplyr::tbl("results_mem") %>%
     filter(tag_outcome == "influensa" &
              source == "data_norsyss" &
              !is.na(rp100_baseline_thresholdu0)) %>%
     distinct(season) %>% arrange(desc(season)) %>%
     collect()
-  
+
   output$influensaSeason <- renderUI(selectInput(session$ns("influensaSeason"), "Sesong", as.list(seasons)$season, selected = current_season))
-  
+
   influensa_data <- reactive({
     req(input$influensaCounty)
     req(input$influensaSeason)
-    
+
     x_location <- input$influensaCounty
     x_season <- input$influensaSeason
     data <- pool %>%
-      tbl("results_mem") %>%
+      dplyr::tbl("results_mem") %>%
       filter(season == x_season &
-               source == "data_norsyss" & 
+               source == "data_norsyss" &
                location_code == x_location &
                tag_outcome == "influensa") %>%
       collect()
