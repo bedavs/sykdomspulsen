@@ -1,4 +1,10 @@
 library(pool)
+library(data.table)
+library(magrittr)
+library(ggplot2)
+
+
+format_nor_perc <- function(x) paste0(fhiplot::format_nor(x, digits=1),"%")
 
 db_config <- list(
   driver = Sys.getenv("DB_DRIVER", "MySQL"),
@@ -33,6 +39,8 @@ if(db_config$driver %in% c("ODBC Driver 17 for SQL Server")){
 }
 DBI::dbExecute(pool, glue::glue({"USE {db_config$db};"}))
 
+
+
 config <- new.env()
 config$ages <- list(
   "Totalt",
@@ -44,5 +52,11 @@ config$ages <- list(
   "65+"
 )
 
-config$start_date <- "2020-03-01"
+config$start_date <- as.Date("2020-03-08")
+val <- pool %>% dplyr::tbl("data_norsyss") %>%
+  dplyr::summarize(date = max(date)) %>%
+  dplyr::collect()
+config$max_date_uncertain <- val$date[1]
+config$min_date_uncertain <- config$max_date_uncertain-6
+
 
