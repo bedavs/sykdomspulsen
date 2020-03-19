@@ -392,9 +392,6 @@ data_norsyss <- function(data, argset, schema){
   d[dates,on="x_date", isoyear:=isoyear]
   d[,x_date:=NULL]
 
-  d[, respiratory := NULL]
-  d[, influensa_all := influensa]
-
   # finding dates to run
   max_year_in_data <- fhi::isoyear_n(max(d$date))
 
@@ -403,7 +400,7 @@ data_norsyss <- function(data, argset, schema){
     dplyr::summarise(date = max(date, na.rm=T)) %>%
     dplyr::collect() %>%
     latin1_to_utf8()
-  
+
   if(nrow(max_date)==0){
     max_year_in_db <- 2006
   } else {
