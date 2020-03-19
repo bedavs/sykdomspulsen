@@ -158,7 +158,8 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     "-U",
     db_config$user,
     "-P",
-    db_config$password
+    db_config$password,
+    "-T"
   )
   processx::run(
     "bcp",
@@ -179,7 +180,8 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     "-P",
     db_config$password,
     "-f",
-    format_file
+    format_file,
+    "-T"
   )
   system2(
     "bcp",
@@ -513,7 +515,9 @@ get_db_connection <- function(
         port = port,
         uid = user,
         Pwd = password,
-        encoding = "utf8"
+        encoding = "utf8",
+        trusted_connection="yes",
+        database = db_config$db
       ))
   } else {
     return(
@@ -533,7 +537,7 @@ get_db_connection <- function(
 #' @param table table
 #' @param db db
 #' @export
-tbl <- function(table, db = "sykdomspuls") {
+tbl <- function(table, db = "Sykdomspulsen_surv") {
   if (is.null(connections[[db]])) {
     connections[[db]] <- get_db_connection()
     use_db(connections[[db]], db)
@@ -544,7 +548,7 @@ tbl <- function(table, db = "sykdomspuls") {
 #' list_tables
 #' @param db db
 #' @export
-list_tables <- function(db = "sykdomspuls") {
+list_tables <- function(db = "Sykdomspulsen_surv") {
   if (is.null(connections[[db]])) {
     connections[[db]] <- get_db_connection()
     use_db(connections[[db]], db)
@@ -557,7 +561,7 @@ list_tables <- function(db = "sykdomspuls") {
 #' @param table table
 #' @param db db
 #' @export
-drop_table <- function(table, db = "sykdomspuls") {
+drop_table <- function(table, db = "Sykdomspulsen_surv") {
   if (is.null(connections[[db]])) {
     connections[[db]] <- get_db_connection()
     use_db(connections[[db]], db)

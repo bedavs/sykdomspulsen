@@ -8,6 +8,8 @@
 #'
 #' @export
 data_pre_norsyss <- function(data, argset, schema){
+  # tm_run_task("data_pre_norsyss")
+
   sykdomspuls_aggregate(
     date_from = argset$date_from,
     date_to = format(Sys.time(), "%Y-%m-%d"),
@@ -37,6 +39,7 @@ takstkoder <- list(
   "11ak" = "Legekontakt",
   "1ad" = "Telefonkontakt",
   "1ak" = "Telefonkontakt",
+  "1be" = "Ekonsultasjon",
   "1bd" = "Telefonkontakt",
   "1bk" = "Telefonkontakt",
   "1g" = "Telefonkontakt",
@@ -54,7 +57,7 @@ takstkoder <- list(
 
 # Any other municip numbers not in config for sykdomspulsen will be set to 9999
 #Bydels number also exist for these codes (see docoumentation)
-nav_to_freg = list(
+nav_to_freg <- list(
   "312" = 301,
   "313" = 301,
   "314" = 301,
@@ -90,16 +93,15 @@ nav_to_freg = list(
 
 
 
-
 sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   d[, influensa := 0]
   d[Diagnose %in% "R80", influensa := 1]
 
+  d[, influensa_all := 0]
+  d[Diagnose %in% "R80", influensa_all := 1]
+
   d[, gastro := 0]
   d[Diagnose %in% c("D11", "D70", "D73"), gastro := 1]
-
-  d[, respiratory := 0]
-  d[Diagnose %in% c("R05", "R74", "R78", "R83"), respiratory := 1]
 
   d[, respiratoryexternal := 0]
   d[Diagnose %in% c("R05", "R74", "R78", "R83"), respiratoryexternal := 1]
@@ -116,21 +118,45 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   d[, skabb := 0]
   d[Diagnose %in% "S72", skabb := 1]
 
-  ####
-  d[, emerg1 := 0]
-  d[Diagnose %in% "R80", emerg1 := 1]
+  # included because of covid19
+  d[, hoste := 0]
+  d[Diagnose %in% "R05", hoste := 1]
 
-  d[, emerg2 := 0]
-  d[Diagnose %in% "R80", emerg2 := 1]
+  d[, akkut_ovre_luftveisinfeksjon := 0]
+  d[Diagnose %in% "R74", akkut_ovre_luftveisinfeksjon := 1]
 
-  d[, emerg3 := 0]
-  d[Diagnose %in% "R80", emerg3 := 1]
+  d[, luftveisinfeksjon_ika := 0]
+  d[Diagnose %in% "R83", luftveisinfeksjon_ika := 1]
 
-  d[, emerg4 := 0]
-  d[Diagnose %in% "R80", emerg4 := 1]
+  d[, luftveissykdom_ika := 0]
+  d[Diagnose %in% "R99", luftveissykdom_ika := 1]
 
-  d[, emerg5 := 0]
-  d[Diagnose %in% "R80", emerg5 := 1]
+  d[, virusinfeksjon_ika := 0]
+  d[Diagnose %in% "A77", virusinfeksjon_ika := 1]
+
+  d[, rxx_for_covid19 := 0]
+  d[stringr::str_detect(Diagnose, "^R"), rxx_for_covid19 := 1]
+  d[Diagnose %in% c(
+    "R26", # Engstelig for kreft luftveier
+    "R71", # Kikhoste
+    "R73", # Nesebyll
+    "R80", # Influensa
+    "R84", # Ondartet svulst bronkie/lunge
+    "R85", # Ondartet svulst luftveier
+
+    "R86", # Godartet svulst luftveier
+    "R87", # Fremmedlegme i nese/larynx/brinkie
+    "R88", # Skade luftveier IKA
+    "R89", # Medfødt feil luftveier
+    "R89", # Medfødt feil luftveier
+    "R90", # Hypertrofi tonsiller/adenoid vev
+    "R92", # Uspesifisert svulst luftveier
+    "R95", # Kronisk obstruktiv lungesykdom
+    "R96" # Astma
+  ), rxx_for_covid19 := 0]
+
+  d[, covid19 := 0]
+  d[Diagnose %in% "R991", covid19 := 1]
 
 
   ### Praksis
@@ -169,28 +195,30 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
 
   #Fixing behandler kommune nummer
   for(old in names(nav_to_freg)){
-
     d[as.character(BehandlerKommune) == old, BehandlerKommune:=nav_to_freg[old]]
-
   }
 
-  
+
 
   # Collapsing it down to 1 row per consultation
   d <- d[, .(
     influensa = sum(influensa),
+    influensa_all = sum(influensa_all),
     gastro = sum(gastro),
-    respiratory = sum(respiratory),
     respiratoryexternal = sum(respiratoryexternal),
     respiratoryinternal = sum(respiratoryinternal),
     lungebetennelse = sum(lungebetennelse),
     bronkitt = sum(bronkitt),
     skabb = sum(skabb),
-    emerg1 = sum(emerg1),
-    emerg2 = sum(emerg2),
-    emerg3 = sum(emerg3),
-    emerg4 = sum(emerg4),
-    emerg5 = sum(emerg5)
+
+    hoste = sum(hoste),
+    akkut_ovre_luftveisinfeksjon = sum(akkut_ovre_luftveisinfeksjon),
+    luftveisinfeksjon_ika = sum(luftveisinfeksjon_ika),
+    luftveissykdom_ika = sum(luftveissykdom_ika),
+    virusinfeksjon_ika = sum(virusinfeksjon_ika),
+    rxx_for_covid19 = sum(rxx_for_covid19),
+
+    covid19 = sum(covid19)
   ),
   by = .(
     Id,
@@ -205,18 +233,23 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   # Collapsing it down to 1 row per kommune/age/day
   d <- d[, .(
     influensa = sum(influensa),
+    influensa_all = sum(influensa_all),
     gastro = sum(gastro),
-    respiratory = sum(respiratory),
     respiratoryexternal = sum(respiratoryexternal),
     respiratoryinternal = sum(respiratoryinternal),
     lungebetennelse = sum(lungebetennelse),
     bronkitt = sum(bronkitt),
     skabb = sum(skabb),
-    emerg1 = sum(emerg1),
-    emerg2 = sum(emerg2),
-    emerg3 = sum(emerg3),
-    emerg4 = sum(emerg4),
-    emerg5 = sum(emerg5),
+
+    hoste = sum(hoste),
+    akkut_ovre_luftveisinfeksjon = sum(akkut_ovre_luftveisinfeksjon),
+    luftveisinfeksjon_ika = sum(luftveisinfeksjon_ika),
+    luftveissykdom_ika = sum(luftveissykdom_ika),
+    virusinfeksjon_ika = sum(virusinfeksjon_ika),
+    rxx_for_covid19 = sum(rxx_for_covid19),
+
+    covid19 = sum(covid19),
+
     consult = .N
   ),
   by = .(
@@ -249,7 +282,7 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
 sykdomspuls_aggregate <- function(
                                   date_from = "2018-01-01",
                                   date_to = lubridate::today(),
-                                  folder = "/mount/work/projects/",
+                                  folder = "/input/norsyss/",
                                   ages = c(
                                     "0-4" = "0-4",
                                     "5-14" = "5-9",
@@ -320,7 +353,7 @@ sykdomspuls_aggregate <- function(
 #' @param folder a
 #' @import data.table
 #' @export
-get_n_doctors <- function(folder) {
+get_n_doctors <- function(folder = "/input/norsyss/") {
   db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
   res <- RODBC::sqlQuery(db, 'select count(distinct(Behandler_Id)) as behandlere, DATEPART("ISO_WEEK", Konsultasjonsdato) as week ,DATEPART("YEAR", Konsultasjonsdato) as year from Konsultasjon group by DATEPART("ISO_WEEK", Konsultasjonsdato) ,DATEPART("YEAR", Konsultasjonsdato)')
   setDT(res)

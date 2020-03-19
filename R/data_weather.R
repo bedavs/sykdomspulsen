@@ -207,6 +207,7 @@ thredds_get_forecast <- function() {
 #'
 #'
 data_weather <- function(data, argset, schema) {
+  # tm_run_task("data_weather")
 
   weather <- schema$output
 

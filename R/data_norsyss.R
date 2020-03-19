@@ -164,11 +164,6 @@ CleanData <- function(d,
   dates[, season := fhi::season(yrwk)]
   dates[, x := fhi::x(week)]
   dates <- dates[year >= 2006]
-
-  # delete last day of data if it is not a sunday
-  if (format.Date(max(dates$datex), "%u") != 7) {
-    dates <- dates[yrwk != max(yrwk)]
-  }
   dates[, datex := NULL]
   #dates[, yrwk := NULL]
   data <- merge(data, dates, by = "date")
@@ -361,6 +356,7 @@ IdentifyDatasets <-
 #'
 #' @export
 data_norsyss <- function(data, argset, schema){
+  # tm_run_task("data_norsyss")
   # argset <- tm_get_argset("data_norsyss")
   # schema <- tm_get_schema("data_norsyss")
   syndromes <- argset$syndromes
@@ -392,9 +388,6 @@ data_norsyss <- function(data, argset, schema){
   d[dates,on="x_date", isoyear:=isoyear]
   d[,x_date:=NULL]
 
-  d[, respiratory := NULL]
-  d[, influensa_all := influensa]
-
   # finding dates to run
   max_year_in_data <- fhi::isoyear_n(max(d$date))
 
@@ -403,7 +396,7 @@ data_norsyss <- function(data, argset, schema){
     dplyr::summarise(date = max(date, na.rm=T)) %>%
     dplyr::collect() %>%
     latin1_to_utf8()
-  
+
   if(nrow(max_date)==0){
     max_year_in_db <- 2006
   } else {
