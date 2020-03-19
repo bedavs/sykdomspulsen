@@ -78,8 +78,8 @@ set_tasks <- function() {
               contactType = list(c("Legekontakt", "Telefonkontakt"))
             ),
             data.table(
-              tag = "covid2019",
-              syndrome = "covid2019",
+              tag = "covid19",
+              syndrome = "covid19",
               contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
             )
           )
