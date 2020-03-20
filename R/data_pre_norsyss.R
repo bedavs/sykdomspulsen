@@ -155,6 +155,9 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   d[, covid19 := 0]
   d[Diagnose %in% "R991", covid19 := 1]
 
+  d[, engstelig_luftveissykdom_ika := 0]
+  d[Diagnose %in% "R27", engstelig_luftveissykdom_ika := 1]
+
 
   ### Praksis
 
@@ -200,7 +203,6 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   # Collapsing it down to 1 row per consultation
   d <- d[, .(
     influensa = sum(influensa),
-    influensa_all = sum(influensa_all),
     gastro = sum(gastro),
     respiratoryexternal = sum(respiratoryexternal),
     respiratoryinternal = sum(respiratoryinternal),
@@ -230,7 +232,6 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   # Collapsing it down to 1 row per kommune/age/day
   d <- d[, .(
     influensa = sum(influensa),
-    influensa_all = sum(influensa_all),
     gastro = sum(gastro),
     respiratoryexternal = sum(respiratoryexternal),
     respiratoryinternal = sum(respiratoryinternal),

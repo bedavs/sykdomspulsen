@@ -11,7 +11,7 @@ set_tasks <- function() {
         action = "data_pre_norsyss",
         schema = list(),
         args = list(
-          date_from = "2017-01-01"
+          date_from = "2014-01-01"
         )
       )
     )
@@ -63,11 +63,6 @@ set_tasks <- function() {
         args = list(
           syndromes = rbind(
             data.table(
-              tag_input = "gastro",
-              tag_output = "gastro_lt",
-              contactType = list(c("Legekontakt", "Telefonkontakt"))
-            ),
-            data.table(
               tag_input = "influensa",
               tag_output = "influensa_l",
               contactType = list("Legekontakt")
@@ -75,6 +70,21 @@ set_tasks <- function() {
             data.table(
               tag_input = "influensa",
               tag_output = "influensa_lt",
+              contactType = list(c("Legekontakt", "Telefonkontakt"))
+            ),
+            data.table(
+              tag_input = "gastro",
+              tag_output = "gastro_lt",
+              contactType = list(c("Legekontakt", "Telefonkontakt"))
+            ),
+            data.table(
+              tag_input = "respiratoryinternal",
+              tag_output = "respiratoryinternal_lt",
+              contactType = list(c("Legekontakt", "Telefonkontakt"))
+            ),
+            data.table(
+              tag_input = "respiratoryexternal",
+              tag_output = "respiratoryexternal_lt",
               contactType = list(c("Legekontakt", "Telefonkontakt"))
             ),
 
@@ -121,14 +131,14 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "analysis_norsyss_qp_gastro",
+        name = "analysis_norsyss_qp_weekly_gastro",
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
         cores = min(7, parallel::detectCores()),
         chunk_size= 1000,
         action = "analysis_qp",
-        filter = "tag_outcome=='gastro'",
+        filter = "tag_outcome=='gastro_lt'",
         for_each_plan = list("age" = "all", "sex" = "Totalt"),
         for_each_argset = list("location_code" = "all"),
         schema = list(
@@ -136,7 +146,7 @@ set_tasks <- function() {
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
-          tag = "gastro",
+          tag = "gastro_lt",
           train_length = 5,
           years = c(2018, 2019, 2020),
           weeklyDenominatorFunction = sum,
@@ -149,20 +159,20 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "analysis_norsyss_qp_gastro_daily",
+        name = "analysis_norsyss_qp_daily_gastro",
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
         cores = min(6, parallel::detectCores()),
         chunk_size= 100,
         action = "analysis_qp",
-        filter = "tag_outcome=='gastro' & (granularity_geo=='county' | granularity_geo=='national')",
+        filter = "tag_outcome=='gastro_lt' & (granularity_geo=='county' | granularity_geo=='national')",
         for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
         schema = list(
           output = config$schema$results_qp
         ),
         args = list(
-          tag = "gastro",
+          tag = "gastro_lt",
           train_length = 5,
           years = c(2018, 2019, 2020),
           weeklyDenominatorFunction = sum,
@@ -172,6 +182,62 @@ set_tasks <- function() {
       )
     )
   )
+
+  config$tasks$add_task(
+    task_from_config(
+      conf = list(
+        name = "analysis_norsyss_qp_weekly_respiratoryexternal_lt",
+        db_table = "data_norsyss",
+        type = "analysis",
+        dependencies = c("data_norsyss"),
+        cores = min(7, parallel::detectCores()),
+        chunk_size= 1000,
+        action = "analysis_qp",
+        filter = "tag_outcome=='respiratoryexternal_lt'",
+        for_each_plan = list("age" = "all", "sex" = "Totalt"),
+        for_each_argset = list("location_code" = "all"),
+        schema = list(
+          output = config$schema$results_qp
+        ),
+        upsert_at_end_of_each_plan = TRUE,
+        args = list(
+          tag = "respiratoryexternal_lt",
+          train_length = 5,
+          years = c(2018, 2019, 2020),
+          weeklyDenominatorFunction = sum,
+          denominator = "consult_without_influenza",
+          granularity_time = "weekly"
+        )
+      )
+    )
+  )
+  config$tasks$add_task(
+    task_from_config(
+      conf = list(
+        name = "analysis_norsyss_qp_daily_respiratoryexternal_lt",
+        db_table = "data_norsyss",
+        type = "analysis",
+        dependencies = c("data_norsyss"),
+        cores = min(6, parallel::detectCores()),
+        chunk_size= 100,
+        action = "analysis_qp",
+        filter = "tag_outcome=='respiratoryexternal_lt' & (granularity_geo=='county' | granularity_geo=='national')",
+        for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
+        schema = list(
+          output = config$schema$results_qp
+        ),
+        args = list(
+          tag = "respiratoryexternal_lt",
+          train_length = 5,
+          years = c(2018, 2019, 2020),
+          weeklyDenominatorFunction = sum,
+          denominator = "consult_without_influenza",
+          granularity_time = "daily"
+        )
+      )
+    )
+  )
+
   config$tasks$add_task(
     task_from_config(
       list(
