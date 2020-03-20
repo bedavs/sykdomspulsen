@@ -63,23 +63,40 @@ set_tasks <- function() {
         args = list(
           syndromes = rbind(
             data.table(
-              tag = "gastro",
-              syndrome = "gastro",
+              tag_input = "gastro",
+              tag_output = "gastro_lt",
               contactType = list(c("Legekontakt", "Telefonkontakt"))
             ),
             data.table(
-              tag = "influensa",
-              syndrome = "influensa",
+              tag_input = "influensa",
+              tag_output = "influensa_l",
               contactType = list("Legekontakt")
             ),
             data.table(
-              tag = "influensa_all",
-              syndrome = "influensa_all",
+              tag_input = "influensa",
+              tag_output = "influensa_lt",
               contactType = list(c("Legekontakt", "Telefonkontakt"))
             ),
+
+            # lte
             data.table(
-              tag = "covid19",
-              syndrome = "covid19",
+              tag_input = "covid19",
+              tag_output = "covid19_lte",
+              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
+            ),
+            data.table(
+              tag_input = "influensa",
+              tag_output = "influensa_lte",
+              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
+            ),
+            data.table(
+              tag_input = "rxx_for_covid19",
+              tag_output = "rxx_for_covid19_lte",
+              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
+            ),
+            data.table(
+              tag_input = "akkut_ovre_luftveisinfeksjon",
+              tag_output = "akkut_ovre_luftveisinfeksjon_lte",
               contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
             )
           )

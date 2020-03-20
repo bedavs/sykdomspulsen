@@ -97,9 +97,6 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
   d[, influensa := 0]
   d[Diagnose %in% "R80", influensa := 1]
 
-  d[, influensa_all := 0]
-  d[Diagnose %in% "R80", influensa_all := 1]
-
   d[, gastro := 0]
   d[Diagnose %in% c("D11", "D70", "D73"), gastro := 1]
 

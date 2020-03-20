@@ -411,13 +411,13 @@ data_norsyss <- function(data, argset, schema){
 
   for (i in 1:nrow(syndromes)) {
     conf <- syndromes[i]
-    fd::msg(sprintf("Processing %s/%s: %s", i, nrow(syndromes), conf$tag))
+    msg(sprintf("Processing %s/%s: %s -> %s", i, nrow(syndromes), conf$tag_input, conf$tag_output))
 
     res <- CleanData(
       d = copy(d[isoyear %in% years_to_process & Kontaktype %in% conf$contactType[[1]]]),
-      syndrome = conf$syndrome
+      syndrome = conf$tag_input
     )
-    res[, tag_outcome:=conf$tag]
+    res[, tag_outcome:=conf$tag_output]
     res[, gender:="Totalt"]
 
     schema$output$db_load_data_infile(res)

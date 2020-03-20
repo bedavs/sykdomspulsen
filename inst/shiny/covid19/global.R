@@ -3,6 +3,7 @@ library(data.table)
 library(magrittr)
 library(ggplot2)
 
+system("/bin/authenticate.sh")
 
 format_nor_perc <- function(x) paste0(fhiplot::format_nor(x, digits=1),"%")
 

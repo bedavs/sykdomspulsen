@@ -103,7 +103,7 @@ overview_server <- function(input, output, session, config) {
   output$overview_plot_national_syndromes_proportion <- renderCachedPlot({
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19") %>%
+      dplyr::filter(tag_outcome == "covid19_lte") %>%
       dplyr::filter(location_code=="norge") %>%
       dplyr::filter(age=="Totalt") %>%
       dplyr::collect()
@@ -140,7 +140,7 @@ overview_server <- function(input, output, session, config) {
   output$overview_plot_county_proportion <- renderCachedPlot({
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19") %>%
+      dplyr::filter(tag_outcome == "covid19_lte") %>%
       dplyr::filter(granularity_geo=="county") %>%
       dplyr::filter(age=="Totalt") %>%
       dplyr::collect()
@@ -198,7 +198,7 @@ overview_server <- function(input, output, session, config) {
   output$overview_plot_national_age_numbers <- renderCachedPlot({
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19") %>%
+      dplyr::filter(tag_outcome == "covid19_lte") %>%
       dplyr::filter(location_code=="norge") %>%
       dplyr::collect()
     setDT(pd)
@@ -251,7 +251,7 @@ overview_server <- function(input, output, session, config) {
   output$overview_plot_national_age_proportion <- renderCachedPlot({
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19") %>%
+      dplyr::filter(tag_outcome == "covid19_lte") %>%
       dplyr::filter(location_code=="norge") %>%
       dplyr::collect()
     setDT(pd)
@@ -302,7 +302,7 @@ overview_server <- function(input, output, session, config) {
   output$overview_plot_county_numbers <- renderCachedPlot({
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19") %>%
+      dplyr::filter(tag_outcome == "covid19_lte") %>%
       dplyr::filter(granularity_geo=="county") %>%
       dplyr::filter(age=="Totalt") %>%
       dplyr::collect()
