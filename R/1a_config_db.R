@@ -243,8 +243,8 @@ set_db <- function(){
         "age"
       )
     ),
-    results_qp = schema$new(
-      db_table = "results_qp",
+    results_norsyss_standard = schema$new(
+      db_table = "results_norsyss_standard",
       db_config = config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",

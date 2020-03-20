@@ -4,20 +4,28 @@ library(shiny)
 shinyOptions(cache = diskCache("/tmp/", max_size = 50e6))
 
 source("global.R")
-source("overview.R")
+source("norsyss.R")
+source("covid19.R")
 
-ui <- navbarPage("Sykdomspulsen/COVID-19",
-  tabPanel("Oversikt",
-    overview_ui("overview", config=config)
+ui <- navbarPage(
+  "Sykdomspulsen",
+  tabPanel("NorSySS",
+    norsyss_ui("norsyss", config=config)
+  ),
+  tabPanel("COVID-19",
+    covid19_ui("covid19", config=config)
   )
 )
 
 server <- function(input, output) {
-  callModule(overview_server, "overview", config=config)
+  callModule(norsyss_server, "norsyss", config=config)
+  callModule(covid19_server, "covid19", config=config)
 }
 
 
 shinyApp(ui, server)
 
 #  shiny::runApp('inst/shiny/corona', port = 4989, host = "0.0.0.0")
+
+
 
