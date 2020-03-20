@@ -147,7 +147,7 @@ set_tasks <- function() {
         for_each_plan = list("age" = "all", "sex" = "Totalt"),
         for_each_argset = list("location_code" = "all"),
         schema = list(
-          output = config$schema$results_qp
+          output = config$schema$results_norsyss_standard
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
@@ -174,8 +174,9 @@ set_tasks <- function() {
         filter = "tag_outcome=='gastro_lt' & (granularity_geo=='county' | granularity_geo=='national')",
         for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
         schema = list(
-          output = config$schema$results_qp
+          output = config$schema$results_norsyss_standard
         ),
+        upsert_at_end_of_each_plan = TRUE,
         args = list(
           tag = "gastro_lt",
           train_length = 5,
@@ -202,7 +203,7 @@ set_tasks <- function() {
         for_each_plan = list("age" = "all", "sex" = "Totalt"),
         for_each_argset = list("location_code" = "all"),
         schema = list(
-          output = config$schema$results_qp
+          output = config$schema$results_norsyss_standard
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
@@ -229,8 +230,9 @@ set_tasks <- function() {
         filter = "tag_outcome=='respiratoryexternal_lt' & (granularity_geo=='county' | granularity_geo=='national')",
         for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
         schema = list(
-          output = config$schema$results_qp
+          output = config$schema$results_norsyss_standard
         ),
+        upsert_at_end_of_each_plan = TRUE,
         args = list(
           tag = "respiratoryexternal_lt",
           train_length = 5,
@@ -384,7 +386,7 @@ set_tasks <- function() {
       list(
         name = "ui_external_api",
         type = "data",
-        schema=list(input=config$schema$results_qp),
+        schema=list(input=config$schema$results_norsyss_standard),
         action="ui_external_api",
         args = list(
           tags = c("gastro"),
@@ -400,7 +402,7 @@ set_tasks <- function() {
       list(
         name = "ui_alert_pdf",
         type = "data",
-        schema=list(input=config$schema$results_qp),
+        schema=list(input=config$schema$results_norsyss_standard),
         action="ui_alert_pdf",
         args = list(
           tags = c("gastro"),
@@ -415,7 +417,7 @@ set_tasks <- function() {
       list(
         name = "ui_norsyss_pdf",
         type = "data",
-        schema=list(input=config$schema$results_qp),
+        schema=list(input=config$schema$results_norsyss_standard),
         action="ui_norsyss_pdf",
         args = list(
           tags = c("gastro"),
@@ -428,9 +430,9 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       list(
-        name = "ui_archive_results_qp",
+        name = "ui_archive_results_norsyss_standard",
         type = "data",
-        schema=list(input=config$schema$results_qp),
+        schema=list(input=config$schema$results_norsyss_standard),
         action="ui_archive_results",
         args = list(
           folder = "norsyss_qp",
@@ -444,7 +446,7 @@ set_tasks <- function() {
       list(
         name = "ui_obsmail_norsyss",
         type = "data",
-        schema=list(input=config$schema$results_qp),
+        schema=list(input=config$schema$results_norsyss_standard),
         action="ui_obsmail",
         args = list(
           folder = "norsyss_qp",

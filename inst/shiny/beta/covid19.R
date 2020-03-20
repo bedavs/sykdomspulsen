@@ -1,4 +1,4 @@
-overview_ui <- function(id, config) {
+covid19_ui <- function(id, config) {
   ns <- NS(id)
   tagList(
     fluidRow(
@@ -55,7 +55,7 @@ overview_ui <- function(id, config) {
     fluidRow(
       column(
         width=10, align="center",
-        plotOutput(ns("overview_plot_county_proportion"), height = "800px")
+        plotOutput(ns("overview_plot_county_proportion"), height = "900px")
       ),
       column(
         width=2,
@@ -98,24 +98,24 @@ overview_ui <- function(id, config) {
   )
 }
 
-overview_server <- function(input, output, session, config) {
+covid19_server <- function(input, output, session, config) {
 
   output$overview_plot_national_syndromes_proportion <- renderCachedPlot({
-    d <- pool %>% dplyr::tbl("data_norsyss") %>%
+    pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(tag_outcome %in% c(
         "covid19_lte",
         "influensa_lte",
         "rxx_for_covid19_lte",
         "akkut_ovre_luftveisinfeksjon_lte"
       )) %>%
-      dplyr::filter(date >= "2020-03-08") %>%
+      dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age >= "Totalt") %>%
       dplyr::filter(location_code >= "norge") %>%
       dplyr::collect()
-    setDT(d)
+    setDT(pd)
 
-    d[, andel := 100*n/consult_with_influenza]
-    d[, name_outcome := factor(
+    pd[, andel := 100*n/consult_with_influenza]
+    pd[, name_outcome := factor(
       tag_outcome,
       levels = c(
         "covid19_lte",
@@ -131,7 +131,7 @@ overview_server <- function(input, output, session, config) {
       )
     )]
 
-    q <- ggplot(d, aes(x=date, y=andel, color=name_outcome))
+    q <- ggplot(pd, aes(x=date, y=andel, color=name_outcome))
     q <- q + geom_line(size=2)
     q <- q + scale_y_continuous(
       "Andel",
@@ -140,9 +140,91 @@ overview_server <- function(input, output, session, config) {
       labels = format_nor_perc
     )
     q <- q + expand_limits(y = 0)
-    q <- q + scale_x_date("Dato")
+    q <- q + scale_x_date("Dato", date_labels = "%d.%m")
     q <- q + fhiplot::scale_color_fhi("Syndrome")
     q <- q + fhiplot::theme_fhi_lines(20)
+    q <- q + theme(legend.key.size = unit(1, "cm"))
+    q <- q + labs(title="Andel konsultasjoner i Norge")
+    q <- q + labs(caption=glue::glue(
+      "Nevneren er totalt antall konsultasjoner\n",
+      "*R26, R71, R73, R80, R84, R85, R86, R87, R88, R89, R89, R90, R92, R95 og R96"
+    ))
+    q
+  }, cacheKeyExpr={list(
+    lubridate::now(),
+    lubridate::today(),
+    input$overview_age
+  )})
+
+  output$overview_plot_county_proportion <- renderCachedPlot({
+    pd <- pool %>% dplyr::tbl("data_norsyss") %>%
+      dplyr::filter(tag_outcome %in% c(
+        "covid19_lte",
+        "influensa_lte",
+        "rxx_for_covid19_lte",
+        "akkut_ovre_luftveisinfeksjon_lte"
+      )) %>%
+      dplyr::filter(date >= !!config$start_date) %>%
+      dplyr::filter(age >= "Totalt") %>%
+      dplyr::filter(granularity_geo=="county") %>%
+      dplyr::collect()
+    setDT(pd)
+
+    pd[
+      fhidata::norway_locations_b2020,
+      on="location_code==county_code",
+      location_name:=county_name
+      ]
+
+    pd[, andel := 100*n/consult_with_influenza]
+    pd[, name_outcome := factor(
+      tag_outcome,
+      levels = c(
+        "covid19_lte",
+        "influensa_lte",
+        "akkut_ovre_luftveisinfeksjon_lte",
+        "rxx_for_covid19_lte"
+      ),
+      labels = c(
+        "COVID-19 liknenede symptomer (R99.1)",
+        "Influensa (R80)",
+        "Akutt øvre luftveisinfeksjon (R74)",
+        "Luftvei diagnosekoder (samlet*)"
+      )
+    )]
+
+    labels <- pd[date == max(date) & tag_outcome=="covid19_lte"]
+    labels[,lab := paste0("R991: ",format_nor_perc(andel))]
+
+    max_val <- max(pd$andel)
+
+    q <- ggplot(pd, aes(x=date, y=andel))
+    q <- q + geom_line(mapping=aes(color=name_outcome),size=1)
+    q <- q + geom_line(data=pd[tag_outcome %in% c("covid19_lte")],mapping=aes(color=name_outcome),size=3.5)
+    q <- q + ggrepel::geom_label_repel(
+      data = labels,
+      mapping = aes(label = lab, y=max_val),
+      nudge_y = 0.0,
+      nudge_x = 0.0,
+      direction = "y",
+      angle = 0,
+      vjust = 0,
+      hjust = 0,
+      label.r=0,
+      segment.size = 0.2,
+      size=6
+    )
+    q <- q + lemon::facet_rep_wrap(~location_name, repeat.tick.labels = "y", ncol=3)
+    q <- q + scale_y_continuous(
+      "Andel",
+      breaks = fhiplot::pretty_breaks(6),
+      expand = expand_scale(mult = c(0, 0.1)),
+      labels = format_nor_perc
+    )
+    q <- q + expand_limits(y = 0)
+    q <- q + scale_x_date("Dato", date_labels = "%d.%m")
+    q <- q + fhiplot::scale_color_fhi("Syndrome")
+    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + labs(title="Andel konsultasjoner i Norge")
     q <- q + labs(caption=glue::glue(
@@ -196,7 +278,7 @@ overview_server <- function(input, output, session, config) {
       breaks = fhiplot::pretty_breaks(6),
       expand = expand_scale(mult = c(0, 0.1))
     )
-    q <- q + scale_x_date("Dato")
+    q <- q + scale_x_date("Dato", date_labels = "%d.%m")
     q <- q + fhiplot::scale_color_fhi("Aldersgruppe")
     q <- q + fhiplot::theme_fhi_lines(20)
     q <- q + theme(legend.key.size = unit(1, "cm"))
@@ -247,7 +329,7 @@ overview_server <- function(input, output, session, config) {
       expand = expand_scale(mult = c(0, 0.1)),
       labels = format_nor_perc
     )
-    q <- q + scale_x_date("Dato")
+    q <- q + scale_x_date("Dato", date_labels = "%d.%m")
     q <- q + fhiplot::scale_color_fhi("Aldersgruppe")
     q <- q + fhiplot::theme_fhi_lines(20)
     q <- q + theme(legend.key.size = unit(1, "cm"))
@@ -315,7 +397,8 @@ overview_server <- function(input, output, session, config) {
     )
     q <- q + scale_x_date(
       "Dato",
-      lim = c(config$start_date, config$max_date_uncertain + 4)
+      lim = c(config$start_date, config$max_date_uncertain + 4),
+      date_labels = "%d.%m"
     )
     q <- q + fhiplot::scale_color_fhi("Fylke", guide="none")
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = FALSE)
