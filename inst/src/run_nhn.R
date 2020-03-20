@@ -1,3 +1,6 @@
 sykdomspulsen::tm_run_task("data_pre_norsyss")
 sykdomspulsen::tm_run_task("data_norsyss")
-sykdomspulsen::tm_run_task("analysis_norsyss_qp_weekly_gastro")
+sykdomspulsen::tm_run_task("analysis_norsyss_qp_weekly_gastro_lt")
+sykdomspulsen::tm_run_task("analysis_norsyss_qp_daily_gastro_lt")
+sykdomspulsen::tm_run_task("analysis_norsyss_qp_weekly_respiratoryexternal_lt")
+sykdomspulsen::tm_run_task("analysis_norsyss_qp_daily_respiratoryexternal_lt")

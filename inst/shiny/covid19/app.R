@@ -21,4 +21,3 @@ shinyApp(ui, server)
 
 #  shiny::runApp('inst/shiny/corona', port = 4989, host = "0.0.0.0")
 
-

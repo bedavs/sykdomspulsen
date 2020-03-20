@@ -108,6 +108,11 @@ set_tasks <- function() {
               tag_input = "akkut_ovre_luftveisinfeksjon",
               tag_output = "akkut_ovre_luftveisinfeksjon_lte",
               contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
+            ),
+            data.table(
+              tag_input = "engstelig_luftveissykdom_ika",
+              tag_output = "engstelig_luftveissykdom_ika_lte",
+              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon"))
             )
           )
         )
@@ -131,7 +136,7 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "analysis_norsyss_qp_weekly_gastro",
+        name = "analysis_norsyss_qp_weekly_gastro_lt",
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
@@ -159,7 +164,7 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "analysis_norsyss_qp_daily_gastro",
+        name = "analysis_norsyss_qp_daily_gastro_lt",
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
