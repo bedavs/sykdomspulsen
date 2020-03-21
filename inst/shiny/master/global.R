@@ -60,4 +60,8 @@ val <- pool %>% dplyr::tbl("data_norsyss") %>%
 config$max_date_uncertain <- val$date[1]
 config$min_date_uncertain <- config$max_date_uncertain-6
 
+x <- pool %>% dplyr::tbl("data_norsyss") %>%
+  dplyr::distinct(tag_outcome) %>%
+  dplyr::collect()
+
 

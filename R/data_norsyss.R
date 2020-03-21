@@ -1,36 +1,3 @@
-#' Validate raw data
-#' @param d Dataset to validate
-#' @export ValidateDataRaw
-ValidateDataRaw <- function(d, syndrome) {
-  # names(d) must contain all required variables
-  vars <-  c( "age",
-             "date",
-             "Kontaktype",
-             "Praksis",
-             "municip",
-             syndrome,
-             "consult"
-  )
-  n <- vars[!vars %in% names(d)]
-  if (length(n) > 0) {
-    for (i in n) {
-      fd::msg(sprintf("%s not in names(d)", i))
-    }
-    return(FALSE)
-  }
-
-  ## # there must not be any extra variables in names(d)
-  ## n <- names(d)[!names(d) %in% VARS$REQ_DATA_RAW]
-  ## if (sum(!names(d) %in% VARS$REQ_DATA_RAW) > 0) {
-  ##   for (i in n) {
-  ##     fd::msg(sprintf("%s not in VARS$REQ_DATA_RAW", i))
-  ##   }
-  ##   fd::msg("Variables in names(d) not in VARS$REQ_DATA_RAW", type = "warn")
-  ## }
-
-  return(TRUE)
-}
-
 #' Format the raw data
 #' @param d Raw data
 #' @param syndrome syndrome of interest
@@ -88,10 +55,6 @@ CleanData <- function(d,
 
   population <- rbind(population, total)
   # end population fix
-
-  if (!ValidateDataRaw(d, syndrome)) {
-    fd::msg("RAW data not validated", type = "err", slack = TRUE)
-  }
 
   if (!"IDate" %in% class(d$date)) {
     d[, date := data.table::as.IDate(date)]

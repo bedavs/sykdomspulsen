@@ -217,7 +217,8 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
     virusinfeksjon_ika = sum(virusinfeksjon_ika),
     rxx_for_covid19 = sum(rxx_for_covid19),
 
-    covid19 = sum(covid19)
+    covid19 = sum(covid19),
+    engstelig_luftveissykdom_ika = sum(engstelig_luftveissykdom_ika)
   ),
   by = .(
     Id,
@@ -247,6 +248,7 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
     rxx_for_covid19 = sum(rxx_for_covid19),
 
     covid19 = sum(covid19),
+    engstelig_luftveissykdom_ika = sum(engstelig_luftveissykdom_ika),
 
     consult = .N
   ),
