@@ -5,15 +5,9 @@
 \title{update_rundate
 Updates the rundate db tables}
 \usage{
-update_rundate(package, date_extraction, date_results, date_run)
+update_rundate(task, date_run)
 }
 \arguments{
-\item{package}{a}
-
-\item{date_extraction}{date when the data file was extracted}
-
-\item{date_results}{the last date of the results}
-
 \item{date_run}{the date when the analysis was run}
 }
 \description{

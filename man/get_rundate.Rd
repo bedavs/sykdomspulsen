@@ -5,7 +5,7 @@
 \title{get_rundate
 Gets the rundate db table}
 \usage{
-get_rundate()
+get_rundate(task = NULL)
 }
 \description{
 get_rundate

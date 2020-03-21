@@ -19,8 +19,7 @@ set_db <- function(){
       ),
       db_load_folder = "/xtmp/",
       keys = c(
-        "task",
-        "date_run"),
+        "task"),
       check_fields_match = TRUE
     ),
 

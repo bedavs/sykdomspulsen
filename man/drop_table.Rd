@@ -4,7 +4,7 @@
 \alias{drop_table}
 \title{drop_table}
 \usage{
-drop_table(table, db = "sykdomspuls")
+drop_table(table, db = "Sykdomspulsen_surv")
 }
 \arguments{
 \item{table}{table}
