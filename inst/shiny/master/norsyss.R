@@ -193,7 +193,7 @@ norsyss_server <- function(input, output, session, config) {
       q <- q + geom_point(data=pd_hig,size=4)
       q <- q + geom_point(data=pd_hig, color=fhiplot::warning_color[["hig"]],size=3)
     }
-    q <- q + lemon::facet_rep_wrap(~type, repeat.tick.labels = "y", scales="free_y")
+    q <- q + lemon::facet_rep_wrap(~type, repeat.tick.labels = "y", scales="free", nrow=1)
     q <- q + scale_y_continuous(NULL)
     q <- q + scale_x_date(
       NULL,
@@ -208,55 +208,60 @@ norsyss_server <- function(input, output, session, config) {
   }
 
   output$norsyss_plot_trends_2 <- renderCachedPlot({
-    min_date <- lubridate::today()-365
+    min_date_daily <- lubridate::today()-28
+    min_date_weekly <- lubridate::today()-365
+    pdday <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
+      dplyr::filter(tag_outcome %in% c(
+        "respiratoryexternal_lt"
+      )) %>%
+      dplyr::filter(date >= !!min_date_daily) %>%
+      dplyr::filter(granularity_time == "daily") %>%
+      dplyr::filter(location_code %in% c("norge")) %>%
+      dplyr::collect()
+    setDT(pdday)
+
     pd <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
       dplyr::filter(tag_outcome %in% c(
         "respiratoryexternal_lt"
       )) %>%
-      dplyr::filter(date >= !!min_date) %>%
+      dplyr::filter(date >= !!min_date_weekly) %>%
       dplyr::filter(granularity_time == "weekly") %>%
       dplyr::filter(location_code %in% c("norge")) %>%
       dplyr::collect()
     setDT(pd)
-    pd[,
-      age:=factor(
-        age,
-        levels=c(
-          "Totalt",
-          "0-4",
-          "5-14",
-          "15-19",
-          "20-29",
-          "30-64",
-          "65+"
-        )
-      )
-    ]
+
     pd1 <- copy(pd)
-    pd1[,type:="Konsultasjoner"]
-    pd1[, plot_n := n]
-    pd1[, plot_u1 := n_baseline_thresholdu0]
-    pd1[, plot_u2 := n_baseline_thresholdu1]
+    pd1[,type:="Ukentlig andel (%)"]
+    pd1[, plot_n := 100 * n / n_denominator]
+    pd1[, plot_u1 := 100 * n_baseline_thresholdu0 / n_denominator]
+    pd1[, plot_u2 := 100 * n_baseline_thresholdu1 / n_denominator]
 
     pd2 <- copy(pd)
-    pd2[,type:="Andel (%)"]
-    pd2[, plot_n := 100 * n / n_denominator]
-    pd2[, plot_u1 := 100 * n_baseline_thresholdu0 / n_denominator]
-    pd2[, plot_u2 := 100 * n_baseline_thresholdu1 / n_denominator]
+    pd2[,type:="Ukentlig konsultasjoner"]
+    pd2[, plot_n := n]
+    pd2[, plot_u1 := n_baseline_thresholdu0]
+    pd2[, plot_u2 := n_baseline_thresholdu1]
 
     pd3 <- copy(pd)
-    pd3[,type:="Eksess"]
+    pd3[,type:="Ukentlig eksess"]
     pd3[,plot_n := pmax(0, n - n_baseline_thresholdu0)]
     pd3[, plot_u1 := 0]
     pd3[, plot_u2 := n_baseline_thresholdu1 - n_baseline_thresholdu0]
 
-    pd <- rbind(pd1,pd2,pd3)
+    pd4 <- copy(pdday)
+    pd4[,type:="Daglig eksess"]
+    pd4[,plot_n := pmax(0, n - n_baseline_thresholdu0)]
+    pd4[, plot_u1 := 0]
+    pd4[, plot_u2 := n_baseline_thresholdu1 - n_baseline_thresholdu0]
+
+    pd <- rbind(pd1,pd2,pd3,pd4)
     pd[,type:=factor(
       type,
       levels=c(
-        "Konsultasjoner",
-        "Eksess",
-        "Andel (%)"
+        "Ukentlig andel (%)",
+        "Ukentlig konsultasjoner",
+        "Ukentlig eksess",
+        "Daglig eksess"
       )
     )]
 

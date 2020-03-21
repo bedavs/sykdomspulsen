@@ -4,7 +4,7 @@
 \alias{get_n_doctors}
 \title{get_n_doctors}
 \usage{
-get_n_doctors(folder)
+get_n_doctors(folder = "/input/norsyss/")
 }
 \arguments{
 \item{folder}{a}

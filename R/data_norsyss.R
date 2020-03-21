@@ -375,7 +375,7 @@ data_norsyss <- function(data, argset, schema){
 
   final_file = files$raw[order(files$raw, decreasing=T)][1]
 
-  fd::msg(sprintf("Cleaning file %s", final_file))
+  msg(sprintf("Cleaning file %s", final_file))
   #EmailNotificationOfNewData(files$id)
 
   d <- fread(path("input", "norsyss", final_file))

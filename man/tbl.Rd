@@ -4,7 +4,7 @@
 \alias{tbl}
 \title{tbl}
 \usage{
-tbl(table, db = "sykdomspuls")
+tbl(table, db = "Sykdomspulsen_surv")
 }
 \arguments{
 \item{table}{table}
