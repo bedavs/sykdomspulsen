@@ -324,19 +324,12 @@ data_norsyss <- function(data, argset, schema){
   # schema <- tm_get_schema("data_norsyss")
   syndromes <- argset$syndromes
   files <- IdentifyDatasets()
-  if (!fd::config$is_dev) {
-    files <- files[is.na(isClean)]
-  }
-  if (nrow(files) == 0) {
-        fd::msg("No new data")
-        return(FALSE)
-  }
-  if (!fhi::file_stable(path("input", "norsyss", files$raw))) {
-    fd::msg(sprintf("Unstable file %s", files$raw))
-    return(FALSE)
-  }
 
   final_file = files$raw[order(files$raw, decreasing=T)][1]
+  if (!fhi::file_stable(final_file)) {
+    fd::msg(sprintf("Unstable file %s", final_file))
+    return(FALSE)
+  }
 
   msg(sprintf("Cleaning file %s", final_file))
   #EmailNotificationOfNewData(files$id)
