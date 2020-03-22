@@ -326,10 +326,6 @@ data_norsyss <- function(data, argset, schema){
   files <- IdentifyDatasets()
 
   final_file = files$raw[order(files$raw, decreasing=T)][1]
-  if (!fhi::file_stable(final_file)) {
-    fd::msg(sprintf("Unstable file %s", final_file))
-    return(FALSE)
-  }
 
   msg(sprintf("Cleaning file %s", final_file))
   #EmailNotificationOfNewData(files$id)
