@@ -1,0 +1,16 @@
+body {
+    font-family: "Brandon Regular", helvetica, arial, sans-serif;
+}
+
+.navbar-default {
+    background-color: #e9f3f9;
+    border-color: #e9f3f9;
+}
+
+.navbar-brand {
+  color: #393C61 !important;
+  font-weight: 900;
+}
+.navbar-nav {
+    clear: left;
+}

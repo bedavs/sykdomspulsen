@@ -399,83 +399,83 @@ norsyss_server <- function(input, output, session, config) {
     q <- q + labs(title="Status etter aldersgrupper i Norge")
     q
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_totalt <- renderCachedPlot({
     norsyss_plot_barameter_location(age="Totalt")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_0_4 <- renderCachedPlot({
     norsyss_plot_barameter_location(age="0-4")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_5_14 <- renderCachedPlot({
     norsyss_plot_barameter_location(age="5-14")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_15_19 <- renderCachedPlot({
     norsyss_plot_barameter_location(age="15-19")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_20_29 <- renderCachedPlot({
     norsyss_plot_barameter_location(age="20-29")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_30_64 <- renderCachedPlot({
     norsyss_plot_barameter_location(age="30-64")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_barometer_location_65p <- renderCachedPlot({
     norsyss_plot_barameter_location(age="65+")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
 
 
   output$norsyss_plot_trends_1 <- renderCachedPlot({
     plot_trends_multiple("gastro_lt")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
   output$norsyss_plot_trends_2 <- renderCachedPlot({
     plot_trends_multiple("respiratoryexternal_lt")
   }, cacheKeyExpr={list(
-    lubridate::now(),
-    lubridate::today(),
-    input$overview_age
-  )})
+    lubridate::today()
+  )},
+  res = 24
+  )
 
 }
