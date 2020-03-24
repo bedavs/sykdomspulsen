@@ -1,7 +1,8 @@
 ## app.R ##
 library(shiny)
+library(shinyjs)
 
-shinyOptions(cache = diskCache("/tmp/", max_size = 50e6, max_age = 5))
+shinyOptions(cache = diskCache("/tmp/", max_size = 50e6, max_age = 60*60))
 
 assign("dev_invalidate_cache", lubridate::now(), envir = .GlobalEnv)
 
@@ -20,15 +21,15 @@ ui <- navbarPage(
 )
 
 ui <- tagList(
+  useShinyjs(),
   tags$style("
   .container{
-    width:100%;
-    min-width: 1300px;
+    width: 1200px;
     }
  "),
   tags$div(class="container",
            navbarPage(
-             title = "Sykdomspulsen intern",
+             title = div(img(id="logo",src="fhi.svg", height="40px"), "Sykdomspulsen intern"),
              tabPanel("NorSySS",
                       norsyss_ui("norsyss", config=config)
              ),
@@ -49,18 +50,6 @@ server <- function(input, output) {
 shinyApp(ui, server)
 
 #  shiny::runApp('inst/shiny/corona', port = 4989, host = "0.0.0.0")
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
