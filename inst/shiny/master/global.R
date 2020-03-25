@@ -64,4 +64,56 @@ x <- pool %>% dplyr::tbl("data_norsyss") %>%
   dplyr::distinct(tag_outcome) %>%
   dplyr::collect()
 
+# choices_location_code
+x_choices <- fhidata::norway_locations_long_b2020[-1]
+setorder(x_choices,location_code)
+x_choices <- rbind(
+  x_choices[location_code=="norge"],
+  x_choices[stringr::str_detect(location_code, "^county")],
+  x_choices[stringr::str_detect(location_code, "^municip")]
+)
 
+x_choices[
+  fhidata::norway_locations_b2020,
+  on="location_code==municip_code",
+  county_name := county_name
+  ]
+
+x_choices[stringr::str_detect(location_code, "^county"), location_name := paste0(location_name, " (fylke)")]
+x_choices[stringr::str_detect(location_code, "^municip"), location_name := paste0(location_name, " (kommune i ", county_name,")")]
+
+choices_location <- x_choices$location_code
+names(choices_location) <- x_choices$location_name
+
+config$choices_location <- choices_location
+
+config$choices_norsyss_tag <- list(
+  "Luftveisinfeksjoner (R05, R74, R78, R83)" = "respiratoryexternal_lt",
+  "Magetarm (D11, D70, D73)" = "gastro_lt"
+)
+
+get_granularity_geo <- function(location_code){
+  if(location_code == "norge"){
+    granularity_geo <- "nation"
+  } else if(stringr::str_detect(location_code, "^county")){
+    granularity_geo <- "county"
+  } else if(stringr::str_detect(location_code, "^municip")){
+    granularity_geo <- "municip"
+  }
+  return(granularity_geo)
+}
+
+get_dependent_location_codes <- function(location_code){
+  granularity_geo <- get_granularity_geo(location_code = location_code)
+
+  if(granularity_geo == "nation"){
+    location_codes <- c("norge",unique(fhidata::norway_locations_b2020[,.(county_code)])$county_code)
+  } else if(granularity_geo == "county"){
+    location_codes <- c(location_code, fhidata::norway_locations_b2020[county_code==location_code]$municip_code)
+  } else if(granularity_geo == "municip"){
+    x_county_code <- fhidata::norway_locations_b2020[municip_code==location_code]$county_code
+    location_codes <- unique(c(location_code, fhidata::norway_locations_b2020[county_code==x_county_code]$municip_code))
+  }
+
+  return(location_codes)
+}

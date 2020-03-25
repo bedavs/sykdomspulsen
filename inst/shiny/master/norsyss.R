@@ -14,8 +14,7 @@ norsyss_ui <- function(id, config) {
           "diagnosekoder (ICPC-2 koder) satt på legekontor og legevakter i hele Norge."
           )
       )
-    )
-    ,
+    ),
     tabsetPanel(
       tabPanel(title="Oversikt",
         tagList(
@@ -42,7 +41,27 @@ norsyss_ui <- function(id, config) {
           fluidRow(
             column(
               width=12, align="center",
-              plotOutput(ns("norsyss_plot_barometer_age"), height = "500px")
+
+              radioButtons(
+                inputId = ns("norsyss_tag"),
+                label = "Syndrome",
+                choices = config$choices_norsyss_tag,
+                selected = config$choices_norsyss_tag[[1]],
+                width = "400px"
+              ),
+
+              br(),
+
+              selectizeInput(
+                inputId = ns("norsyss_location_code"),
+                label = "Geografisk område",
+                choices = config$choices_location,
+                selected = "norge",
+                multiple = FALSE,
+                options = NULL,
+                width = "400px"
+              )
+
             )
           ),
 
@@ -69,7 +88,35 @@ norsyss_ui <- function(id, config) {
           fluidRow(
             column(
               width=12, align="center",
-              plotOutput(ns("norsyss_plot_barometer_location"), height = "3000px")
+              plotOutput(ns("norsyss_plot_barometer_age"), height = "600px")
+            )
+          ),
+
+          fluidRow(
+            column(
+              width=2,
+              p("")
+            ),
+            column(
+              width=8, align="center",
+
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text ")
+            ),
+            column(
+              width=2,
+              p("")
+            )
+          ),
+
+          fluidRow(
+            column(
+              width=12, align="center",
+              uiOutput(ns("norsyss_ui_barometer_location"))
+              #plotOutput(ns("norsyss_plot_barometer_location"), height = "5000px")
             )
           ),
 
@@ -132,13 +179,16 @@ norsyss_ui <- function(id, config) {
 
 norsyss_server <- function(input, output, session, config) {
 
-  plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt"){
+  plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_code = "norge"){
+
+    granularity_geo <- get_granularity_geo(location_code = location_code)
+
     min_date1 <- lubridate::today()-7*16
     pd1 <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
       dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
       dplyr::filter(date >= !!min_date1) %>%
       dplyr::filter(granularity_time == "weekly") %>%
-      dplyr::filter(location_code %in% c("norge")) %>%
+      dplyr::filter(location_code %in% !!location_code) %>%
       dplyr::collect()
 
     min_date2 <- lubridate::today()-16
@@ -146,7 +196,7 @@ norsyss_server <- function(input, output, session, config) {
       dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
       dplyr::filter(date >= !!min_date2) %>%
       dplyr::filter(granularity_time == "daily") %>%
-      dplyr::filter(location_code %in% c("norge")) %>%
+      dplyr::filter(location_code %in% !!location_code) %>%
       dplyr::collect()
 
     pd <- rbind(pd1,pd2)
@@ -186,7 +236,10 @@ norsyss_server <- function(input, output, session, config) {
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + theme(legend.position="bottom")
     q <- q + fhiplot::set_x_axis_vertical()
-    q1 <- q + labs(title="Ukentlig status etter aldersgrupper i Norge")
+    q <- q + labs(title=glue::glue(
+      "Ukentlig status etter aldersgruppe"
+    ))
+    q1 <- q
 
     q <- ggplot(pd[granularity_time=="daily"], aes(x=date,y=age,fill=n_status))
     q <- q + geom_tile(color="black")
@@ -208,11 +261,18 @@ norsyss_server <- function(input, output, session, config) {
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + theme(legend.position="bottom")
     q <- q + fhiplot::set_x_axis_vertical()
-    q2 <- q + labs(title="Daglig status etter aldersgrupper i Norge")
+    q <- q + labs(title=glue::glue(
+      "Daglig status etter aldersgruppe"
+    ))
+    q2 <- q
 
+    title_text <- glue::glue(
+      "{names(config$choices_location)[config$choices_location==location_code]}\n",
+      "{names(config$choices_norsyss_tag)[config$choices_norsyss_tag==tag_outcome]}\n",
+    )
     title <- cowplot::ggdraw() +
       cowplot::draw_label(
-        tag_outcome,
+        title_text,
         fontface = 'bold',
         x = 0,
         hjust = 0,
@@ -221,26 +281,43 @@ norsyss_server <- function(input, output, session, config) {
       theme(
         # add margin on the left of the drawing canvas,
         # so title is aligned with left edge of first plot
-        plot.margin = margin(0, 0, 0, 7)
+        plot.margin = margin(0, 0, 0, 0)
       )
+    if(granularity_geo=="municip"){
+      retval <- q1
 
-    cowplot::plot_grid(
-      title,
-      NULL,
-      q1,
-      q2,
-      ncol=2,
-      rel_heights = c(0.2, 1)
-    )
+      retval <- cowplot::plot_grid(
+        title,
+        q1,
+        ncol=1,
+        rel_heights = c(0.2, 1)
+      )
+    } else {
+
+      retval <- cowplot::plot_grid(
+        title,
+        NULL,
+        q1,
+        q2,
+        ncol=2,
+        rel_heights = c(0.2, 1)
+      )
+    }
+
+    return(retval)
   }
 
-  plot_barameter_location <- function(tag_outcome = "respiratoryexternal_lt"){
+  plot_barameter_location <- function(tag_outcome = "respiratoryexternal_lt", location_code = "norge"){
+
+    granularity_geo <- get_granularity_geo(location_code = location_code)
+    location_codes <- get_dependent_location_codes(location_code = location_code)
+
     min_date1 <- lubridate::today()-7*16
     pd_week <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
       dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
       dplyr::filter(date >= !!min_date1) %>%
       dplyr::filter(granularity_time == "weekly") %>%
-      dplyr::filter(granularity_geo %in% c("national","county")) %>%
+      dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::collect()
 
     min_date2 <- lubridate::today()-16
@@ -248,11 +325,13 @@ norsyss_server <- function(input, output, session, config) {
       dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
       dplyr::filter(date >= !!min_date2) %>%
       dplyr::filter(granularity_time == "daily") %>%
-      dplyr::filter(granularity_geo %in% c("national","county")) %>%
+      dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::collect()
 
     pd <- rbind(pd_week,pd_day)
     setDT(pd)
+
+    pd[,location_code := factor(location_code, levels=rev(location_codes))]
 
     pd[, age := factor(
       age,
@@ -274,7 +353,6 @@ norsyss_server <- function(input, output, session, config) {
       ]
     setorder(pd,location_code)
     locs <- unique(pd$location_name)
-    locs <- rev(unique(c("Norge",locs)))
     pd[,location_name := factor(location_name, levels=locs)]
 
     pd[, n_status := factor(
@@ -299,11 +377,14 @@ norsyss_server <- function(input, output, session, config) {
         "High" = fhiplot::warning_color[["hig"]]
       )
     )
-    q <- q + fhiplot::theme_fhi_basic(20)
+    q <- q + fhiplot::theme_fhi_basic(16)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + theme(legend.position="bottom")
     q <- q + fhiplot::set_x_axis_vertical()
-    q_week <- q + labs(title="Ukentlig status etter aldersgrupper")
+    q <- q + labs(title=glue::glue(
+      "Ukentlig status etter område per aldersgruppe"
+    ))
+    q_week <- q
 
     q <- ggplot(pd[granularity_time=="daily"], aes(x=date,y=location_name,fill=n_status))
     q <- q + geom_tile(color="black")
@@ -322,15 +403,19 @@ norsyss_server <- function(input, output, session, config) {
         "High" = fhiplot::warning_color[["hig"]]
       )
     )
-    q <- q + fhiplot::theme_fhi_basic(20)
+    q <- q + fhiplot::theme_fhi_basic(16)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + theme(legend.position="bottom")
     q <- q + fhiplot::set_x_axis_vertical()
-    q_day <- q + labs(title="Daglig status etter aldersgrupper")
+    q <- q + labs(title=glue::glue(
+      "Daglig status etter område per aldersgruppe"
+    ))
+    q_day <- q
 
+    title_text <- glue::glue("{names(config$choices_norsyss_tag)[config$choices_norsyss_tag==tag_outcome]}\n")
     title <- cowplot::ggdraw() +
       cowplot::draw_label(
-        tag_outcome,
+        title_text,
         fontface = 'bold',
         x = 0,
         hjust = 0,
@@ -339,17 +424,33 @@ norsyss_server <- function(input, output, session, config) {
       theme(
         # add margin on the left of the drawing canvas,
         # so title is aligned with left edge of first plot
-        plot.margin = margin(0, 0, 0, 7)
+        plot.margin = margin(0, 0, 0, 0)
       )
 
-    cowplot::plot_grid(
-      title,
-      NULL,
-      q_week,
-      q_day,
-      ncol=2,
-      rel_heights = c(0.03, 1)
-    )
+    rel_heights <- c(0.3/length(location_codes),1)
+    if(granularity_geo!="nation"){
+      retval <- q_week
+
+      retval <- cowplot::plot_grid(
+        title,
+        q_week,
+        ncol=1,
+        rel_heights = rel_heights
+      )
+    } else {
+
+      retval <- cowplot::plot_grid(
+        title,
+        NULL,
+        q_week,
+        q_day,
+        ncol=2,
+        rel_heights = rel_heights
+      )
+    }
+
+    return(retval)
+
     #
     # pd[, name_outcome := factor(
     #   tag_outcome,
@@ -388,21 +489,24 @@ norsyss_server <- function(input, output, session, config) {
       date_labels = "%d.%m"
     )
     q <- q + fhiplot::scale_fill_fhi(NULL)
-    q <- q + fhiplot::theme_fhi_lines(20)
+    q <- q + fhiplot::theme_fhi_lines(16)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     #q <- q + fhiplot::set_x_axis_vertical()
     #q <- q + labs(title=x_age)
     q
   }
 
-  plot_trends_multiple <- function(tag_outcome){
+  plot_trends_multiple <- function(tag_outcome, location_code){
+
+    granularity_geo <- get_granularity_geo(location_code = location_code)
+
     min_date_daily <- lubridate::today()-28
     min_date_weekly <- lubridate::today()-365
     pdday <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
       dplyr::filter(tag_outcome == !!tag_outcome) %>%
       dplyr::filter(date >= !!min_date_daily) %>%
       dplyr::filter(granularity_time == "daily") %>%
-      dplyr::filter(location_code %in% c("norge")) %>%
+      dplyr::filter(location_code %in% !!location_code) %>%
       dplyr::collect()
     setDT(pdday)
 
@@ -410,7 +514,7 @@ norsyss_server <- function(input, output, session, config) {
       dplyr::filter(tag_outcome == !!tag_outcome) %>%
       dplyr::filter(date >= !!min_date_weekly) %>%
       dplyr::filter(granularity_time == "weekly") %>%
-      dplyr::filter(location_code %in% c("norge")) %>%
+      dplyr::filter(location_code %in% !!location_code) %>%
       dplyr::collect()
     setDT(pd)
 
@@ -432,26 +536,42 @@ norsyss_server <- function(input, output, session, config) {
     pd3[, plot_u1 := 0]
     pd3[, plot_u2 := n_baseline_thresholdu1 - n_baseline_thresholdu0]
 
-    pd4 <- copy(pdday)
-    pd4[,type:="Daglig eksess"]
-    pd4[,plot_n := pmax(0, n - n_baseline_thresholdu0)]
-    pd4[, plot_u1 := 0]
-    pd4[, plot_u2 := n_baseline_thresholdu1 - n_baseline_thresholdu0]
+    if(granularity_geo != "municip"){
+      pd4 <- copy(pdday)
+      pd4[,type:="Daglig eksess"]
+      pd4[,plot_n := pmax(0, n - n_baseline_thresholdu0)]
+      pd4[, plot_u1 := 0]
+      pd4[, plot_u2 := n_baseline_thresholdu1 - n_baseline_thresholdu0]
 
-    pd <- rbind(pd1,pd2,pd3,pd4)
-    pd[,type:=factor(
-      type,
-      levels=c(
-        "Ukentlig andel (%)",
-        "Ukentlig konsultasjoner",
-        "Ukentlig eksess",
-        "Daglig eksess"
-      )
-    )]
+      pd <- rbind(pd1,pd2,pd3,pd4)
+      pd[,type:=factor(
+        type,
+        levels=c(
+          "Ukentlig andel (%)",
+          "Ukentlig konsultasjoner",
+          "Ukentlig eksess",
+          "Daglig eksess"
+        )
+      )]
+    } else {
+      pd <- rbind(pd1,pd2,pd3)
+      pd[,type:=factor(
+        type,
+        levels=c(
+          "Ukentlig andel (%)",
+          "Ukentlig konsultasjoner",
+          "Ukentlig eksess"
+        )
+      )]
+    }
+
 
     title <- cowplot::ggdraw() +
       cowplot::draw_label(
-        tag_outcome,
+        glue::glue(
+          "{names(config$choices_location)[config$choices_location==location_code]}\n",
+          "{names(config$choices_norsyss_tag)[config$choices_norsyss_tag==tag_outcome]}"
+        ),
         fontface = 'bold',
         x = 0,
         hjust = 0,
@@ -460,7 +580,7 @@ norsyss_server <- function(input, output, session, config) {
       theme(
         # add margin on the left of the drawing canvas,
         # so title is aligned with left edge of first plot
-        plot.margin = margin(0, 0, 0, 7)
+        plot.margin = margin(0, 0, 0, 0)
       )
 
     cowplot::plot_grid(
@@ -473,7 +593,7 @@ norsyss_server <- function(input, output, session, config) {
       plot_trends_single(pd, "30-64"),
       plot_trends_single(pd, "65+"),
       ncol=1,
-      rel_heights = c(0.2, rep(1,7)),
+      rel_heights = c(0.3, rep(1,7)),
       labels=c(
         "",
         "Totalt",
@@ -486,39 +606,75 @@ norsyss_server <- function(input, output, session, config) {
       ),
       label_x = 0,
       hjust = 0,
+      vjust = 1.4,
       label_size=26
     )
   }
 
   output$norsyss_plot_barometer_age <- renderCachedPlot({
-    plot_barometer_age(tag_outcome = "respiratoryexternal_lt")
+    req(input$norsyss_tag)
+    req(input$norsyss_location_code)
+
+    plot_barometer_age(
+      tag_outcome = input$norsyss_tag,
+      location_code = input$norsyss_location_code
+    )
   }, cacheKeyExpr={list(
-    lubridate::today(),
+    input$norsyss_tag,
+    input$norsyss_location_code,
     dev_invalidate_cache
   )},
-  res = 72
+    res = 72
   )
 
   output$norsyss_plot_barometer_location <- renderCachedPlot({
-    plot_barameter_location(tag_outcome = "respiratoryexternal_lt")
+    req(input$norsyss_tag)
+    req(input$norsyss_location_code)
+
+    plot_barameter_location(
+      tag_outcome = input$norsyss_tag,
+      location_code = input$norsyss_location_code
+    )
   }, cacheKeyExpr={list(
-    lubridate::today(),
+    input$norsyss_tag,
+    input$norsyss_location_code,
     dev_invalidate_cache
   )},
-  res = 72
+    res = 72
   )
+
+  output$norsyss_ui_barometer_location <- renderUI({
+    ns <- session$ns
+    req(input$norsyss_tag)
+    req(input$norsyss_location_code)
+
+    location_codes <- get_dependent_location_codes(location_code = input$norsyss_location_code)
+    height <- round(200*length(location_codes))
+    height <- max(1000, height)
+    height <- paste0(height,"px")
+    plotOutput(ns("norsyss_plot_barometer_location"), height = height)
+  })
+
+  #plotOutput(ns("norsyss_plot_barometer_location"), height = "5000px")
 
   output$norsyss_plot_trends <- renderCachedPlot({
-    plot_trends_multiple("respiratoryexternal_lt")
+    req(input$norsyss_tag)
+    req(input$norsyss_location_code)
+
+    plot_trends_multiple(
+      tag_outcome = input$norsyss_tag,
+      location_code = input$norsyss_location_code
+    )
   }, cacheKeyExpr={list(
-    lubridate::today(),
+    input$norsyss_tag,
+    input$norsyss_location_code,
     dev_invalidate_cache
   )},
   res = 72
   )
-
 
   outputOptions(output, "norsyss_plot_barometer_age", priority = 10)
   outputOptions(output, "norsyss_plot_barometer_location", priority = 9)
+  outputOptions(output, "norsyss_plot_trends", priority = 8)
 
 }
