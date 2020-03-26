@@ -88,8 +88,8 @@ names(choices_location) <- x_choices$location_name
 config$choices_location <- choices_location
 
 config$choices_norsyss_tag <- list(
-  "Luftveisinfeksjoner (R05, R74, R78, R83)" = "respiratoryexternal_lt",
-  "Magetarm (D11, D70, D73)" = "gastro_lt"
+  "Luftveisinfeksjoner (R05, R74, R78, R83)" = "respiratoryexternal_lf_lt",
+  "Magetarm (D11, D70, D73)" = "gastro_lf_lt"
 )
 
 get_granularity_geo <- function(location_code){

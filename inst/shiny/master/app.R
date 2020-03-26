@@ -29,7 +29,7 @@ ui <- tagList(
  "),
   tags$div(class="container",
            navbarPage(
-             title = div(img(id="logo",src="fhi.svg", height="40px"), "Sykdomspulsen intern"),
+             title = div(img(id="logo",src="fhi.svg", height="40px"), "Sykdomspulsen"),
              tabPanel("NorSySS",
                       norsyss_ui("norsyss", config=config)
              ),
@@ -50,6 +50,11 @@ server <- function(input, output) {
 shinyApp(ui, server)
 
 #  shiny::runApp('inst/shiny/corona', port = 4989, host = "0.0.0.0")
+
+
+
+
+
 
 
 

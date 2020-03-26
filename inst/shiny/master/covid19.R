@@ -57,6 +57,7 @@ covid19_ui <- function(id, config) {
 
             )
           ),
+
           fluidRow(
             column(
               width=2,
@@ -81,6 +82,33 @@ covid19_ui <- function(id, config) {
             column(
               width=12, align="center",
               plotOutput(ns("overview_plot_national_syndromes_proportion"), height = "700px")
+            )
+          ),
+
+          fluidRow(
+            column(
+              width=2,
+              p("")
+            ),
+            column(
+              width=8, align="center",
+
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text ")
+            ),
+            column(
+              width=2,
+              p("")
+            )
+          ),
+
+          fluidRow(
+            column(
+              width=12, align="center",
+              plotOutput(ns("overview_plot_national_source_proportion"), height = "700px")
             )
           ),
 
@@ -213,11 +241,11 @@ covid19_server <- function(input, output, session, config) {
 
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(tag_outcome %in% c(
-        "covid19_lte",
-        "engstelig_luftveissykdom_ika_lte",
-        "influensa_lte",
-        "rxx_for_covid19_lte",
-        "akkut_ovre_luftveisinfeksjon_lte"
+        "covid19_lf_lte",
+        "engstelig_luftveissykdom_ika_lf_lte",
+        "influensa_lf_lte",
+        "rxx_for_covid19_lf_lte",
+        "akkut_ovre_luftveisinfeksjon_lf_lte"
       )) %>%
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age == "Totalt") %>%
@@ -232,11 +260,11 @@ covid19_server <- function(input, output, session, config) {
     pd[, name_outcome := factor(
       tag_outcome,
       levels = c(
-        "covid19_lte",
-        "engstelig_luftveissykdom_ika_lte",
-        "influensa_lte",
-        "akkut_ovre_luftveisinfeksjon_lte",
-        "rxx_for_covid19_lte"
+        "covid19_lf_lte",
+        "engstelig_luftveissykdom_ika_lf_lte",
+        "influensa_lf_lte",
+        "akkut_ovre_luftveisinfeksjon_lf_lte",
+        "rxx_for_covid19_lf_lte"
       ),
       labels = c(
         "COVID-19 liknenede\nsymptomer (R991)",
@@ -288,7 +316,7 @@ covid19_server <- function(input, output, session, config) {
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + labs(title = glue::glue(
-     "Andel konsultasjoner i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
+      "Andel konsultasjoner i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
     ))
     q <- q + labs(caption=glue::glue(
       "Nevneren er totalt antall konsultasjoner\n",
@@ -300,7 +328,157 @@ covid19_server <- function(input, output, session, config) {
     input$covid_location_code,
     dev_invalidate_cache
   )},
-    res = 72
+  res = 72
+  )
+
+  output$overview_plot_national_source_proportion <- renderCachedPlot({
+    req(input$covid_location_code)
+
+    pd <- pool %>% dplyr::tbl("data_norsyss") %>%
+      dplyr::filter(tag_outcome %in% c(
+        "covid19_f_l",
+        "covid19_f_t",
+        "covid19_f_e",
+        "covid19_l_l",
+        "covid19_l_t",
+        "covid19_l_e"
+      )) %>%
+      dplyr::filter(date >= !!config$start_date) %>%
+      dplyr::filter(age >= "Totalt") %>%
+      dplyr::filter(location_code == !!input$covid_location_code) %>%
+      dplyr::collect()
+    setDT(pd)
+
+    pd[,
+       contact_type := dplyr::case_when(
+         stringr::str_detect(tag_outcome, "_e$") ~ "Ekonsultasjon",
+         stringr::str_detect(tag_outcome, "_t$") ~ "Telefon",
+         stringr::str_detect(tag_outcome, "_l$") ~ "Lege"
+       )]
+
+    pd[,
+       practice_type := dplyr::case_when(
+         stringr::str_detect(tag_outcome, "_f_") ~ "Fastlege",
+         stringr::str_detect(tag_outcome, "_l_") ~ "Legevakt"
+       )]
+    pd[, cat:= paste0(contact_type,"/",practice_type)]
+    pd[,cat := factor(
+      cat,
+      levels = c(
+        "Ekonsultasjon/Fastlege",
+        "Ekonsultasjon/Legevakt",
+        "Telefon/Fastlege",
+        "Telefon/Legevakt",
+        "Lege/Fastlege",
+        "Lege/Legevakt"
+      )
+    )]
+    pd[,total := sum(n), by=.(date, location_code)]
+    pd[,andel := 100*n/total]
+
+    weekends <- unique(pd$date)
+    weekends <- weekends[lubridate::wday(weekends, week_start = 1) %in% c(6,7)]
+    weekends <- data.frame(date = weekends)
+
+    q <- ggplot(pd, aes(x=date, y=andel, fill=cat))
+    q <- q + geom_col()
+    q <- q + fhiplot::scale_fill_fhi(NULL)
+    q <- q + scale_y_continuous(
+      "Andel",
+      breaks = fhiplot::pretty_breaks(6),
+      expand = expand_scale(mult = c(0, 0)),
+      labels = format_nor_perc
+    )
+    q <- q + scale_x_date(
+      "Dato",
+      date_breaks = "2 days",
+      date_labels = "%d.%m",
+      expand = expand_scale(mult = c(0.00, 0.0)),
+      limits = c(config$start_date,config$max_date_uncertain)
+    )
+    q <- q + fhiplot::scale_color_fhi("Syndrome", guide = "none")
+    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
+    q <- q + theme(legend.key.size = unit(1, "cm"))
+    q <- q + labs(title = glue::glue(
+      "R991 konsultasjoner kilde i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
+    ))
+    q <- q + labs(caption=glue::glue(
+      "Nevneren er totalt antall R991 konsultasjoner"
+    ))
+    q1 <- q
+
+    max_y <- max(pd[,.(n=sum(n)),by=.(date)]$n)
+    min_y_start <- -0.2*max_y*1.01
+    min_y_end <- -0.1*max_y*1.01
+
+    pd_line <- pd[,.(
+      n=sum(n),
+      consult_with_influenza=sum(consult_with_influenza)
+    ),
+    by=.(date)
+    ]
+    pd_line[, andel := n/consult_with_influenza]
+    max_andel <- max(pd_line$andel)
+    pd_line[, andel := max_y * andel / max_andel]
+
+    q <- ggplot(pd, aes(x=date, y=n))
+    q <- q + geom_col(mapping=aes(fill=cat))
+    q <- q + geom_line(data=pd_line, mapping=aes(y=andel),color="red", size = 3)
+    q <- q + geom_segment(
+      data = weekends,
+      mapping = aes(
+        x = date, xend=date,
+        y = min_y_start, yend = min_y_end
+      ),
+      color = "red",
+      size = 1,
+      arrow = arrow(length = unit(0.1, "inches"))
+    )
+    q <- q + fhiplot::scale_fill_fhi(NULL)
+    q <- q + scale_y_continuous(
+      "Antall",
+      breaks = fhiplot::pretty_breaks(6),
+      labels = fhiplot::format_nor,
+      sec.axis = sec_axis(
+        ~ . * 100 / max_y * max_andel,
+        breaks = fhiplot::pretty_breaks(6),
+        labels = format_nor_perc,
+        name = "Andel"
+        )
+    )
+    q <- q + scale_x_date(
+      "Dato",
+      date_breaks = "2 days",
+      date_labels = "%d.%m",
+      expand = expand_scale(mult = c(0.00, 0.0)),
+      limits = c(config$start_date,config$max_date_uncertain)
+    )
+    q <- q + fhiplot::scale_color_fhi("Syndrome", guide = "none")
+    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
+    q <- q + theme(legend.key.size = unit(1, "cm"))
+    q <- q + coord_cartesian(ylim=c(0, max_y), clip="off", expand = F)
+    q <- q + labs(title = glue::glue(
+      "R991 konsultasjoner kilde i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
+    ))
+    q <- q + labs(caption=glue::glue(
+      "Røde piler viser helgen\n",
+      "Kolonnene tilhører høyre-aksen, den røde linjen tilhører venstre-aksen\n",
+      "Nevneren til andelen er totalt antall konsultasjoner"
+    ))
+    q2 <- q
+
+    retval <- cowplot::plot_grid(
+      q1,
+      q2,
+      ncol=1
+    )
+
+    return(retval)
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+  res = 72
   )
 
   output$overview_plot_national_age_proportion <- renderCachedPlot({
@@ -308,7 +486,7 @@ covid19_server <- function(input, output, session, config) {
 
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19_lte") %>%
+      dplyr::filter(tag_outcome == "covid19_lf_lte") %>%
       dplyr::filter(location_code== !!input$covid_location_code) %>%
       dplyr::collect()
     setDT(pd)
@@ -402,8 +580,8 @@ covid19_server <- function(input, output, session, config) {
 
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(tag_outcome %in% c(
-        "covid19_lte",
-        "engstelig_luftveissykdom_ika_lte"
+        "covid19_lf_lte",
+        "engstelig_luftveissykdom_ika_lf_lte"
       )) %>%
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age >= "Totalt") %>%
@@ -421,8 +599,8 @@ covid19_server <- function(input, output, session, config) {
     pd[, name_outcome := factor(
       tag_outcome,
       levels = c(
-        "covid19_lte",
-        "engstelig_luftveissykdom_ika_lte"
+        "covid19_lf_lte",
+        "engstelig_luftveissykdom_ika_lf_lte"
       ),
       labels = c(
         "COVID-19 liknenede symptomer (R991)",
@@ -437,14 +615,14 @@ covid19_server <- function(input, output, session, config) {
 
     max_val <- max(pd$andel,na.rm=T)
     labels <- pd[date == max(date)]
-    labels[tag_outcome=="covid19_lte",lab := paste0("R991: ",format_nor_perc(andel))]
-    labels[tag_outcome=="engstelig_luftveissykdom_ika_lte",lab := paste0("R27: ",format_nor_perc(andel))]
+    labels[tag_outcome=="covid19_lf_lte",lab := paste0("R991: ",format_nor_perc(andel))]
+    labels[tag_outcome=="engstelig_luftveissykdom_ika_lf_lte",lab := paste0("R27: ",format_nor_perc(andel))]
 
-    labels[tag_outcome=="covid19_lte",lab := paste0("R991: ",format_nor_perc(andel))]
+    labels[tag_outcome=="covid19_lf_lte",lab := paste0("R991: ",format_nor_perc(andel))]
 
 
-    labels[tag_outcome=="covid19_lte",andel := max_val]
-    labels[tag_outcome=="engstelig_luftveissykdom_ika_lte",andel := max_val-5]
+    labels[tag_outcome=="covid19_lf_lte",andel := max_val]
+    labels[tag_outcome=="engstelig_luftveissykdom_ika_lf_lte",andel := max_val-5]
 
     q <- ggplot(pd, aes(x=date, y=andel, color=name_outcome))
     q <- q + geom_line(size=2)
@@ -513,8 +691,8 @@ covid19_server <- function(input, output, session, config) {
     if(granularity_geo == "nation"){
       d <- pool %>% dplyr::tbl("data_norsyss") %>%
         dplyr::filter(tag_outcome %in% c(
-          "covid19_lte",
-          "engstelig_luftveissykdom_ika_lte"
+          "covid19_lf_lte",
+          "engstelig_luftveissykdom_ika_lf_lte"
         )) %>%
         dplyr::filter(date >= !!config$start_date) %>%
         dplyr::filter(granularity_geo == "county") %>%
@@ -523,8 +701,8 @@ covid19_server <- function(input, output, session, config) {
     } else {
       d <- pool %>% dplyr::tbl("data_norsyss") %>%
         dplyr::filter(tag_outcome %in% c(
-          "covid19_lte",
-          "engstelig_luftveissykdom_ika_lte"
+          "covid19_lf_lte",
+          "engstelig_luftveissykdom_ika_lf_lte"
         )) %>%
         dplyr::filter(date >= !!config$start_date) %>%
         dplyr::filter(granularity_geo == "municip") %>%
@@ -562,8 +740,8 @@ covid19_server <- function(input, output, session, config) {
     d[, name_outcome := factor(
       tag_outcome,
       levels = c(
-        "covid19_lte",
-        "engstelig_luftveissykdom_ika_lte"
+        "covid19_lf_lte",
+        "engstelig_luftveissykdom_ika_lf_lte"
       ),
       labels = c(
         "COVID-19 liknenede symptomer (R991)",
