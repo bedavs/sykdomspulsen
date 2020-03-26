@@ -267,7 +267,7 @@ covid19_server <- function(input, output, session, config) {
         "rxx_for_covid19_lf_lte"
       ),
       labels = c(
-        "COVID-19 liknenede\nsymptomer (R991)",
+        "COVID-19 (mistenkt\neller bekreftet) (R991)",
         "Engstelig luftveissykdom\nIKA (R27)",
         "Influensa (R80)",
         "Akutt øvre\nluftveisinfeksjon (R74)",
@@ -316,7 +316,8 @@ covid19_server <- function(input, output, session, config) {
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + labs(title = glue::glue(
-      "Andel konsultasjoner i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
+      "{names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
+      "Andel konsultasjoner"
     ))
     q <- q + labs(caption=glue::glue(
       "Nevneren er totalt antall konsultasjoner\n",
@@ -378,7 +379,7 @@ covid19_server <- function(input, output, session, config) {
     weekends <- weekends[lubridate::wday(weekends, week_start = 1) %in% c(6,7)]
     weekends <- data.frame(date = weekends)
 
-    max_y <- max(pd[,.(n=sum(n)),by=.(date)]$n)
+    max_y <- max(pd[,.(n=sum(n)),by=.(date)]$n, na.rm=T)
     min_y_start <- -0.085*max_y*1.01
     min_y_end <- -0.05*max_y*1.01
 
@@ -389,7 +390,7 @@ covid19_server <- function(input, output, session, config) {
     by=.(date)
     ]
     pd_line[, andel := n/consult_with_influenza]
-    max_andel <- max(pd_line$andel)
+    max_andel <- max(pd_line$andel, na.rm=T)
     pd_line[, andel := max_y * andel / max_andel]
 
     q <- ggplot(pd, aes(x=date, y=n))
@@ -427,7 +428,8 @@ covid19_server <- function(input, output, session, config) {
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + coord_cartesian(ylim=c(0, max_y), clip="off", expand = F)
     q <- q + labs(title = glue::glue(
-      "R991 konsultasjoner kilde i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
+      "{names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
+      "COVID-19 (mistenkt eller bekreftet) (R991) konsultasjoner etter kilde"
     ))
     q <- q + labs(caption=glue::glue(
       "Røde piler viser helgen\n",
@@ -518,8 +520,8 @@ covid19_server <- function(input, output, session, config) {
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + labs(title = glue::glue(
-     "Andel konsultasjoner i {names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
-     "som tilhører COVID-19 liknenedesymptomer"
+     "{names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
+     "Andel konsultasjoner som tilhører COVID-19 (mistenkt eller bekreftet) (R991)"
     ))
     q <- q + labs(caption=glue::glue(
       "Konsultasjoner er legekontakt, telefon, ekonsultasjoner til fastleger og legevakter\n",
@@ -564,7 +566,7 @@ covid19_server <- function(input, output, session, config) {
         "engstelig_luftveissykdom_ika_lf_lte"
       ),
       labels = c(
-        "COVID-19 liknenede symptomer (R991)",
+        "COVID-19 (mistenkt eller bekreftet) (R991)",
         "Engstelig luftveissykdom IKA (R27)"
       )
     )]
@@ -705,7 +707,7 @@ covid19_server <- function(input, output, session, config) {
         "engstelig_luftveissykdom_ika_lf_lte"
       ),
       labels = c(
-        "COVID-19 liknenede symptomer (R991)",
+        "COVID-19 (mistenkt eller bekreftet) (R991)",
         "Engstelig luftveissykdom IKA (R27)"
       )
     )]
