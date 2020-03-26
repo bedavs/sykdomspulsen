@@ -5,6 +5,7 @@ library(shinyjs)
 shinyOptions(cache = diskCache("/tmp/", max_size = 50e6, max_age = 60*60)) # 1 hour
 
 assign("dev_invalidate_cache", lubridate::now(), envir = .GlobalEnv)
+assign("dev_invalidate_cache", 1, envir = .GlobalEnv)
 
 source("global.R")
 source("norsyss.R")
@@ -50,7 +51,6 @@ server <- function(input, output) {
 shinyApp(ui, server)
 
 #  shiny::runApp('inst/shiny/corona', port = 4989, host = "0.0.0.0")
-
 
 
 
