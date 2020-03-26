@@ -366,7 +366,11 @@ data_norsyss <- function(data, argset, schema){
     msg(sprintf("Processing %s/%s: %s -> %s", i, nrow(syndromes), conf$tag_input, conf$tag_output))
 
     res <- CleanData(
-      d = copy(d[isoyear %in% years_to_process & Kontaktype %in% conf$contactType[[1]]]),
+      d = copy(d[
+        isoyear %in% years_to_process &
+        Kontaktype %in% conf$contactType[[1]] &
+        Praksis %in% conf$practice_type[[1]]
+        ]),
       syndrome = conf$tag_input
     )
     res[, tag_outcome:=conf$tag_output]
