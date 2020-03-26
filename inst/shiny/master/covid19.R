@@ -373,43 +373,14 @@ covid19_server <- function(input, output, session, config) {
         "Lege/Legevakt"
       )
     )]
-    pd[,total := sum(n), by=.(date, location_code)]
-    pd[,andel := 100*n/total]
 
     weekends <- unique(pd$date)
     weekends <- weekends[lubridate::wday(weekends, week_start = 1) %in% c(6,7)]
     weekends <- data.frame(date = weekends)
 
-    q <- ggplot(pd, aes(x=date, y=andel, fill=cat))
-    q <- q + geom_col()
-    q <- q + fhiplot::scale_fill_fhi(NULL)
-    q <- q + scale_y_continuous(
-      "Andel",
-      breaks = fhiplot::pretty_breaks(6),
-      expand = expand_scale(mult = c(0, 0)),
-      labels = format_nor_perc
-    )
-    q <- q + scale_x_date(
-      "Dato",
-      date_breaks = "2 days",
-      date_labels = "%d.%m",
-      expand = expand_scale(mult = c(0.00, 0.0)),
-      limits = c(config$start_date,config$max_date_uncertain)
-    )
-    q <- q + fhiplot::scale_color_fhi("Syndrome", guide = "none")
-    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
-    q <- q + theme(legend.key.size = unit(1, "cm"))
-    q <- q + labs(title = glue::glue(
-      "R991 konsultasjoner kilde i {names(config$choices_location)[config$choices_location==input$covid_location_code]}"
-    ))
-    q <- q + labs(caption=glue::glue(
-      "Nevneren er totalt antall R991 konsultasjoner"
-    ))
-    q1 <- q
-
     max_y <- max(pd[,.(n=sum(n)),by=.(date)]$n)
-    min_y_start <- -0.2*max_y*1.01
-    min_y_end <- -0.1*max_y*1.01
+    min_y_start <- -0.085*max_y*1.01
+    min_y_end <- -0.05*max_y*1.01
 
     pd_line <- pd[,.(
       n=sum(n),
@@ -449,9 +420,7 @@ covid19_server <- function(input, output, session, config) {
     q <- q + scale_x_date(
       "Dato",
       date_breaks = "2 days",
-      date_labels = "%d.%m",
-      expand = expand_scale(mult = c(0.00, 0.0)),
-      limits = c(config$start_date,config$max_date_uncertain)
+      date_labels = "%d.%m"
     )
     q <- q + fhiplot::scale_color_fhi("Syndrome", guide = "none")
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
@@ -465,15 +434,7 @@ covid19_server <- function(input, output, session, config) {
       "Kolonnene tilhører høyre-aksen, den røde linjen tilhører venstre-aksen\n",
       "Nevneren til andelen er totalt antall konsultasjoner"
     ))
-    q2 <- q
-
-    retval <- cowplot::plot_grid(
-      q1,
-      q2,
-      ncol=1
-    )
-
-    return(retval)
+    q
   }, cacheKeyExpr={list(
     input$covid_location_code,
     dev_invalidate_cache
