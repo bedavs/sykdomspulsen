@@ -239,6 +239,96 @@ covid19_server <- function(input, output, session, config) {
   output$overview_plot_national_syndromes_proportion <- renderCachedPlot({
     req(input$covid_location_code)
 
+    covid19_overview_plot_national_syndromes_proportion(
+      location_code = input$covid_location_code,
+      config = config
+    )
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+  res = 72
+  )
+
+  output$overview_plot_national_source_proportion <- renderCachedPlot({
+    req(input$covid_location_code)
+
+    covid19_overview_plot_national_source_proportion(
+      location_code = input$covid_location_code,
+      config = config
+    )
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+  res = 72
+  )
+
+  output$overview_plot_national_age_proportion <- renderCachedPlot({
+    req(input$covid_location_code)
+
+    covid19_overview_plot_national_age_proportion(
+      location_code = input$covid_location_code,
+      config = config
+    )
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+    res = 72
+  )
+
+  output$overview_plot_county_proportion <- renderCachedPlot({
+    req(input$covid_location_code)
+
+    covid19_overview_plot_county_proportion(
+      location_code = input$covid_location_code,
+      config = config
+    )
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+  res = 72
+  )
+
+  output$overview_ui_county_proportion <- renderUI({
+    ns <- session$ns
+    req(input$covid_location_code)
+
+    location_codes <- get_dependent_location_codes(location_code = input$covid_location_code)
+    height <- round(250*ceiling(length(location_codes)/4))
+    height <- max(400, height)
+    height <- paste0(height,"px")
+    plotOutput(ns("overview_plot_county_proportion"), height = height)
+  })
+
+  output$overview_map_county_proportion <- renderCachedPlot({
+
+    covid19_overview_map_county_proportion(
+      location_code = input$covid_location_code,
+      config = config
+    )
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+  res = 72
+  )
+
+  outputOptions(output, "overview_plot_national_syndromes_proportion", priority = 10)
+  outputOptions(output, "overview_plot_national_age_proportion", priority = 9)
+  outputOptions(output, "overview_plot_county_proportion", priority = 8)
+  outputOptions(output, "overview_map_county_proportion", priority = 7)
+
+}
+
+
+covid19_overview_plot_national_syndromes_proportion <- function(
+  location_code,
+  config
+){
+
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(tag_outcome %in% c(
         "covid19_lf_lte",
@@ -249,9 +339,10 @@ covid19_server <- function(input, output, session, config) {
       )) %>%
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age == "Totalt") %>%
-      dplyr::filter(location_code == !!input$covid_location_code) %>%
+      dplyr::filter(location_code == !!location_code) %>%
       dplyr::collect()
     setDT(pd)
+    pd[, date:= as.Date(date)]
 
     pd[, andel := 100*n/consult_with_influenza]
     pd[, no_data := consult_with_influenza==0]
@@ -316,7 +407,7 @@ covid19_server <- function(input, output, session, config) {
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + labs(title = glue::glue(
-      "{names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
+      "{names(config$choices_location)[config$choices_location==location_code]}\n",
       "Andel konsultasjoner"
     ))
     q <- q + labs(caption=glue::glue(
@@ -325,15 +416,12 @@ covid19_server <- function(input, output, session, config) {
       "Røde stiplede vertikale linjer på grafen betyr at ingen data ble rapportert på disse dagene"
     ))
     q
-  }, cacheKeyExpr={list(
-    input$covid_location_code,
-    dev_invalidate_cache
-  )},
-  res = 72
-  )
+}
 
-  output$overview_plot_national_source_proportion <- renderCachedPlot({
-    req(input$covid_location_code)
+covid19_overview_plot_national_source_proportion <- function(
+  location_code,
+  config
+){
 
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(tag_outcome %in% c(
@@ -346,9 +434,10 @@ covid19_server <- function(input, output, session, config) {
       )) %>%
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age >= "Totalt") %>%
-      dplyr::filter(location_code == !!input$covid_location_code) %>%
+      dplyr::filter(location_code == !!location_code) %>%
       dplyr::collect()
     setDT(pd)
+    pd[, date:= as.Date(date)]
 
     pd[,
        contact_type := dplyr::case_when(
@@ -416,7 +505,7 @@ covid19_server <- function(input, output, session, config) {
         breaks = fhiplot::pretty_breaks(6),
         labels = format_nor_perc,
         name = "Andel"
-        )
+      )
     )
     q <- q + scale_x_date(
       "Dato",
@@ -428,7 +517,7 @@ covid19_server <- function(input, output, session, config) {
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + coord_cartesian(ylim=c(0, max_y), clip="off", expand = F)
     q <- q + labs(title = glue::glue(
-      "{names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
+      "{names(config$choices_location)[config$choices_location==location_code]}\n",
       "COVID-19 (mistenkt eller bekreftet) (R991) konsultasjoner etter kilde"
     ))
     q <- q + labs(caption=glue::glue(
@@ -437,22 +526,20 @@ covid19_server <- function(input, output, session, config) {
       "Nevneren til andelen er totalt antall konsultasjoner"
     ))
     q
-  }, cacheKeyExpr={list(
-    input$covid_location_code,
-    dev_invalidate_cache
-  )},
-  res = 72
-  )
+}
 
-  output$overview_plot_national_age_proportion <- renderCachedPlot({
-    req(input$covid_location_code)
+covid19_overview_plot_national_age_proportion <- function(
+  location_code,
+  config
+){
 
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(tag_outcome == "covid19_lf_lte") %>%
-      dplyr::filter(location_code== !!input$covid_location_code) %>%
+      dplyr::filter(location_code== !!location_code) %>%
       dplyr::collect()
     setDT(pd)
+    pd[, date:= as.Date(date)]
 
     pd[,age:=factor(
       age,
@@ -520,8 +607,8 @@ covid19_server <- function(input, output, session, config) {
     q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + labs(title = glue::glue(
-     "{names(config$choices_location)[config$choices_location==input$covid_location_code]}\n",
-     "Andel konsultasjoner som tilhører COVID-19 (mistenkt eller bekreftet) (R991)"
+      "{names(config$choices_location)[config$choices_location==location_code]}\n",
+      "Andel konsultasjoner som tilhører COVID-19 (mistenkt eller bekreftet) (R991)"
     ))
     q <- q + labs(caption=glue::glue(
       "Konsultasjoner er legekontakt, telefon, ekonsultasjoner til fastleger og legevakter\n",
@@ -529,17 +616,14 @@ covid19_server <- function(input, output, session, config) {
       "Røde stiplede vertikale linjer på grafen betyr at ingen data ble rapportert på disse dagene"
     ))
     q
-  }, cacheKeyExpr={list(
-    input$covid_location_code,
-    dev_invalidate_cache
-  )},
-    res = 72
-  )
+}
 
-  output$overview_plot_county_proportion <- renderCachedPlot({
-    req(input$covid_location_code)
+covid19_overview_plot_county_proportion <- function(
+  location_code,
+  config
+){
 
-    location_codes <- get_dependent_location_codes(location_code = input$covid_location_code)
+    location_codes <- get_dependent_location_codes(location_code = location_code)
 
     pd <- pool %>% dplyr::tbl("data_norsyss") %>%
       dplyr::filter(tag_outcome %in% c(
@@ -551,6 +635,7 @@ covid19_server <- function(input, output, session, config) {
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::collect()
     setDT(pd)
+    pd[, date:= as.Date(date)]
 
     pd[
       fhidata::norway_locations_long_b2020,
@@ -628,28 +713,15 @@ covid19_server <- function(input, output, session, config) {
       "Nevneren er totalt antall konsultasjoner"
     ))
     q
-  }, cacheKeyExpr={list(
-    input$covid_location_code,
-    dev_invalidate_cache
-  )},
-  res = 72
-  )
+}
 
-  output$overview_ui_county_proportion <- renderUI({
-    ns <- session$ns
-    req(input$covid_location_code)
+covid19_overview_map_county_proportion <- function(
+  location_code,
+  config
+){
 
-    location_codes <- get_dependent_location_codes(location_code = input$covid_location_code)
-    height <- round(250*ceiling(length(location_codes)/4))
-    height <- max(400, height)
-    height <- paste0(height,"px")
-    plotOutput(ns("overview_plot_county_proportion"), height = height)
-  })
-
-  output$overview_map_county_proportion <- renderCachedPlot({
-
-    granularity_geo <- get_granularity_geo(location_code = input$covid_location_code)
-    location_codes <- get_dependent_location_codes(location_code = input$covid_location_code)
+    granularity_geo <- get_granularity_geo(location_code = location_code)
+    location_codes <- get_dependent_location_codes(location_code = location_code)
 
     if(granularity_geo == "nation"){
       d <- pool %>% dplyr::tbl("data_norsyss") %>%
@@ -751,16 +823,4 @@ covid19_server <- function(input, output, session, config) {
     q <- q + fhiplot::scale_fill_fhi("Kumulativt\nantall",palette = "map_seq_missing", direction = -1, drop=F)
     q <- q + labs(title = glue::glue("Kumulativt antall konsultasjoner f.o.m {format(config$start_date,'%d.%m.%Y')} t.o.m {format(config$max_date_uncertain,'%d.%m.%Y')}\n\n"))
     q
-  }, cacheKeyExpr={list(
-    input$covid_location_code,
-    dev_invalidate_cache
-  )},
-  res = 72
-  )
-
-  outputOptions(output, "overview_plot_national_syndromes_proportion", priority = 10)
-  outputOptions(output, "overview_plot_national_age_proportion", priority = 9)
-  outputOptions(output, "overview_plot_county_proportion", priority = 8)
-  outputOptions(output, "overview_map_county_proportion", priority = 7)
-
 }

@@ -2,7 +2,10 @@
 library(shiny)
 library(shinyjs)
 
-shinyOptions(cache = diskCache("/tmp/", max_size = 50e6, max_age = 60*60)) # 1 hour
+if (.Platform$OS.type == "windows"){
+} else {
+  shinyOptions(cache = diskCache("/tmp/", max_size = 50e6, max_age = 60*60)) # 1 hour
+}
 
 assign("dev_invalidate_cache", lubridate::now(), envir = .GlobalEnv)
 #assign("dev_invalidate_cache", 1, envir = .GlobalEnv)
