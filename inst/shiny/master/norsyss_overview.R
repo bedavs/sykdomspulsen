@@ -217,7 +217,7 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
 
   granularity_geo <- get_granularity_geo(location_code = location_code)
 
-  min_date1 <- lubridate::today()-7*16
+  min_date1 <- lubridate::today()-7*15
   pd1 <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
     dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
     dplyr::filter(date >= !!min_date1) %>%
@@ -226,7 +226,7 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
     dplyr::select(granularity_time, date, yrwk, age, location_code, n_status) %>%
     dplyr::collect()
 
-  min_date2 <- lubridate::today()-16
+  min_date2 <- lubridate::today()-14
   pd2 <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
     dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
     dplyr::filter(date >= !!min_date2) %>%
@@ -353,7 +353,7 @@ plot_barameter_location <- function(
   granularity_geo <- get_granularity_geo(location_code = location_code)
   location_codes <- get_dependent_location_codes(location_code = location_code)
 
-  min_date1 <- lubridate::today()-7*16
+  min_date1 <- lubridate::today()-7*15
   pd_week <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
     dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
     dplyr::filter(date >= !!min_date1) %>%
@@ -362,7 +362,7 @@ plot_barameter_location <- function(
     dplyr::select(granularity_time, date, yrwk, age, location_code, n_status) %>%
     dplyr::collect()
 
-  min_date2 <- lubridate::today()-16
+  min_date2 <- lubridate::today()-14
   pd_day <- pool %>% dplyr::tbl("results_norsyss_standard") %>%
     dplyr::filter(tag_outcome %in% !!tag_outcome) %>%
     dplyr::filter(date >= !!min_date2) %>%
@@ -656,8 +656,3 @@ plot_trends_multiple <- function(tag_outcome, location_code, config){
     label_size=26
   )
 }
-
-norsyss_plot_investigate_weekly <- function(){
-
-}
-

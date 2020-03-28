@@ -72,6 +72,7 @@ config$ages <- list(
   "65+"
 )
 
+config$start_date_norsyss_standard_weekly <- as.Date("2018-01-01")
 config$start_date <- as.Date("2020-03-08")
 val <- pool %>% dplyr::tbl("data_norsyss") %>%
   dplyr::summarize(date = max(date)) %>%
@@ -105,6 +106,10 @@ choices_location <- x_choices$location_code
 names(choices_location) <- x_choices$location_name
 
 config$choices_location <- choices_location
+
+choices_location_daily <- x_choices[is.na(county_name)]$location_code
+names(choices_location_daily) <- x_choices[is.na(county_name)]$location_name
+config$choices_location_daily <- choices_location_daily
 
 config$choices_norsyss_tag <- list(
   "Luftveisinfeksjoner (R05, R74, R78, R83)" = "respiratoryexternal_lf_lt",

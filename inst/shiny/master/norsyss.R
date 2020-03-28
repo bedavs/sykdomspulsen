@@ -16,8 +16,17 @@ norsyss_ui <- function(id, config) {
       )
     ),
     tabsetPanel(
-      tabPanel(title="Oversikt",
-               norsyss_overview_ui("norsyss_overview", config=config)
+      tabPanel(
+        title="Oversikt",
+        norsyss_overview_ui("norsyss_overview", config=config)
+      ),
+      tabPanel(
+        title="Ukentlig",
+        norsyss_weekly_ui("norsyss_weekly", config=config)
+      ),
+      tabPanel(
+        title="Daglig",
+        norsyss_daily_ui("norsyss_daily", config=config)
       ),
       tabPanel(
         title="Formålet",
@@ -28,5 +37,6 @@ norsyss_ui <- function(id, config) {
 }
 
 norsyss_server <- function(input, output, session, config) {
+
 }
 

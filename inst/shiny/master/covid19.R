@@ -381,6 +381,7 @@ covid19_overview_plot_national_syndromes_proportion <- function(
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age == "Totalt") %>%
       dplyr::filter(location_code == !!location_code) %>%
+      dplyr::select(tag_outcome, date, n, consult_with_influenza) %>%
       dplyr::collect()
     setDT(pd)
     pd[, date:= as.Date(date)]
@@ -476,6 +477,7 @@ covid19_overview_plot_national_source_proportion <- function(
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age >= "Totalt") %>%
       dplyr::filter(location_code == !!location_code) %>%
+      dplyr::select(tag_outcome, date, n, consult_with_influenza) %>%
       dplyr::collect()
     setDT(pd)
     pd[, date:= as.Date(date)]
@@ -795,7 +797,7 @@ covid19_overview_plot_county_proportion <- function(
     )
     q <- q + fhiplot::scale_fill_fhi(NULL)
     q <- q + fhiplot::scale_color_fhi(NULL, guide="none")
-    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
+    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + theme(legend.position="bottom")
     q <- q + labs(title="Andel konsultasjoner etter geografiske område")
