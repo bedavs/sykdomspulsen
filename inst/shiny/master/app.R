@@ -18,16 +18,6 @@ source("norsyss_weekly.R")
 source("norsyss_daily.R")
 source("norsyss_purpose.R")
 
-ui <- navbarPage(
-  "Sykdomspulsen intern",
-  tabPanel("NorSySS",
-    norsyss_ui("norsyss", config=config)
-  ),
-  tabPanel("COVID-19",
-    covid19_ui("covid19", config=config)
-  )
-)
-
 ui <- tagList(
   useShinyjs(),
   tags$style("
@@ -37,8 +27,8 @@ ui <- tagList(
  "),
   tags$div(class="container",
            navbarPage(
-             title = div(img(id="logo",src="fhi.svg", height="40px"), "Sykdomspulsen"),
-             tabPanel("COVID-19",
+             title = div(img(id="logo",src="fhi.svg", height="40px"), "Sykdomspulsen til kommunehelsetjenesten"),
+             tabPanel("Covid-19",
                       covid19_ui("covid19", config=config)
              ),
              tabPanel("NorSySS",

@@ -73,7 +73,7 @@ config$ages <- list(
 )
 
 config$start_date_norsyss_standard_weekly <- as.Date("2018-01-01")
-config$start_date <- as.Date("2020-03-08")
+config$start_date <- as.Date("2020-03-06")
 val <- pool %>% dplyr::tbl("data_norsyss") %>%
   dplyr::summarize(date = max(date)) %>%
   dplyr::collect()

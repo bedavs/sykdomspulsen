@@ -161,5 +161,8 @@ plot_norsyss_weekly_trend <- function(
   q <- q + theme(legend.key.size = unit(1, "cm"))
   #q <- q + fhiplot::set_x_axis_vertical()
   q <- q + labs(title=title_text)
+  q <- q + labs(caption = glue::glue(
+    "Folkehelseinstituttet, {format(lubridate::today(),'%d.%m.%Y')}"
+  ))
   q
 }

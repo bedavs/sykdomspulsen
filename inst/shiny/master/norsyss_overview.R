@@ -9,13 +9,43 @@ norsyss_overview_ui <- function(id, config) {
         p("")
       ),
       column(
-        width=8, align="center",
+        width=8, align="left",
 
-        p("text text text text text text text text text text text text "),
-        p("text text text text text text text text text text text text "),
-        p("text text text text text text text text text text text text "),
-        p("text text text text text text text text text text text text "),
-        p("text text text text text text text text text text text text ")
+        p(
+          "Under vil du se en rekke grafer og tabeller som gir en ",
+          "oversikt over det symptomet/syndromet og geografiske ",
+          "område du velger i under. For å velge geografisk område ",
+          "kan du begynne å skrive navnet på ønsket fylke eller ",
+          "kommune så vil det automatisk komme opp alternativer.", br(), br(),
+
+          strong("Norge: "), "Gir en oversikt over Norge i tillegg ",
+          "til oversikt over alle fylkene.", br(),
+          strong("Fylke: "), "Gir en oversikt over det valgte ",
+          "fylket i tillegg til en oversikt over alle kommunene i dette fylket.", br(),
+          strong("Kommune: "), "Gir en oversikt over den valgte kommunen ",
+          "i tillegg til en oversikt over nabokommunene.", br(), br(),
+
+          "Informasjon om dataene (se også i fanen 'informasjon'):", br(),
+          "- Både telefon, legekontakt er inkludert i grafene.", br(),
+          "- Geografisk område basert på stedet for legekonsultasjon, ",
+          "ikke pasientens bosted.", br(),
+          "- De kommunene som ikke har legevakt eller legekontor finner ",
+          "du ikke i listen over geografisk område da vi ikke har noe ",
+          "data over disse kommunene. De som bor i disse kommunene drar ",
+          "til legekontor i andre kommuner.", br(),
+          "- Det kan være 14 dager forsinkelse i dataene da de kommer fra ",
+          "KUHR systemet. Dersom det for noen datoer ikke er registrert ",
+          "noen konsultasjoner fra et geografisk område vil dette vises ",
+          "som røde stiplede linjer i grafene.", br(), br(),
+
+          strong("Mage-tarminfeksjoner"), " er en samlebetegnelse for ICPC-2 ",
+          "kodene Diare (D11), Tarminfeksjon (D70) og Gastroenteritt ",
+          "antatt infeksiøs (D73)", br(), br(),
+
+          strong("Luftveisinfeksjoner"), " er en samlebetegnelse for Hoste (R05), ",
+          "Akutt øvre luftveisinfeksjon (R74), Akutt bronkitt/bronkiolitt (R78) ",
+          "og Luftveisinfeksjon IKA (R83)."
+        )
       ),
       column(
         width=2,
@@ -29,7 +59,7 @@ norsyss_overview_ui <- function(id, config) {
 
         radioButtons(
           inputId = ns("norsyss_tag"),
-          label = "Syndrome",
+          label = "Sykdom/syndrom",
           choices = config$choices_norsyss_tag,
           selected = config$choices_norsyss_tag[[1]],
           width = "400px"
@@ -56,13 +86,33 @@ norsyss_overview_ui <- function(id, config) {
        p("")
      ),
      column(
-       width=8, align="center",
+       width=8, align="left",
 
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text ")
+       p(
+         "Under ser du to oversikter (bokser) med aldersgrupper ",
+         "vertikalt på venstre side og dato nede på x-aksen. ",
+         "Ved å kombinere disse vil hver firkant i boksen stå ",
+         "for en aldersgruppe og en tidsperiode.", br(), br(),
+
+         strong("Boksen til venstre viser ukesoversikt. "),
+         "Her ser du 16 uker og 7 aldersgrupper ('totalt' ",
+         "er summen av alle aldersgrupper). ",
+         "Hver firkant i boksen står for en aldersgruppe og en uke.", br(), br(),
+
+         strong("Boksen til høyre viser en daglig oversikt. "),
+         "Her ser du 14 dager og 7 aldersgrupper ('totalt' ",
+         "er summen av alle aldersgrupper). ",
+         "Hver firkant i boksen står for en aldersgruppe og en dag.", br(), br(),
+
+         "Fargen i boksene er laget ut fra beregninger fra de ",
+         "foregående 5 årene i samme geografiske område og ",
+         "samme sykdom/syndrom og aldersgruppe (for årene ",
+         "2006-2010 er 2006-2010 brukt).", br(), br(),
+
+         strong("Blå "), "farge viser at antallet konsultasjoner er som forventet",br(),
+         strong("Gul "), "farge viser at antallet konsultasjoner er høyere enn forventet", br(),
+         strong("Rød "), "farge viser at antall konsultasjoner er betydelig høyere enn forventet"
+       )
      ),
      column(
        width=2,
@@ -83,13 +133,32 @@ norsyss_overview_ui <- function(id, config) {
        p("")
      ),
      column(
-       width=8, align="center",
+       width=8, align="left",
 
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text ")
+       p(
+         "Under er same type grafer som beskrevet over ",
+         "men for fylker eller kommuner i det geografiske ",
+         "området som er valgt.", br(), br(),
+
+         strong("Boksen til venstre viser ukesoversikt. "),
+         "Her ser du 16 uker og 7 aldersgrupper ('totalt' ",
+         "er summen av alle aldersgrupper). ",
+         "Hver firkant i boksen står for en aldersgruppe og en uke.", br(), br(),
+
+         strong("Boksen til høyre viser en daglig oversikt. "),
+         "Her ser du 14 dager og 7 aldersgrupper ('totalt' ",
+         "er summen av alle aldersgrupper). ",
+         "Hver firkant i boksen står for en aldersgruppe og en dag.", br(), br(),
+
+         "Fargen i boksene er laget ut fra beregninger fra de ",
+         "foregående 5 årene i samme geografiske område og ",
+         "samme sykdom/syndrom og aldersgruppe (for årene ",
+         "2006-2010 er 2006-2010 brukt).", br(), br(),
+
+         strong("Blå "), "farge viser at antallet konsultasjoner er som forventet",br(),
+         strong("Gul "), "farge viser at antallet konsultasjoner er høyere enn forventet", br(),
+         strong("Rød "), "farge viser at antall konsultasjoner er betydelig høyere enn forventet"
+        )
      ),
      column(
        width=2,
@@ -111,13 +180,22 @@ norsyss_overview_ui <- function(id, config) {
        p("")
      ),
      column(
-       width=8, align="center",
+       width=8, align="left",
 
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text "),
-       p("text text text text text text text text text text text text ")
+       p(
+         "Under er en oversikt over antall og andel ukentlige konsultasjoner ",
+         "for valgt geografisk område for forskjellige aldersgrupper.", br(), br(),
+
+         "- Den svarte streken viser antallet faktiske konsultasjoner det ",
+         "har vært på legekontor og legevakt. Dersom denne streken er ",
+         "i det blå feltet er antallet konsultasjoner er som forventet, ",
+         "om den er i det gule feltet er antallet konsultasjoner høyere ",
+         "enn forventet og om den er i det røde feltet er antallet konsultasjoner ",
+         "betydelig høyere enn forventet for gitt tidsrom, alder og geografisk område.", br(),
+         "- Bakgrunnsfargen er laget ut fra beregninger fra de foregående 5 ",
+         "årene i samme geografiske område og samme sykdom/syndrom og aldersgruppe ",
+         "(for årene 2006-2010 er 5 fremtidige år brukt)."
+       )
      ),
      column(
        width=2,
@@ -254,19 +332,24 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
 
   pd[, n_status := factor(
     n_status,
-    levels = c("Normal", "Medium", "High")
+    levels = c("Normal", "Medium", "High"),
+    labels = c(
+      "Forventet",
+      "Høyere enn\nforventet",
+      "Betydelig høyere\nenn forventet"
+    )
   )]
 
   q <- ggplot(pd[granularity_time=="weekly"], aes(x=yrwk,y=age,fill=n_status))
   q <- q + geom_tile(color="black")
-  q <- q + scale_y_discrete(NULL)
-  q <- q + scale_x_discrete(NULL)
+  q <- q + scale_y_discrete("Alder")
+  q <- q + scale_x_discrete("Uke")
   q <- q + scale_fill_manual(
     NULL,
     values = c(
-      "Normal" = fhiplot::warning_color[["low"]],
-      "Medium" = fhiplot::warning_color[["med"]],
-      "High" = fhiplot::warning_color[["hig"]]
+      "Forventet" = fhiplot::warning_color[["low"]],
+      "Høyere enn\nforventet" = fhiplot::warning_color[["med"]],
+      "Betydelig høyere\nenn forventet" = fhiplot::warning_color[["hig"]]
     )
   )
   q <- q + fhiplot::theme_fhi_basic(20)
@@ -276,22 +359,25 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
   q <- q + labs(title=glue::glue(
     "Ukentlig status etter aldersgruppe"
   ))
+  q <- q + labs(caption = glue::glue(
+    "Folkehelseinstituttet, {format(lubridate::today(),'%d.%m.%Y')}"
+  ))
   q1 <- q
 
   q <- ggplot(pd[granularity_time=="daily"], aes(x=date,y=age,fill=n_status))
   q <- q + geom_tile(color="black")
-  q <- q + scale_y_discrete(NULL)
+  q <- q + scale_y_discrete("Alder")
   q <- q + scale_x_date(
-    NULL,
+    "Dag",
     date_breaks = "1 day",
     expand = expand_scale(mult = c(0, 0))
   )
   q <- q + scale_fill_manual(
     NULL,
     values = c(
-      "Normal" = fhiplot::warning_color[["low"]],
-      "Medium" = fhiplot::warning_color[["med"]],
-      "High" = fhiplot::warning_color[["hig"]]
+      "Forventet" = fhiplot::warning_color[["low"]],
+      "Høyere enn\nforventet" = fhiplot::warning_color[["med"]],
+      "Betydelig høyere\nenn forventet" = fhiplot::warning_color[["hig"]]
     )
   )
   q <- q + fhiplot::theme_fhi_basic(20)
@@ -300,6 +386,9 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
   q <- q + fhiplot::set_x_axis_vertical()
   q <- q + labs(title=glue::glue(
     "Daglig status etter aldersgruppe"
+  ))
+  q <- q + labs(caption = glue::glue(
+    "Folkehelseinstituttet, {format(lubridate::today(),'%d.%m.%Y')}"
   ))
   q2 <- q
 
@@ -405,6 +494,11 @@ plot_barameter_location <- function(
       "Normal",
       "Medium",
       "High"
+    ),
+    labels = c(
+      "Forventet",
+      "Høyere enn\nforventet",
+      "Betydelig høyere\nenn forventet"
     )
   )]
 
@@ -416,9 +510,9 @@ plot_barameter_location <- function(
   q <- q + scale_fill_manual(
     NULL,
     values = c(
-      "Normal" = fhiplot::warning_color[["low"]],
-      "Medium" = fhiplot::warning_color[["med"]],
-      "High" = fhiplot::warning_color[["hig"]]
+      "Forventet" = fhiplot::warning_color[["low"]],
+      "Høyere enn\nforventet" = fhiplot::warning_color[["med"]],
+      "Betydelig høyere\nenn forventet" = fhiplot::warning_color[["hig"]]
     )
   )
   q <- q + fhiplot::theme_fhi_basic(16)
@@ -427,6 +521,9 @@ plot_barameter_location <- function(
   q <- q + fhiplot::set_x_axis_vertical()
   q <- q + labs(title=glue::glue(
     "Ukentlig status etter område per aldersgruppe"
+  ))
+  q <- q + labs(caption = glue::glue(
+    "Folkehelseinstituttet, {format(lubridate::today(),'%d.%m.%Y')}"
   ))
   q_week <- q
 
@@ -442,9 +539,9 @@ plot_barameter_location <- function(
   q <- q + scale_fill_manual(
     NULL,
     values = c(
-      "Normal" = fhiplot::warning_color[["low"]],
-      "Medium" = fhiplot::warning_color[["med"]],
-      "High" = fhiplot::warning_color[["hig"]]
+      "Forventet" = fhiplot::warning_color[["low"]],
+      "Høyere enn\nforventet" = fhiplot::warning_color[["med"]],
+      "Betydelig høyere\nenn forventet" = fhiplot::warning_color[["hig"]]
     )
   )
   q <- q + fhiplot::theme_fhi_basic(16)
@@ -453,6 +550,9 @@ plot_barameter_location <- function(
   q <- q + fhiplot::set_x_axis_vertical()
   q <- q + labs(title=glue::glue(
     "Daglig status etter område per aldersgruppe"
+  ))
+  q <- q + labs(caption = glue::glue(
+    "Folkehelseinstituttet, {format(lubridate::today(),'%d.%m.%Y')}"
   ))
   q_day <- q
 
