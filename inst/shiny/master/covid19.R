@@ -135,7 +135,34 @@ covid19_ui <- function(id, config) {
           fluidRow(
             column(
               width=12, align="center",
-              plotOutput(ns("overview_plot_national_age_proportion"), height = "700px")
+              plotOutput(ns("overview_plot_national_age_burden"), height = "700px")
+            )
+          ),
+
+          fluidRow(
+            column(
+              width=2,
+              p("")
+            ),
+            column(
+              width=8, align="center",
+
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text "),
+              p("text text text text text text text text text text text text ")
+            ),
+            column(
+              width=2,
+              p("")
+            )
+          ),
+
+          fluidRow(
+            column(
+              width=12, align="center",
+              plotOutput(ns("overview_plot_national_age_trends"), height = "700px")
             )
           ),
 
@@ -264,10 +291,10 @@ covid19_server <- function(input, output, session, config) {
   res = 72
   )
 
-  output$overview_plot_national_age_proportion <- renderCachedPlot({
+  output$overview_plot_national_age_burden <- renderCachedPlot({
     req(input$covid_location_code)
 
-    covid19_overview_plot_national_age_proportion(
+    covid19_overview_plot_national_age_burden(
       location_code = input$covid_location_code,
       config = config
     )
@@ -275,7 +302,21 @@ covid19_server <- function(input, output, session, config) {
     input$covid_location_code,
     dev_invalidate_cache
   )},
-    res = 72
+  res = 72
+  )
+
+  output$overview_plot_national_age_trends <- renderCachedPlot({
+    req(input$covid_location_code)
+
+    covid19_overview_plot_national_age_trends(
+      location_code = input$covid_location_code,
+      config = config
+    )
+  }, cacheKeyExpr={list(
+    input$covid_location_code,
+    dev_invalidate_cache
+  )},
+  res = 72
   )
 
   output$overview_plot_county_proportion <- renderCachedPlot({
@@ -317,7 +358,7 @@ covid19_server <- function(input, output, session, config) {
   )
 
   outputOptions(output, "overview_plot_national_syndromes_proportion", priority = 10)
-  outputOptions(output, "overview_plot_national_age_proportion", priority = 9)
+  outputOptions(output, "overview_plot_national_age_burden", priority = 9)
   outputOptions(output, "overview_plot_county_proportion", priority = 8)
   outputOptions(output, "overview_map_county_proportion", priority = 7)
 
@@ -528,94 +569,141 @@ covid19_overview_plot_national_source_proportion <- function(
     q
 }
 
-covid19_overview_plot_national_age_proportion <- function(
+covid19_overview_plot_national_age_burden <- function(
   location_code,
   config
 ){
 
-    pd <- pool %>% dplyr::tbl("data_norsyss") %>%
-      dplyr::filter(date >= !!config$start_date) %>%
-      dplyr::filter(tag_outcome == "covid19_lf_lte") %>%
-      dplyr::filter(location_code== !!location_code) %>%
-      dplyr::collect()
-    setDT(pd)
-    pd[, date:= as.Date(date)]
+  pd <- pool %>% dplyr::tbl("data_norsyss") %>%
+    dplyr::filter(date >= !!config$start_date) %>%
+    dplyr::filter(tag_outcome == "covid19_lf_lte") %>%
+    dplyr::filter(location_code== !!location_code) %>%
+    dplyr::filter(age != "Totalt") %>%
+    dplyr::select(date, age, n, consult_with_influenza) %>%
+    dplyr::collect()
+  setDT(pd)
+  pd[, date:= as.Date(date)]
 
-    pd[,age:=factor(
-      age,
-      levels = c(
-        "Totalt",
-        "0-4",
-        "5-14",
-        "15-19",
-        "20-29",
-        "30-64",
-        "65+"
-      )
-    )]
-    pd <- pd[,c("date","age","n","consult_with_influenza"),with=F]
-    pd_totalt <- pd[age=="Totalt",.(date,consult_with_influenza_totalt=consult_with_influenza)]
-    pd[
-      pd_totalt,
-      on="date",
-      consult_with_influenza_totalt := consult_with_influenza_totalt
-      ]
-
-    pd[, andel := 100*n/consult_with_influenza_totalt]
-    pd[, no_data := consult_with_influenza_totalt==0]
-    pd[is.nan(andel), andel := 0]
-
-    labels <- pd[date == max(date)]
-
-    max_date_uncertain <- max(pd$date)
-    min_date_uncertain <- max_date_uncertain-6
-    q <- ggplot(pd, aes(x=date,y=andel, color=age, group=age))
-    q <- q + geom_line(size=4)
-    if(sum(pd$no_data)>0){
-      q <- q + geom_vline(data=pd[no_data==TRUE], mapping=aes(xintercept = date),color= "red", lty=3, lwd=3)
-    }
-    q <- q + ggrepel::geom_label_repel(
-      data = labels,
-      mapping = aes(label = age),
-      nudge_y = 0.0,
-      nudge_x = 0.5,
-      direction = "y",
-      angle = 0,
-      vjust = 0,
-      hjust = 0,
-      label.r=0,
-      segment.size = 1,
-      label.size = 1,
-      label.padding = 1,
-      box.padding = 1,
-      size=8
+  pd[,age:=factor(
+    age,
+    levels = c(
+      "0-4",
+      "5-14",
+      "15-19",
+      "20-29",
+      "30-64",
+      "65+"
     )
-    q <- q + scale_y_continuous(
-      "Andel",
-      breaks = fhiplot::pretty_breaks(6),
-      expand = expand_scale(mult = c(0, 0.1)),
-      labels = format_nor_perc
+  )]
+  pd[, consult_with_influenza_totalt := sum(consult_with_influenza), by=.(date)]
+
+  pd[, andel := 100*n/consult_with_influenza_totalt]
+  pd[, no_data := consult_with_influenza_totalt==0]
+  pd[is.nan(andel), andel := 0]
+
+  labels <- pd[date == max(date)]
+
+  max_date_uncertain <- max(pd$date)
+  min_date_uncertain <- max_date_uncertain-6
+  q <- ggplot(pd, aes(x=date,y=andel))
+  q <- q + geom_col(mapping=aes(fill=age))
+  if(sum(pd$no_data)>0){
+    q <- q + geom_vline(data=pd[no_data==TRUE], mapping=aes(xintercept = date),color= "red", lty=3, lwd=3)
+  }
+  q <- q + scale_y_continuous(
+    "Andel",
+    breaks = fhiplot::pretty_breaks(6),
+    expand = expand_scale(mult = c(0, 0.1)),
+    labels = format_nor_perc
+  )
+  q <- q + expand_limits(y = 0)
+  q <- q + scale_x_date(
+    "Dato",
+    date_breaks = "2 days",
+    date_labels = "%d.%m"
+  )
+  q <- q + fhiplot::scale_fill_fhi("Aldersgruppe")
+  q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
+  q <- q + theme(legend.key.size = unit(1, "cm"))
+  q <- q + labs(title = glue::glue(
+    "{names(config$choices_location)[config$choices_location==location_code]}\n",
+    "Andel konsultasjoner som tilhører COVID-19 (mistenkt eller bekreftet) (R991)"
+  ))
+  q <- q + labs(caption=glue::glue(
+    "Konsultasjoner er legekontakt, telefon, ekonsultasjoner til fastleger og legevakter\n",
+    "Nevneren til alle aldersgrupper er totalt antall konsultasjoner (alle aldersgrupper summert)\n",
+    "Røde stiplede vertikale linjer på grafen betyr at ingen data ble rapportert på disse dagene"
+  ))
+  q
+}
+
+covid19_overview_plot_national_age_trends <- function(
+  location_code,
+  config
+){
+
+  pd <- pool %>% dplyr::tbl("data_norsyss") %>%
+    dplyr::filter(date >= !!config$start_date) %>%
+    dplyr::filter(tag_outcome == "covid19_lf_lte") %>%
+    dplyr::filter(location_code== !!location_code) %>%
+    dplyr::select(date, age, n, consult_with_influenza) %>%
+    dplyr::collect()
+  setDT(pd)
+  pd[, date:= as.Date(date)]
+
+  pd[,age:=factor(
+    age,
+    levels = c(
+      "Totalt",
+      "0-4",
+      "5-14",
+      "15-19",
+      "20-29",
+      "30-64",
+      "65+"
     )
-    q <- q + expand_limits(y = 0)
-    q <- q + scale_x_date(
-      "Dato",
-      date_breaks = "2 days",
-      date_labels = "%d.%m",
-      expand = expand_scale(mult = c(0.02, 0.15))
-    )
-    q <- q + fhiplot::scale_color_fhi("Aldersgruppe", guide = "none")
-    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
-    q <- q + theme(legend.key.size = unit(1, "cm"))
-    q <- q + labs(title = glue::glue(
-      "{names(config$choices_location)[config$choices_location==location_code]}\n",
-      "Andel konsultasjoner som tilhører COVID-19 (mistenkt eller bekreftet) (R991)"
-    ))
-    q <- q + labs(caption=glue::glue(
-      "Konsultasjoner er legekontakt, telefon, ekonsultasjoner til fastleger og legevakter\n",
-      "Nevneren til alle aldersgrupper er totalt antall konsultasjoner (alle aldersgrupper summert)\n",
-      "Røde stiplede vertikale linjer på grafen betyr at ingen data ble rapportert på disse dagene"
-    ))
-    q
+  )]
+
+  pd[, andel := 100*n/consult_with_influenza]
+
+  pd[, consult_with_influenza_totalt := sum(consult_with_influenza), by=.(date)]
+  pd[, no_data := consult_with_influenza_totalt==0]
+  pd[is.nan(andel), andel := 0]
+
+  labels <- pd[date == max(date)]
+
+  max_date_uncertain <- max(pd$date)
+  min_date_uncertain <- max_date_uncertain-6
+  q <- ggplot(pd, aes(x=date,y=andel))
+  q <- q + geom_col()
+  if(sum(pd$no_data)>0){
+    q <- q + geom_vline(data=pd[no_data==TRUE], mapping=aes(xintercept = date),color= "red", lty=3, lwd=3)
+  }
+  q <- q + scale_y_continuous(
+    "Andel",
+    breaks = fhiplot::pretty_breaks(5),
+    expand = expand_scale(mult = c(0, 0.1)),
+    labels = format_nor_perc
+  )
+  q <- q + expand_limits(y = 0)
+  q <- q + scale_x_date(
+    "Dato",
+    date_breaks = "4 days",
+    date_labels = "%d.%m"
+  )
+  q <- q + lemon::facet_rep_wrap(~age, repeat.tick.labels = "all", ncol=3)
+  q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
+  q <- q + theme(legend.key.size = unit(1, "cm"))
+  q <- q + labs(title = glue::glue(
+    "{names(config$choices_location)[config$choices_location==location_code]}\n",
+    "Andel konsultasjoner som tilhører COVID-19 (mistenkt eller bekreftet) (R991)"
+  ))
+  q <- q + labs(caption=glue::glue(
+    "Konsultasjoner er legekontakt, telefon, ekonsultasjoner til fastleger og legevakter\n",
+    "Nevneren er beregnet innen hver aldersgruppe\n",
+    "Røde stiplede vertikale linjer på grafen betyr at ingen data ble rapportert på disse dagene"
+  ))
+  q
 }
 
 covid19_overview_plot_county_proportion <- function(
@@ -633,6 +721,7 @@ covid19_overview_plot_county_proportion <- function(
       dplyr::filter(date >= !!config$start_date) %>%
       dplyr::filter(age >= "Totalt") %>%
       dplyr::filter(location_code %in% !!location_codes) %>%
+      dplyr::select(tag_outcome, location_code, date, n, consult_with_influenza) %>%
       dplyr::collect()
     setDT(pd)
     pd[, date:= as.Date(date)]
@@ -672,11 +761,11 @@ covid19_overview_plot_county_proportion <- function(
     labels[tag_outcome=="covid19_lf_lte",andel := max_val]
     labels[tag_outcome=="engstelig_luftveissykdom_ika_lf_lte",andel := max_val-5]
 
-    q <- ggplot(pd, aes(x=date, y=andel, color=name_outcome))
-    q <- q + geom_line(size=2)
+    q <- ggplot(pd, aes(x=date, y=andel))
+    q <- q + geom_col(mapping = aes(fill=name_outcome), position = "dodge", width=1)
     q <- q + ggrepel::geom_label_repel(
       data = labels,
-      mapping = aes(label = lab, y=andel),
+      mapping = aes(label = lab, y=andel, color=name_outcome),
       nudge_y = 0.0,
       nudge_x = 0.0,
       direction = "y",
@@ -690,10 +779,10 @@ covid19_overview_plot_county_proportion <- function(
       box.padding = 0.25,
       size=4
     )
-    q <- q + lemon::facet_rep_wrap(~location_name, repeat.tick.labels = "y", ncol=4)
+    q <- q + lemon::facet_rep_wrap(~location_name, repeat.tick.labels = "y", ncol=3)
     q <- q + scale_y_continuous(
       "Andel",
-      breaks = fhiplot::pretty_breaks(6),
+      breaks = fhiplot::pretty_breaks(5),
       expand = expand_scale(mult = c(0, 0.1)),
       labels = format_nor_perc
     )
@@ -704,8 +793,9 @@ covid19_overview_plot_county_proportion <- function(
       date_labels = "%d.%m",
       expand = expand_scale(mult = c(0.02, 0.02))
     )
-    q <- q + fhiplot::scale_color_fhi(NULL)
-    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = F)
+    q <- q + fhiplot::scale_fill_fhi(NULL)
+    q <- q + fhiplot::scale_color_fhi(NULL, guide="none")
+    q <- q + fhiplot::theme_fhi_lines(20, panel_on_top = T)
     q <- q + theme(legend.key.size = unit(1, "cm"))
     q <- q + theme(legend.position="bottom")
     q <- q + labs(title="Andel konsultasjoner etter geografiske område")

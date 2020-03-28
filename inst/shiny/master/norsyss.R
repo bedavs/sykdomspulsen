@@ -266,6 +266,7 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
     dplyr::filter(date >= !!min_date1) %>%
     dplyr::filter(granularity_time == "weekly") %>%
     dplyr::filter(location_code %in% !!location_code) %>%
+    dplyr::select(granularity_time, date, yrwk, age, location_code, n_status) %>%
     dplyr::collect()
 
   min_date2 <- lubridate::today()-16
@@ -274,6 +275,7 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
     dplyr::filter(date >= !!min_date2) %>%
     dplyr::filter(granularity_time == "daily") %>%
     dplyr::filter(location_code %in% !!location_code) %>%
+    dplyr::select(granularity_time, date, yrwk, age, location_code, n_status) %>%
     dplyr::collect()
 
   pd <- rbind(pd1,pd2)
@@ -385,7 +387,11 @@ plot_barometer_age <- function(tag_outcome = "respiratoryexternal_lt", location_
   return(retval)
 }
 
-plot_barameter_location <- function(tag_outcome = "respiratoryexternal_lt", location_code = "norge", config){
+plot_barameter_location <- function(
+  tag_outcome = "respiratoryexternal_lt",
+  location_code = "norge",
+  config
+  ){
 
   granularity_geo <- get_granularity_geo(location_code = location_code)
   location_codes <- get_dependent_location_codes(location_code = location_code)
@@ -396,6 +402,7 @@ plot_barameter_location <- function(tag_outcome = "respiratoryexternal_lt", loca
     dplyr::filter(date >= !!min_date1) %>%
     dplyr::filter(granularity_time == "weekly") %>%
     dplyr::filter(location_code %in% !!location_codes) %>%
+    dplyr::select(granularity_time, date, yrwk, age, location_code, n_status) %>%
     dplyr::collect()
 
   min_date2 <- lubridate::today()-16
@@ -404,6 +411,7 @@ plot_barameter_location <- function(tag_outcome = "respiratoryexternal_lt", loca
     dplyr::filter(date >= !!min_date2) %>%
     dplyr::filter(granularity_time == "daily") %>%
     dplyr::filter(location_code %in% !!location_codes) %>%
+    dplyr::select(granularity_time, date, yrwk, age, location_code, n_status) %>%
     dplyr::collect()
 
   pd <- rbind(pd_week,pd_day)
@@ -692,5 +700,7 @@ plot_trends_multiple <- function(tag_outcome, location_code, config){
   )
 }
 
+norsyss_plot_investigate_weekly <- function(){
 
+}
 

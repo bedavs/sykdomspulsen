@@ -34,11 +34,11 @@ ui <- tagList(
   tags$div(class="container",
            navbarPage(
              title = div(img(id="logo",src="fhi.svg", height="40px"), "Sykdomspulsen"),
-             tabPanel("NorSySS",
-                      norsyss_ui("norsyss", config=config)
-             ),
              tabPanel("COVID-19",
                       covid19_ui("covid19", config=config)
+             ),
+             tabPanel("NorSySS",
+                      norsyss_ui("norsyss", config=config)
              ),
              theme = "fhi.css"
            )
