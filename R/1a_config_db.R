@@ -70,6 +70,34 @@ set_db <- function(){
       )
     ),
 
+    data_covid19_msis = schema$new(
+      db_table = "data_covid19_msis",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "tag_outcome" = "TEXT",
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "month" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = "/xtmp/",
+      keys =  c(
+        "tag_outcome",
+        "location_code",
+        "date"
+      )
+    ),
+
     results_normomo_standard = schema$new(
       db_config = config$db_config,
       db_table = "results_normomo_standard",
