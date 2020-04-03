@@ -510,14 +510,13 @@ get_db_connection <- function(
     return(
       DBI::dbConnect(
         odbc::odbc(),
-        driver = driver,
-        server = server,
-        port = port,
-        uid = user,
-        Pwd = password,
-        encoding = "utf8",
-        trusted_connection="yes",
-        database = db_config$db
+        driver = db_config$driver,
+        server = db_config$server,
+        database = db_config$db,
+        port = db_config$port,
+        uid = db_config$user,
+        Pwd = db_config$password#,
+        #trusted_connection = "yes"
       ))
   } else {
     return(
