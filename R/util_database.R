@@ -512,7 +512,6 @@ get_db_connection <- function(
         odbc::odbc(),
         driver = db_config$driver,
         server = db_config$server,
-        database = db_config$db,
         port = db_config$port,
         uid = db_config$user,
         Pwd = db_config$password#,
