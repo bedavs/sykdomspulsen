@@ -325,12 +325,12 @@ data_norsyss <- function(data, argset, schema){
   syndromes <- argset$syndromes
 
   file <- fs::dir_ls("/input/norsyss/", regexp="norsyss_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt")
-  final_file <- max(file)
+  file <- max(file)
 
-  msg(sprintf("Cleaning file %s", final_file))
+  msg(sprintf("Cleaning file %s", file))
   #EmailNotificationOfNewData(files$id)
 
-  d <- fread(path("input", "norsyss", final_file))
+  d <- fread(file)
   setnames(d,"date","x_date")
   dates <- unique(d[,"x_date"])
   dates[,date:=data.table::as.IDate(x_date)]
