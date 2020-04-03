@@ -349,7 +349,7 @@ sykdomspuls_aggregate <- function(
       utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
     }
   }
-  pb$terminate()
+  #pb$terminate()
   system(glue::glue("mv {file_temp} {file_permanent}"))
 }
 
