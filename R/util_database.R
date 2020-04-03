@@ -513,9 +513,9 @@ get_db_connection <- function(
         driver = db_config$driver,
         server = db_config$server,
         port = db_config$port,
-        uid = db_config$user,
-        Pwd = db_config$password#,
-        #trusted_connection = "yes"
+        #uid = db_config$user,
+        #Pwd = db_config$password#,
+        trusted_connection = "yes"
       ))
   } else {
     return(
