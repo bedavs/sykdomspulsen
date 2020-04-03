@@ -11,7 +11,6 @@ set_config <- function() {
   set_db()
   set_progressr()
 
-
   config$def <- list(
     smallMunicips = c(
       "municip1151",

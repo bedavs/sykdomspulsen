@@ -323,8 +323,15 @@ sykdomspuls_aggregate <- function(
   datesToExtract <- datesToExtract[from <= date_to]
 
   # predefine storage of results
-  pb <- fhi::txt_progress_bar(min = 1, max = nrow(datesToExtract))
+  pb <- progress::progress_bar$new(
+    format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
+    clear = FALSE,
+    total =  nrow(datesToExtract)
+  )
+  pb$tick(0)
   for (i in 1:nrow(datesToExtract)) {
+    pb$tick()
+
     command <- paste0(
       "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
       datesToExtract[i]$from,
@@ -340,9 +347,8 @@ sykdomspuls_aggregate <- function(
     } else {
       utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
     }
-    utils::setTxtProgressBar(pb, i)
   }
-  close(pb)
+  pb$terminate()
   system(glue::glue("mv {file_temp} {file_permanent}"))
 }
 
