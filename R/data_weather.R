@@ -239,7 +239,7 @@ data_weather <- function(data, argset, schema) {
     for (i in download_dates) {
       msg(glue::glue("Downloading weather for {i}"))
       d <- thredds_get_data(date = i)
-      d <- add_date_info(d)
+      d <- add_info_for_weather(d)
       weather$db_upsert_load_data_infile(d)
     }
   }
