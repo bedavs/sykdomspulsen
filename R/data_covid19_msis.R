@@ -11,7 +11,7 @@ data_covid19_msis <- function(data, argset, schema){
   # argset <- tm_get_argset("data_covid19_msis")
   # schema <- tm_get_schema("data_covid19_msis")
 
-  file <- fs::dir_ls("/input/covid19_msis/", regexp="per_municip_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].rds")
+  file <- fs::dir_ls("/input/covid19/", regexp="per_municip_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].rds")
   file <- max(file)
   d <- readRDS(file)
 
@@ -79,7 +79,6 @@ data_covid19_msis <- function(data, argset, schema){
   d[, month := lubridate::month(date)]
   d[, season := fhi::season(yrwk)]
   d[, x := fhi::x(week)]
-
 
 
   schema$output$db_drop_table()

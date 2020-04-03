@@ -9,7 +9,7 @@
 #' @export CleanData
 CleanData <- function(d,
                       syndrome,
-                      population = fd::norway_population(),
+                      population = norway_population(),
                       hellidager = fhidata::norway_dates_holidays,
                       testIfHelligdagIndikatorFileIsOutdated = TRUE,
                       removeMunicipsWithoutConsults = FALSE) {
@@ -84,7 +84,7 @@ CleanData <- function(d,
     d[, total := NULL]
     skeleton <-
       data.table(expand.grid(
-        municip = unique(fd::norway_municip_merging()[municip_code_current %in% unique(d$municip) |
+        municip = unique(norway_municip_merging()[municip_code_current %in% unique(d$municip) |
           municip_code_original %in% unique(d$municip)]$municip_code_original),
         unique(d$age),
         seq.Date(dateMin, dateMax, 1)
@@ -92,7 +92,7 @@ CleanData <- function(d,
   } else {
     skeleton <-
       data.table(expand.grid(
-        municip = unique(fd::norway_municip_merging()$municip_code_original),
+        municip = unique(norway_municip_merging()$municip_code_original),
         unique(d$age),
         seq.Date(dateMin, dateMax, 1)
       ))
@@ -134,7 +134,7 @@ CleanData <- function(d,
   # KOMMUNE MERGING
   data <-
     merge(data,
-      fd::norway_municip_merging()[, c("municip_code_original", "year", "municip_code_current", "weighting")],
+      norway_municip_merging()[, c("municip_code_original", "year", "municip_code_current", "weighting")],
       by.x = c("municip", "year"),
       by.y = c("municip_code_original", "year"),
       all.x = T,
@@ -170,11 +170,11 @@ CleanData <- function(d,
   n2 <- nrow(data)
 
   if (n1 != n2) {
-    fd::msg("Population file not merging correctly", type = "err", slack = T)
+    msg("Population file not merging correctly", type = "err", slack = T)
   }
 
   # merging in municipalitiy-fylke names
-  data[fd::norway_locations(), on = "municip==municip_code", county := county_code]
+  data[norway_locations(), on = "municip==municip_code", county := county_code]
 
   for (i in syndromeAndConsult) {
     data[is.na(get(i)), (i) := 0]
@@ -187,7 +187,7 @@ CleanData <- function(d,
   hellidager[, date := data.table::as.IDate(date)]
   if (testIfHelligdagIndikatorFileIsOutdated &
     lubridate::today() > max(hellidager$date)) {
-    fd::msg("HELLIGDAGER NEEDS UPDATING", type = "err", slack = T)
+    msg("HELLIGDAGER NEEDS UPDATING", type = "err", slack = T)
   }
   data[hellidager, on = "date", HelligdagIndikator := HelligdagIndikator]
   data[is.na(HelligdagIndikator), HelligdagIndikator := FALSE]
@@ -251,7 +251,7 @@ CleanData <- function(d,
 
   data[, county:=NULL]
   norge[, location := "norge"]
-  norge[, granularityGeo := "national"]
+  norge[, granularityGeo := "nation"]
 
   data <- rbind(data, fylke, norge)
   setcolorder(data, c("granularityGeo",  "location", "age", "date"))
@@ -276,8 +276,8 @@ CleanData <- function(d,
 
   ))
 
-  data[, sex:="Totalt"]
-  data[, border:=fd::config$border]
+  data[, sex:="totalt"]
+  data[, border:=config$border]
   data[, granularity_time:="day"]
   ## data[, yrwk := fhi::isoyearweek(date)]
   ## data[, year := fhi::isoyear_n(date)]
@@ -323,9 +323,9 @@ data_norsyss <- function(data, argset, schema){
   # argset <- tm_get_argset("data_norsyss")
   # schema <- tm_get_schema("data_norsyss")
   syndromes <- argset$syndromes
-  files <- IdentifyDatasets()
 
-  final_file = files$raw[order(files$raw, decreasing=T)][1]
+  file <- fs::dir_ls("/input/norsyss/", regexp="norsyss_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt")
+  final_file <- max(file)
 
   msg(sprintf("Cleaning file %s", final_file))
   #EmailNotificationOfNewData(files$id)
@@ -380,6 +380,6 @@ data_norsyss <- function(data, argset, schema){
   }
   #fd::msg("Adding db constraint")
   #schema$output$db_add_constraint()
-  fd::msg("New data is now formatted and ready")
+  msg("New data is now formatted and ready")
   return(TRUE)
 }

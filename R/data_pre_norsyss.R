@@ -299,7 +299,7 @@ sykdomspuls_aggregate <- function(
                                   ),
                                   overwrite_file = FALSE,
                                   ...) {
-  file_name <- paste0("partially_formatted_", format(Sys.time(), "%Y_%m_%d"), ".txt")
+  file_name <- glue::glue("norsyss_{lubridate::today()}.txt")
   file_temp <- fs::path(fhi::temp_dir(), file_name)
   file_permanent <- fs::path(folder, file_name)
 
