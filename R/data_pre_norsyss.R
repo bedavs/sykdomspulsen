@@ -323,14 +323,15 @@ sykdomspuls_aggregate <- function(
   datesToExtract <- datesToExtract[from <= date_to]
 
   # predefine storage of results
-  pb <- progress::progress_bar$new(
-    format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
-    clear = FALSE,
-    total =  nrow(datesToExtract)
-  )
-  pb$tick(0)
+  # pb <- progress::progress_bar$new(
+  #   format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
+  #   clear = FALSE,
+  #   total =  nrow(datesToExtract)
+  # )
+  # pb$tick(0)
   for (i in 1:nrow(datesToExtract)) {
-    pb$tick()
+    #pb$tick()
+    cat(i, "/", nrow(datesToExtract), "\n")
 
     command <- paste0(
       "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
