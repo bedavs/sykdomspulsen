@@ -161,8 +161,26 @@ norsyss_aggregate_format_raw_data <- function(d, configs) {
 
   ### Praksis
 
-  d[Praksis == "Fastl\u00F8nnet", Praksis := "legekontor"]
-  d[Praksis == "kommunal legevakt", Praksis := "legevakt"]
+  d[
+    Praksis %in% c(
+      "Fastl\u00F8nnet",
+      "Fastlege"
+    ),
+    Praksis := "legekontor"
+  ]
+  d[
+    Praksis %in% c(
+      "kommunal legevakt",
+      "Legevakt"
+    ),
+    Praksis := "legevakt"
+  ]
+  d[
+    Praksis %in% c(
+      "Annet"
+    ),
+    Praksis := "annet"
+  ]
 
 
   d[, Kontaktype := "ukjent"]
