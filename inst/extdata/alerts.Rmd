@@ -99,7 +99,7 @@ lines_municip <- function(pd){
   pd[,age:=factor(age,levels=names(CONFIG$AGES))]
   pd[,xval:=1:.N, by =age]
 
-  labs <- pd[age == "Totalt"]
+  labs <- pd[age == "totalt"]
   labs <- labs[seq(1,.N,2),c("xval","yrwkdate","yrwk")]
   
   pd_nor <- pd[n_status=="Normal"]

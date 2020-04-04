@@ -20,7 +20,7 @@ set_config <- function() {
     ),
     age = list(
       norsyss=list(
-        "Totalt" = c(0:105),
+        "totalt" = c(0:105),
         "0-4" = c(0:4),
         "5-14" = c(5:14),
         "15-19" = c(15:19),

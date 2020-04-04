@@ -16,11 +16,11 @@ data_covid19_msis <- function(data, argset, schema){
   d <- readRDS(file)
 
   setnames(d, "N", "n")
-  d[, location_code := paste0("municip",bostedskommunenr_msis)]
+  d[, location_code := paste0("municip",bostedskommunenr)]
   d[, date:= as.Date(provedato)]
 
   d[, provedato := NULL]
-  d[, bostedskommunenr_msis := NULL]
+  d[, bostedskommunenr := NULL]
 
   skeleton <- expand.grid(
     location_code = fhidata::norway_locations_b2020$municip_code,

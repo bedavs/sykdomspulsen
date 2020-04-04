@@ -34,7 +34,7 @@ CleanData <- function(d,
   # end
   CONFIG <- config
   # fix population age categories
-  for (i in which(names(CONFIG$def$age$norsyss) != "Totalt")) {
+  for (i in which(names(CONFIG$def$age$norsyss) != "totalt")) {
     population[age %in% CONFIG$def$age$norsyss[[i]], agex := names(CONFIG$def$age$norsyss)[i]]
   }
   population[, age := NULL]
@@ -51,7 +51,7 @@ CleanData <- function(d,
   ), keyby = .(
     location_code, year
   )]
-  total[, age := "Totalt"]
+  total[, age := "totalt"]
 
   population <- rbind(population, total)
   # end population fix
@@ -115,8 +115,8 @@ CleanData <- function(d,
     keyby = .(date, municip),
     .SDcols = syndromeAndConsult
   ]
-  total[, age := "Totalt"]
-  data <- rbind(total, data[age != "Ukjent"])
+  total[, age := "totalt"]
+  data <- rbind(total, data[age != "ukjent"])
 
   dates <- unique(data[, "date", with = F])
   dates[, datex := date]
@@ -374,7 +374,7 @@ data_norsyss <- function(data, argset, schema){
       syndrome = conf$tag_input
     )
     res[, tag_outcome:=conf$tag_output]
-    res[, gender:="Totalt"]
+    res[, gender:="totalt"]
 
     schema$output$db_load_data_infile(res)
   }

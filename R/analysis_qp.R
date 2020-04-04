@@ -4,10 +4,10 @@
 #'
 #' @export
 analysis_qp <- function(data, argset, schema){
-  # tm_update_plans("analysis_norsyss_qp_gastro")
-  # data <- tm_get_data("analysis_norsyss_qp_gastro", index_plan = 1)
-  # argset <- tm_get_argset("analysis_norsyss_qp_gastro", index_plan = 1, index_argset = 90)
-  # schema <- tm_get_schema("analysis_norsyss_qp_gastro")
+  # tm_update_plans("analysis_norsyss_qp_weekly")
+  # data <- tm_get_data("analysis_norsyss_qp_weekly", index_plan = 1)
+  # argset <- tm_get_argset("analysis_norsyss_qp_weekly", index_plan = 1, index_argset = 90)
+  # schema <- tm_get_schema("analysis_norsyss_qp_weekly")
 
   # arguments start
   d <- data$data[location_code == argset$location_code]
@@ -448,7 +448,7 @@ clean_post_analysis <- function(res, argset) {
   res[, sex:=argset$sex]
   res[, source:=argset$source_table]
   res[, n_denominator:=denominator]
-  res[, tag_outcome:=argset$tag]
+  res[, tag_outcome:=argset$tag_outcome]
   res[, granularity_time:=argset$granularity_time]
   res[, granularity_geo:=argset$granularity_geo]
   res[, location_code:=argset$location_code]
@@ -475,9 +475,9 @@ clean_post_analysis <- function(res, argset) {
   # add location name
 
   # cleaning on small municipalities
-  res[location_code %in% config$smallMunicips & age != "Totalt", n := 0 ]
-  res[location_code %in% config$smallMunicips & age != "Totalt", threshold2 := 5 ]
-  res[location_code %in% config$smallMunicips & age != "Totalt", threshold4 := 10 ]
+  res[location_code %in% config$smallMunicips & age != "totalt", n := 0 ]
+  res[location_code %in% config$smallMunicips & age != "totalt", threshold2 := 5 ]
+  res[location_code %in% config$smallMunicips & age != "totalt", threshold4 := 10 ]
 
   return(res)
 }

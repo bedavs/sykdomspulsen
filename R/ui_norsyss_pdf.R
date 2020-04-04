@@ -108,7 +108,7 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
     dplyr::filter(granularity_time == "weekly") %>%
     dplyr::filter(location_code == !!location_code) %>%
     dplyr::filter(tag_outcome == !!x_tag) %>%
-    dplyr::filter(age == "Totalt") %>%
+    dplyr::filter(age == "totalt") %>%
     dplyr::collect() %>%
     fd::latin1_to_utf8()
   # remove last 3 weeks
@@ -169,7 +169,7 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
     dplyr::filter(granularity_time == "weekly") %>%
     dplyr::filter(location_code == !!location_code) %>%
     dplyr::filter(tag_outcome == !!x_tag) %>%
-    dplyr::filter(age != "Totalt") %>%
+    dplyr::filter(age != "totalt") %>%
     dplyr::collect() %>%
     fd::latin1_to_utf8()
   # remove last 3 weeks

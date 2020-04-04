@@ -35,19 +35,19 @@ data_pre_norsyss <- function(data, argset, schema){
 
 
 takstkoder <- list(
-  "11ad" = "Legekontakt",
-  "11ak" = "Legekontakt",
-  "1ad" = "Telefonkontakt",
-  "1ak" = "Telefonkontakt",
-  "1be" = "Ekonsultasjon",
-  "1bd" = "Telefonkontakt",
-  "1bk" = "Telefonkontakt",
-  "1g" = "Telefonkontakt",
-  "1h" = "Telefonkontakt",
-  "2ad" = "Legekontakt",
-  "2ae" = "Telefonkontakt",
-  "2ak" = "Legekontakt",
-  "2fk" = "Legekontakt"
+  "11ad" = "oppmote",
+  "11ak" = "oppmote",
+  "1ad" = "telefonkontakt",
+  "1ak" = "telefonkontakt",
+  "1be" = "ekonsultasjon",
+  "1bd" = "telefonkontakt",
+  "1bk" = "telefonkontakt",
+  "1g" = "telefonkontakt",
+  "1h" = "telefonkontakt",
+  "2ad" = "oppmote",
+  "2ae" = "telefonkontakt",
+  "2ak" = "oppmote",
+  "2fk" = "oppmote"
 )
 
 
@@ -93,7 +93,7 @@ nav_to_freg <- list(
 
 
 
-sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
+norsyss_aggregate_format_raw_data <- function(d, configs) {
   d[, influensa := 0]
   d[Diagnose %in% "R80", influensa := 1]
 
@@ -161,20 +161,20 @@ sykdomspuls_aggregate_format_raw_data <- function(d, configs) {
 
   ### Praksis
 
-  d[Praksis == "Fastl\u00F8nnet", Praksis := "Fastlege"]
-  d[Praksis == "kommunal legevakt", Praksis := "Legevakt"]
+  d[Praksis == "Fastl\u00F8nnet", Praksis := "legekontor"]
+  d[Praksis == "kommunal legevakt", Praksis := "legevakt"]
 
 
-  d[, Kontaktype := "Ukjent"]
+  d[, Kontaktype := "ukjent"]
   ### Kontaktkode
   for (takstkode in names(takstkoder)) {
     d[ Takst == takstkode, Kontaktype := takstkoder[takstkode]]
   }
 
   dups <- d[, .(n_diff = length(unique(Kontaktype))), by = .(Id)]
-  d <- d[ !(Id %in% dups[n_diff >= 2, Id] & Kontaktype == "Telefonkontakt")]
+  d <- d[ !(Id %in% dups[n_diff >= 2, Id] & Kontaktype == "telefonkontakt")]
 
-  d[, age := "Ukjent"]
+  d[, age := "ukjent"]
   d[PasientAlder == "0-4", age := "0-4"]
   d[PasientAlder == "5-9", age := "5-14"]
   d[PasientAlder == "0-9", age := "5-14"]
@@ -342,7 +342,7 @@ sykdomspuls_aggregate <- function(
     )
     d <- RODBC::sqlQuery(db, command)
     d <- data.table(d)
-    d <- sykdomspuls_aggregate_format_raw_data(d)
+    d <- norsyss_aggregate_format_raw_data(d)
     if (i == 1) {
       utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
     } else {

@@ -71,106 +71,111 @@ set_tasks <- function() {
         action = "data_norsyss",
         schema = list(output = config$schema$data_norsyss),
         args = list(
+          # v = (lege)vakt
+          # k = (lege)kontor
+          # o = oppmote
+          # t = telefon
+          # e = ekonsultasjon
           syndromes = rbind(
             data.table(
               tag_input = "influensa",
-              tag_output = "influensa_lf_l",
-              contactType = list("Legekontakt"),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "influensa_vk_o",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list("oppmote")
             ),
             data.table(
               tag_input = "influensa",
-              tag_output = "influensa_lf_lt",
-              contactType = list(c("Legekontakt", "Telefonkontakt")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "influensa_vk_ot",
+              practice_type = list(c("legevakt", "legekontor")),
+                contactType = list(c("oppmote", "telefonkontakt"))
             ),
             data.table(
               tag_input = "gastro",
-              tag_output = "gastro_lf_lt",
-              contactType = list(c("Legekontakt", "Telefonkontakt")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "gastro_vk_ot",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt"))
             ),
             data.table(
               tag_input = "respiratoryinternal",
-              tag_output = "respiratoryinternal_lf_lt",
-              contactType = list(c("Legekontakt", "Telefonkontakt")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "respiratoryinternal_vk_ot",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt"))
             ),
             data.table(
               tag_input = "respiratoryexternal",
-              tag_output = "respiratoryexternal_lf_lt",
-              contactType = list(c("Legekontakt", "Telefonkontakt")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "respiratoryexternal_vk_ot",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt"))
             ),
 
             # lte
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_lf_lte",
-              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "covid19_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
             ),
             data.table(
               tag_input = "influensa",
-              tag_output = "influensa_lf_lte",
-              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "influensa_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
             ),
             data.table(
               tag_input = "rxx_for_covid19",
-              tag_output = "rxx_for_covid19_lf_lte",
-              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "rxx_for_covid19_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
             ),
             data.table(
               tag_input = "akkut_ovre_luftveisinfeksjon",
-              tag_output = "akkut_ovre_luftveisinfeksjon_lf_lte",
-              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "akkut_ovre_luftveisinfeksjon_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
             ),
             data.table(
               tag_input = "engstelig_luftveissykdom_ika",
-              tag_output = "engstelig_luftveissykdom_ika_lf_lte",
-              contactType = list(c("Legekontakt", "Telefonkontakt", "Ekonsultasjon")),
-              practice_type = list(c("Legevakt", "Fastlege"))
+              tag_output = "engstelig_luftveissykdom_ika_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
             ),
 
             # strata
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_l_l",
-              contactType = list(c("Legekontakt")),
-              practice_type = list(c("Legevakt"))
+              tag_output = "covid19_v_o",
+              practice_type = list(c("legevakt")),
+              contactType = list(c("oppmote"))
             ),
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_l_t",
-              contactType = list(c("Telefonkontakt")),
-              practice_type = list(c("Legevakt"))
+              tag_output = "covid19_v_t",
+              practice_type = list(c("legevakt")),
+              contactType = list(c("telefonkontakt"))
             ),
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_l_e",
-              contactType = list(c("Ekonsultasjon")),
-              practice_type = list(c("Legevakt"))
+              tag_output = "covid19_v_e",
+              practice_type = list(c("legevakt")),
+              contactType = list(c("ekonsultasjon"))
             ),
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_f_l",
-              contactType = list(c("Legekontakt")),
-              practice_type = list(c("Fastlege"))
+              tag_output = "covid19_k_l",
+              practice_type = list(c("legekontor")),
+              contactType = list(c("oppmote"))
             ),
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_f_t",
-              contactType = list(c("Telefonkontakt")),
-              practice_type = list(c("Fastlege"))
+              tag_output = "covid19_k_t",
+              practice_type = list(c("legekontor")),
+              contactType = list(c("telefonkontakt"))
             ),
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_f_e",
-              contactType = list(c("Ekonsultasjon")),
-              practice_type = list(c("Fastlege"))
+              tag_output = "covid19_k_e",
+              practice_type = list(c("legekontor")),
+              contactType = list(c("ekonsultasjon"))
             )
 
           )
@@ -195,54 +200,32 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "analysis_norsyss_qp_weekly_gastro_lf_lt",
+        name = "analysis_norsyss_qp_weekly",
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
         cores = min(7, parallel::detectCores()),
         chunk_size= 1000,
         action = "analysis_qp",
-        filter = "tag_outcome=='gastro_lf_lt'",
-        for_each_plan = list("age" = "all", "sex" = "Totalt"),
+        for_each_plan = list(
+          "age" = "all",
+          "sex" = "totalt",
+          "tag_outcome" = c(
+            "gastro_vk_ot",
+            "respiratoryexternal_vk_ot"
+          )
+        ),
         for_each_argset = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_norsyss_standard
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
-          tag = "gastro_lf_lt",
           train_length = 5,
           years = c(2018, 2019, 2020),
           weeklyDenominatorFunction = sum,
           denominator = "consult_without_influenza",
           granularity_time = "weekly"
-        )
-      )
-    )
-  )
-  config$tasks$add_task(
-    task_from_config(
-      conf = list(
-        name = "analysis_norsyss_qp_daily_gastro_lf_lt",
-        db_table = "data_norsyss",
-        type = "analysis",
-        dependencies = c("data_norsyss"),
-        cores = min(6, parallel::detectCores()),
-        chunk_size= 100,
-        action = "analysis_qp",
-        filter = "tag_outcome=='gastro_lf_lt' & (granularity_geo=='county' | granularity_geo=='national')",
-        for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
-        schema = list(
-          output = config$schema$results_norsyss_standard
-        ),
-        upsert_at_end_of_each_plan = TRUE,
-        args = list(
-          tag = "gastro_lf_lt",
-          train_length = 5,
-          years = c(2018, 2019, 2020),
-          weeklyDenominatorFunction = sum,
-          denominator = "consult_without_influenza",
-          granularity_time = "daily"
         )
       )
     )
@@ -251,49 +234,28 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "analysis_norsyss_qp_weekly_respiratoryexternal_lf_lt",
+        name = "analysis_norsyss_qp_daily",
         db_table = "data_norsyss",
         type = "analysis",
         dependencies = c("data_norsyss"),
         cores = min(7, parallel::detectCores()),
         chunk_size= 1000,
         action = "analysis_qp",
-        filter = "tag_outcome=='respiratoryexternal_lf_lt'",
-        for_each_plan = list("age" = "all", "sex" = "Totalt"),
+        filter = "(granularity_geo=='county' | granularity_geo=='nation')",
+        for_each_plan = list(
+          "age" = "all",
+          "sex" = "totalt",
+          "tag_outcome" = c(
+            "gastro_vk_ot",
+            "respiratoryexternal_vk_ot"
+          )
+        ),
         for_each_argset = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_norsyss_standard
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
-          tag = "respiratoryexternal_lf_lt",
-          train_length = 5,
-          years = c(2018, 2019, 2020),
-          weeklyDenominatorFunction = sum,
-          denominator = "consult_without_influenza",
-          granularity_time = "weekly"
-        )
-      )
-    )
-  )
-  config$tasks$add_task(
-    task_from_config(
-      conf = list(
-        name = "analysis_norsyss_qp_daily_respiratoryexternal_lf_lt",
-        db_table = "data_norsyss",
-        type = "analysis",
-        dependencies = c("data_norsyss"),
-        cores = min(6, parallel::detectCores()),
-        chunk_size= 100,
-        action = "analysis_qp",
-        filter = "tag_outcome=='respiratoryexternal_lf_lt' & (granularity_geo=='county' | granularity_geo=='national')",
-        for_each_plan = list("location_code" = "all", "age" = "all", "sex" = "Totalt"),
-        schema = list(
-          output = config$schema$results_norsyss_standard
-        ),
-        upsert_at_end_of_each_plan = TRUE,
-        args = list(
-          tag = "respiratoryexternal_lf_lt",
           train_length = 5,
           years = c(2018, 2019, 2020),
           weeklyDenominatorFunction = sum,
@@ -312,14 +274,14 @@ set_tasks <- function() {
         type = "analysis",
         dependencies = c("data_norsyss"),
         action = "analysis_mem",
-        filter = "(granularity_geo=='county' | granularity_geo=='national') & tag_outcome=='influensa'",
+        filter = "(granularity_geo=='county' | granularity_geo=='nation') & tag_outcome=='influensa_vk_o'",
         for_each_plan = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_mem,
           output_limits = config$schema$results_mem_limits
         ),
         args = list(
-          age = jsonlite::toJSON(list("Totalt" = c("Totalt"))),
+          age = jsonlite::toJSON(list("totalt" = c("totalt"))),
           tag = "influensa",
           weeklyDenominatorFunction = "sum",
           multiplicative_factor = 100,
@@ -337,7 +299,7 @@ set_tasks <- function() {
         type = "analysis",
         dependencies = c("data_norsyss"),
         action = "analysis_mem",
-        filter = "(granularity_geo=='county' | granularity_geo=='norge') & tag_outcome=='influensa_all'",
+        filter = "(granularity_geo=='county' | granularity_geo=='norge') & tag_outcome=='influensa_vk_ote'",
         for_each_plan = list("location_code" = "all"),
         schema = list(
           output = config$schema$results_mem,
@@ -409,7 +371,7 @@ set_tasks <- function() {
         args = list(
           tag = "influensa",
           icpc2 = "R60",
-          contactType = "Legekontakt, Telefonkontakt",
+          contactType = "oppmote, telefonkontakt",
           folder_name = "mem_influensa",
           outputs = c("n_doctors_sheet")
         ),
@@ -431,7 +393,7 @@ set_tasks <- function() {
         args = list(
           tag = "influensa",
           icpc2 = "R80",
-          contactType = "Legekontakt",
+          contactType = "oppmote",
           folder_name = "mem_influensa",
           outputs = c("charts", "county_sheet", "region_sheet", "norway_sheet")
         ),
