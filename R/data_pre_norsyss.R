@@ -131,6 +131,10 @@ norsyss_aggregate_format_raw_data <- function(d, configs) {
   d[, virusinfeksjon_ika := 0]
   d[Diagnose %in% "A77", virusinfeksjon_ika := 1]
 
+  # all R codes:
+  # R01 R02 R03 R04 R05 R06 R07 R08 R09
+  # R21 R24 R25 R27 R270000 R29 R71 R72 R74 R75 R76
+  # R77 R78 R79 R80 R81 R82 R83 R95 R96 R99 R991 R9910000
   d[, rxx_for_covid19 := 0]
   d[stringr::str_detect(Diagnose, "^R"), rxx_for_covid19 := 1]
   d[Diagnose %in% c(

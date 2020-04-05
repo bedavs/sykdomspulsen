@@ -9,6 +9,8 @@
 #' @export CleanData
 CleanData <- function(d,
                       syndrome,
+                      skeleton_date_max = max(d$date),
+                      skeleton_date_min = min(d$date),
                       population = norway_population(),
                       hellidager = fhidata::norway_dates_holidays,
                       testIfHelligdagIndikatorFileIsOutdated = TRUE,
@@ -75,8 +77,8 @@ CleanData <- function(d,
     .SDcols = syndromeAndConsult
   ]
 
-  dateMin <- min(d$date)
-  dateMax <- max(d$date)
+  dateMin <- min(skeleton_date_min)
+  dateMax <- max(skeleton_date_max)
   if (removeMunicipsWithoutConsults) {
     d[, total := sum(consult_with_influenza, na.rm = T), by = municip]
     d <- d[is.finite(total)]
@@ -336,6 +338,9 @@ data_norsyss <- function(data, argset, schema){
   dates[,date:=data.table::as.IDate(x_date)]
   dates[, isoyear := fhi::isoyear_n(date)]
 
+  skeleton_date_max <- as.Date(stringr::str_extract(file, "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))
+  skeleton_date_min <- as.Date(min(d$date))
+
   d[dates,on="x_date", date:=date]
   d[dates,on="x_date", isoyear:=isoyear]
   d[,x_date:=NULL]
@@ -355,7 +360,26 @@ data_norsyss <- function(data, argset, schema){
     max_date <- min(max_date$date)
     max_year_in_db <- fhi::isoyear_n(max_date)-10
   }
-  if(max_year_in_db<=2006) max_year_in_db <- 2006
+  if(max_year_in_db <=2006) max_year_in_db <- 2006
+
+  # if we aren't deleting all the data
+  # check to see if the required syndromes are in the database for each year
+  # if we don't have a perfect syndrome match, then delete all the data
+  # and start again
+  if(max_year_in_db > 2006){
+    syndromes_in_db <- schema$output$dplyr_tbl() %>%
+      dplyr::distinct(year, tag_outcome) %>%
+      dplyr::collect() %>%
+      latin1_to_utf8()
+
+    delete_all_data <- FALSE
+    for(y in unique(syndromes_in_db$year)){
+      syndromes_in_db_in_year <- syndromes_in_db[year==y]$tag_outcome
+      if(sum(!argset$syndromes$tag_output %in% syndromes_in_db_in_year)>0) delete_all_data <- TRUE
+      if(sum(!syndromes_in_db_in_year %in% argset$syndromes$tag_output)>0) delete_all_data <- TRUE
+    }
+    if(delete_all_data) max_year_in_db <- 2006
+  }
 
   schema$output$db_drop_rows_where(glue::glue("year>={max_year_in_db}"))
   #schema$output$db_drop_constraint()
@@ -371,10 +395,14 @@ data_norsyss <- function(data, argset, schema){
         Kontaktype %in% conf$contactType[[1]] &
         Praksis %in% conf$practice_type[[1]]
         ]),
-      syndrome = conf$tag_input
+      syndrome = conf$tag_input,
+      skeleton_date_max = skeleton_date_max,
+      skeleton_date_min = skeleton_date_min
     )
     res[, tag_outcome:=conf$tag_output]
     res[, gender:="totalt"]
+    # make sure there's nothing funny going on with week 53
+    res <- res[year %in% years_to_process]
 
     schema$output$db_load_data_infile(res)
   }

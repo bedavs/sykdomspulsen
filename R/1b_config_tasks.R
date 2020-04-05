@@ -161,7 +161,7 @@ set_tasks <- function() {
             ),
             data.table(
               tag_input = "covid19",
-              tag_output = "covid19_k_l",
+              tag_output = "covid19_k_o",
               practice_type = list(c("legekontor")),
               contactType = list(c("oppmote"))
             ),
