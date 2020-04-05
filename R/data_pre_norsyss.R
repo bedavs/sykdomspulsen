@@ -9,25 +9,14 @@
 #' @export
 data_pre_norsyss <- function(data, argset, schema){
   # tm_run_task("data_pre_norsyss")
+  # argset = tm_get_argset("data_pre_norsyss")
 
-  sykdomspuls_aggregate(
+  norsyss_fetch_raw_data_and_aggregate(
     date_from = argset$date_from,
     date_to = format(Sys.time(), "%Y-%m-%d"),
     folder = path("input", "norsyss"),
-    ages = c(
-      "0-4" = "0-4",
-      "5-14" = "5-9",
-      "5-14" = "10-14",
-      "15-19" = "15-19",
-      "20-29" = "20-29",
-      "30-64" = "30-39",
-      "30-64" = "40-49",
-      "30-64" = "50-59",
-      "30-64" = "60-64",
-      "65-69" = "65+",
-      "70-79" = "65+",
-      "80+" = "65+"
-    ))
+    diags = argset$diags
+  )
   get_n_doctors(path("input", "norsyss"))
   return(TRUE)
 }
@@ -39,13 +28,13 @@ takstkoder <- list(
   "11ak" = "oppmote",
   "1ad" = "telefonkontakt",
   "1ak" = "telefonkontakt",
-  "1be" = "ekonsultasjon",
   "1bd" = "telefonkontakt",
+  "1be" = "ekonsultasjon",
   "1bk" = "telefonkontakt",
   "1g" = "telefonkontakt",
   "1h" = "telefonkontakt",
   "2ad" = "oppmote",
-  "2ae" = "telefonkontakt",
+  "2ae" = "ekonsultasjon", # this used to be telefonkontakt -- changed on 2020-04-05
   "2ak" = "oppmote",
   "2fk" = "oppmote"
 )
@@ -93,7 +82,168 @@ nav_to_freg <- list(
 
 
 
-norsyss_aggregate_format_raw_data <- function(d, configs) {
+# norsyss_fetch_raw_data_and_aggregate
+norsyss_fetch_raw_data_and_aggregate <- function(
+  date_from = "2018-01-01",
+  date_to = lubridate::today(),
+  folder = "/input/norsyss/",
+  overwrite_file = FALSE,
+  diags,
+  ...) {
+  file_name <- glue::glue("norsyss_{lubridate::today()}.txt")
+  file_temp <- fs::path(fhi::temp_dir(), file_name)
+  file_permanent <- fs::path(folder, file_name)
+
+  if (overwrite_file == FALSE) {
+    if (file.exists(file_permanent)) {
+      x <- fread(file_permanent)
+      max_date <- as.Date(max(x$date, na.rm = T))
+      # as long as last date in the file is within 2 days of the requested date
+      if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
+        fd::msg("file already exists! exiting...", slack = T)
+        return()
+      }
+    }
+  }
+
+  db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
+
+  # calculate dates
+  datesToExtract <- data.table(from = seq(as.Date(date_from), by = "month", length.out = 300), to = seq(as.Date(date_from), by = "month", length.out = 301)[-1] - 1)
+  # Remove future dates
+  datesToExtract <- datesToExtract[from <= date_to]
+
+  # predefine storage of results
+  # pb <- progress::progress_bar$new(
+  #   format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
+  #   clear = FALSE,
+  #   total =  nrow(datesToExtract)
+  # )
+  # pb$tick(0)
+  for (i in 1:nrow(datesToExtract)) {
+    #pb$tick()
+    cat(i, "/", nrow(datesToExtract), "\n")
+
+    command <- paste0(
+      "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
+      datesToExtract[i]$from,
+      "' AND Konsultasjonsdato <= '",
+      datesToExtract[i]$to,
+      "'"
+    )
+    d <- RODBC::sqlQuery(db, command)
+    d <- data.table(d)
+    d <- norsyss_aggregate_raw_data(d, diags = diags)
+    if (i == 1) {
+      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
+    } else {
+      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
+    }
+  }
+  #pb$terminate()
+  system(glue::glue("mv {file_temp} {file_permanent}"))
+}
+
+norsyss_aggregate_raw_data <- function(d, diags) {
+  . <- BehandlerKommune <- Diagnose <- Id <-
+    Konsultasjonsdato <- Kontaktype <- PasientAlder <-
+    Praksis <- Takst <- age <- consult <- from <-
+    municip <- n_diff <- pb <- NULL
+
+  for (i in seq_along(diags)) {
+    d[, (names(diags)[i]) := 0]
+    d[Diagnose %in% diags[[i]], (names(diags)[i]) := 1]
+  }
+
+  ### Praksis
+
+  d[
+    Praksis %in% c(
+      "Fastl\u00F8nnet",
+      "Fastlege"
+    ),
+    Praksis := "legekontor"
+    ]
+  d[
+    Praksis %in% c(
+      "kommunal legevakt",
+      "Legevakt"
+    ),
+    Praksis := "legevakt"
+    ]
+  d[
+    Praksis %in% c(
+      "Annet"
+    ),
+    Praksis := "annet"
+    ]
+
+  d[, Kontaktype := "ukjent"]
+  ### Kontaktkode
+  for (takstkode in names(takstkoder)) {
+    d[Takst == takstkode, Kontaktype := takstkoder[takstkode]]
+  }
+
+  dups <- d[, .(n_diff = length(unique(Kontaktype))), by = .(Id)]
+  d <- d[!(Id %in% dups[n_diff >= 2, Id] & Kontaktype == "telefonkontakt")]
+
+  d[, age := "ukjent"]
+  d[PasientAlder == "0-4", age := "0-4"]
+  d[PasientAlder == "5-9", age := "5-14"]
+  d[PasientAlder == "0-9", age := "5-14"]
+  d[PasientAlder == "10-14", age := "5-14"]
+  d[PasientAlder == "10-19", age := "15-19"]
+  d[PasientAlder == "15-19", age := "15-19"]
+  d[PasientAlder == "20-29", age := "20-29"]
+  d[PasientAlder == "30-39", age := "30-64"]
+  d[PasientAlder == "40-49", age := "30-64"]
+  d[PasientAlder == "50-59", age := "30-64"]
+  d[PasientAlder == "60-64", age := "30-64"]
+  d[PasientAlder == "65-69", age := "65+"]
+  d[PasientAlder == "60-69", age := "65+"]
+  d[PasientAlder == "70-79", age := "65+"]
+  d[PasientAlder == "80+", age := "65+"]
+
+  # Fixing behandler kommune nummer
+  for (old in names(nav_to_freg)) {
+    d[as.character(BehandlerKommune) == old, BehandlerKommune := nav_to_freg[old]]
+  }
+
+  # Collapsing it down to 1 row per consultation
+  d <- d[,
+         lapply(.SD, sum),
+         by = .(
+           Id,
+           BehandlerKommune,
+           age,
+           Konsultasjonsdato,
+           Praksis,
+           Kontaktype
+         ),
+         .SDcols = names(diags)
+         ]
+  d[, consult := 1]
+
+  # Collapsing it down to 1 row per kommune/age/day
+  d <- d[, lapply(.SD, sum), ,
+         by = .(
+           BehandlerKommune,
+           age,
+           Konsultasjonsdato,
+           Praksis,
+           Kontaktype
+         ),
+         .SDcols = c(names(diags), "consult")
+         ]
+
+  d[, municip := paste0("municip", formatC(BehandlerKommune, width = 4, flag = 0))]
+  d[, BehandlerKommune := NULL]
+  setnames(d, "Konsultasjonsdato", "date")
+
+  return(d)
+}
+
+old_delete_norsyss_aggregate_format_raw_data <- function(d, configs) {
   d[, influensa := 0]
   d[Diagnose %in% "R80", influensa := 1]
 
@@ -288,91 +438,6 @@ norsyss_aggregate_format_raw_data <- function(d, configs) {
   setnames(d, "Konsultasjonsdato", "date")
 
   return(d)
-}
-
-#' sykdomspuls_aggregate
-#'
-#' A function to extract aggregated sykdomspulsen data
-#' @param date_from a
-#' @param date_to a
-#' @param folder a
-#' @param ages a
-#' @param overwrite_file a
-#' @param ... a
-#' @import data.table
-#' @export
-sykdomspuls_aggregate <- function(
-                                  date_from = "2018-01-01",
-                                  date_to = lubridate::today(),
-                                  folder = "/input/norsyss/",
-                                  ages = c(
-                                    "0-4" = "0-4",
-                                    "5-14" = "5-9",
-                                    "5-14" = "10-14",
-                                    "15-19" = "15-19",
-                                    "20-29" = "20-29",
-                                    "30-64" = "30-39",
-                                    "30-64" = "40-49",
-                                    "30-64" = "50-59",
-                                    "30-64" = "60-64",
-                                    "65-69" = "65+",
-                                    "70-79" = "65+",
-                                    "80+" = "65+"
-                                  ),
-                                  overwrite_file = FALSE,
-                                  ...) {
-  file_name <- glue::glue("norsyss_{lubridate::today()}.txt")
-  file_temp <- fs::path(fhi::temp_dir(), file_name)
-  file_permanent <- fs::path(folder, file_name)
-
-  if (overwrite_file == FALSE) {
-    if (file.exists(file_permanent)) {
-      x <- fread(file_permanent)
-      max_date <- as.Date(max(x$date, na.rm = T))
-      # as long as last date in the file is within 2 days of the requested date
-      if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
-        fd::msg("file already exists! exiting...", slack = T)
-        return()
-      }
-    }
-  }
-
-  db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
-
-  # calculate dates
-  datesToExtract <- data.table(from = seq(as.Date(date_from), by = "month", length.out = 300), to = seq(as.Date(date_from), by = "month", length.out = 301)[-1] - 1)
-  # Remove future dates
-  datesToExtract <- datesToExtract[from <= date_to]
-
-  # predefine storage of results
-  # pb <- progress::progress_bar$new(
-  #   format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
-  #   clear = FALSE,
-  #   total =  nrow(datesToExtract)
-  # )
-  # pb$tick(0)
-  for (i in 1:nrow(datesToExtract)) {
-    #pb$tick()
-    cat(i, "/", nrow(datesToExtract), "\n")
-
-    command <- paste0(
-      "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
-      datesToExtract[i]$from,
-      "' AND Konsultasjonsdato <= '",
-      datesToExtract[i]$to,
-      "'"
-    )
-    d <- RODBC::sqlQuery(db, command)
-    d <- data.table(d)
-    d <- norsyss_aggregate_format_raw_data(d)
-    if (i == 1) {
-      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
-    } else {
-      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
-    }
-  }
-  #pb$terminate()
-  system(glue::glue("mv {file_temp} {file_permanent}"))
 }
 
 #' get_n_doctors

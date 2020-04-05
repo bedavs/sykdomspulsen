@@ -11,53 +11,60 @@ set_tasks <- function() {
         action = "data_pre_norsyss",
         schema = list(),
         args = list(
-          date_from = "2014-01-01"
-        )
-      )
-    )
-  )
+          date_from = "2014-01-01",
+          diags = list(
+            "influensa" = c("R80"),
+            "gastro" = c("D11", "D70", "D73"),
+            "respiratory" = c("R05", "R74", "R78", "R83"),
+            "respiratoryexternal" = c("R05", "R74", "R78", "R83"),
+            "respiratoryinternal" = c("R05", "R74", "R83"),
+            "lungebetennelse" = c("R81"),
+            "bronkitt" = c("R78"),
+            "skabb" = c("S72"),
 
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_normomo",
-        type = "data",
-        action = "data_normomo",
-        schema = list(output = config$schema$datar_normomo)
-      )
-    )
-  )
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_weather",
-        type = "data",
-        action = "data_weather",
-        schema = list(output = config$schema$data_weather)
-      )
-    )
-  )
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_covid19_msis",
-        type = "data",
-        action = "data_covid19_msis",
-        schema = list(output = config$schema$data_covid19_msis)
-      )
-    )
-  )
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_msis",
-        type = "data",
-        action = "data_msis",
-        schema = list(output = config$schema$data_msis),
-        args = list(
-          start_year = 2008,
-          end_year = 2019,
-          tags = c("Kikoste", "Campylobacteriose")
+            "hoste" = c("R05"),
+            "akkut_ovre_luftveisinfeksjon" = c("R74"),
+            "luftveisinfeksjon_ika" = c("R83"),
+            "luftveissykdom_ika" = c("R99"),
+            "virusinfeksjon_ika" = c("A77"),
+            "rxx_for_covid19" = c(
+              "R01",
+              "R02",
+              "R03",
+              "R04",
+              "R05",
+              "R06",
+              "R07",
+              "R08",
+              "R09",
+              "R21",
+              "R24",
+              "R25",
+              "R27",
+              #"R270000",
+              "R29",
+              #"R71",
+              "R72",
+              "R74",
+              "R75",
+              "R76",
+              "R77",
+              "R78",
+              "R79",
+              "R80",
+              "R81",
+              "R82",
+              "R83",
+              #"R95",
+              #"R96",
+              "R99",
+              "R991"
+              #"R9910000"
+            ),
+
+            "covid19" = c("R991"),
+            "engstelig_luftveissykdom_ika" = c("R27")
+          )
         )
       )
     )
@@ -87,7 +94,7 @@ set_tasks <- function() {
               tag_input = "influensa",
               tag_output = "influensa_vk_ot",
               practice_type = list(c("legevakt", "legekontor")),
-                contactType = list(c("oppmote", "telefonkontakt"))
+              contactType = list(c("oppmote", "telefonkontakt"))
             ),
             data.table(
               tag_input = "gastro",
@@ -108,7 +115,7 @@ set_tasks <- function() {
               contactType = list(c("oppmote", "telefonkontakt"))
             ),
 
-            # lte
+            # ote
             data.table(
               tag_input = "covid19",
               tag_output = "covid19_vk_ote",
@@ -179,6 +186,52 @@ set_tasks <- function() {
             )
 
           )
+        )
+      )
+    )
+  )
+
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_normomo",
+        type = "data",
+        action = "data_normomo",
+        schema = list(output = config$schema$datar_normomo)
+      )
+    )
+  )
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_weather",
+        type = "data",
+        action = "data_weather",
+        schema = list(output = config$schema$data_weather)
+      )
+    )
+  )
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_covid19_msis",
+        type = "data",
+        action = "data_covid19_msis",
+        schema = list(output = config$schema$data_covid19_msis)
+      )
+    )
+  )
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_msis",
+        type = "data",
+        action = "data_msis",
+        schema = list(output = config$schema$data_msis),
+        args = list(
+          start_year = 2008,
+          end_year = 2019,
+          tags = c("Kikoste", "Campylobacteriose")
         )
       )
     )

@@ -338,8 +338,8 @@ data_norsyss <- function(data, argset, schema){
   dates[,date:=data.table::as.IDate(x_date)]
   dates[, isoyear := fhi::isoyear_n(date)]
 
-  skeleton_date_max <- as.Date(stringr::str_extract(file, "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))
-  skeleton_date_min <- as.Date(min(d$date))
+  skeleton_date_max <- as.Date(stringr::str_extract(file, "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
+  skeleton_date_min <- as.Date(min(d$x_date))
 
   d[dates,on="x_date", date:=date]
   d[dates,on="x_date", isoyear:=isoyear]

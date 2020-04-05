@@ -1,6 +1,6 @@
 #' update_rundate
 #' Updates the rundate db tables
-#' @param task
+#' @param task a
 #' @param date_run the date when the analysis was run
 #' @export
 update_rundate <- function(task, date_run){
@@ -26,7 +26,7 @@ get_rundate <- function(task=NULL) {
     temp <- config$schema$rundate$dplyr_tbl() %>%
       dplyr::collect() %>%
       latin1_to_utf8()
-  }    
+  }
   return(temp)
 }
 

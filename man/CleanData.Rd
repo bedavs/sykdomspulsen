@@ -4,7 +4,8 @@
 \alias{CleanData}
 \title{Format the raw data}
 \usage{
-CleanData(d, syndrome, population = fd::norway_population(),
+CleanData(d, syndrome, skeleton_date_max = max(d$date),
+  skeleton_date_min = min(d$date), population = norway_population(),
   hellidager = fhidata::norway_dates_holidays,
   testIfHelligdagIndikatorFileIsOutdated = TRUE,
   removeMunicipsWithoutConsults = FALSE)

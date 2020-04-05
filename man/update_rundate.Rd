@@ -8,6 +8,8 @@ Updates the rundate db tables}
 update_rundate(task, date_run)
 }
 \arguments{
+\item{task}{a}
+
 \item{date_run}{the date when the analysis was run}
 }
 \description{
