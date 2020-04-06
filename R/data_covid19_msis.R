@@ -16,7 +16,7 @@ data_covid19_msis <- function(data, argset, schema){
   d <- readRDS(file)
 
   setnames(d, "N", "n")
-  d[, location_code := paste0("municip",bostedskommunenr)]
+  d[, location_code := paste0("municip",formatC(as.numeric(bostedskommunenr),flag="0",width=4))]
   d[, date:= as.Date(provedato)]
 
   d[, provedato := NULL]
