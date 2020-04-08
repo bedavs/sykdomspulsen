@@ -5,6 +5,7 @@
 #' @export
 analysis_normomo <-  function(data, argset, schema, ...){
   # tm_update_plans("analysis_normomo")
+  # tm_run_task("analysis_normomo")
   # data <- tm_get_data("analysis_normomo", index_plan=2)
   # argset <- tm_get_argset("analysis_normomo", index_plan=2, index_argset = 1)
   # schema <- tm_get_schema("analysis_normomo")
@@ -24,7 +25,7 @@ analysis_normomo <-  function(data, argset, schema, ...){
     INPUTDIR = tempdir(),
     WDIR = argset$wdir,
     back = 7,
-    WWW = 290,
+    WWW = 52*5,
     Ysum = argset$year_end,
     Wsum = 40,
     plotGraphs = FALSE,
@@ -87,14 +88,20 @@ analysis_normomo_plans <- function(){
       "5to14" = "age >= 5 & age <=14",
       "15to64" = "age >= 15 & age <=64",
       "65P" = "age >= 65 | is.na(age)",
-      "Total" = "age >= 0 | is.na(age)"
+      "Total" = "age >= 0 | is.na(age)",
+      "65to74" = "65 <= age & age <= 74",
+      "75to84" = "75 <= age & age <= 84",
+      "85P" = "age >= 85 | is.na(age)"
     ),
     momo_models = c(
       "0to4" = "LINE",
       "5to14" = "LINE",
       "15to64" = "LINE_SIN",
       "65P" = "LINE_SIN",
-      "Total" = "LINE_SIN"
+      "Total" = "LINE_SIN",
+      "65to74" = "LINE_SIN",
+      "75to84" = "LINE_SIN",
+      "85P" = "LINE_SIN"
     )
   )
 
@@ -115,7 +122,7 @@ analysis_normomo_plans <- function(){
     list_plan[[length(list_plan)]]$add_analysis(
       fn = analysis_normomo,
       location_code = "norge",
-      year_start_upload = ifelse(i==2012, 2008, i-1),
+      year_start_upload = ifelse(i<=2015, i-4,i-1), ##ifelse(i==2012, 2008, i-1),
       year_end = i,
       date_extracted = date_extracted_year_specific,
       wdir = tempdir(),
@@ -124,15 +131,21 @@ analysis_normomo_plans <- function(){
         "0to4" =  "age >= 0 & age <=4",
         "5to14" = "age >= 5 & age <=14",
         "15to64" = "age >= 15 & age <=64",
-        "65P" = "age >= 65 | is.na(age)",
-        "Total" = "age >= 0 | is.na(age)"
+        "65to74" = "65 <= age & age <= 74",
+        "75to84" = "75 <= age & age <= 84",
+        "85P" = "age >= 85 | is.na(age)",
+        "Total" = "age >= 0 | is.na(age)",
+        "65P" = "age >= 65 | is.na(age)"
       ),
       momo_models = c(
         "0to4" = "LINE",
         "5to14" = "LINE",
         "15to64" = "LINE_SIN",
-        "65P" = "LINE_SIN",
-        "Total" = "LINE_SIN"
+        "65to74" = "LINE_SIN",
+        "75to84" = "LINE_SIN",
+        "85P" = "LINE_SIN",
+        "Total" = "LINE_SIN",
+        "65P" = "LINE_SIN"
       )
     )
   }
@@ -163,15 +176,21 @@ analysis_normomo_plans <- function(){
           "0to4" =  "age >= 0 & age <=4",
           "5to14" = "age >= 5 & age <=14",
           "15to64" = "age >= 15 & age <=64",
-          "65P" = "age >= 65 | is.na(age)",
-          "Total" = "age >= 0 | is.na(age)"
+          "65to74" = "65 <= age & age <= 74",
+          "75to84" = "75 <= age & age <= 84",
+          "85P" = "age >= 85 | is.na(age)",
+          "Total" = "age >= 0 | is.na(age)",
+          "65P" = "age >= 65 | is.na(age)"
         ),
         momo_models = c(
           "0to4" = "LINE",
           "5to14" = "LINE",
           "15to64" = "LINE_SIN",
-          "65P" = "LINE_SIN",
-          "Total" = "LINE_SIN"
+          "65to74" = "LINE_SIN",
+          "75to84" = "LINE_SIN",
+          "85P" = "LINE_SIN",
+          "Total" = "LINE_SIN",
+          "65P" = "LINE_SIN"
         )
       )
     }
@@ -236,8 +255,11 @@ clean_exported_momo_data <- function(
     GROUP == "0to4" ~ "0-4",
     GROUP == "5to14" ~ "5-14",
     GROUP == "15to64" ~ "15-64",
-    GROUP == "65P" ~ "65+",
-    GROUP == "Total" ~ "totalt"
+    GROUP == "65to74" ~ "65-74",
+    GROUP == "75to84" ~ "75-84",
+    GROUP == "85P" ~ "85+",
+    GROUP == "Total" ~ "totalt",
+    GROUP == "65P" ~ "65+"
   )]
 
   # creating thesholds

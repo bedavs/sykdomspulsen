@@ -29,7 +29,7 @@ takstkoder <- list(
   "1ad" = "telefonkontakt",
   "1ak" = "telefonkontakt",
   "1bd" = "telefonkontakt",
-  "1be" = "ekonsultasjon",
+  "1be" = "ekonsultasjon", #
   "1bk" = "telefonkontakt",
   "1g" = "telefonkontakt",
   "1h" = "telefonkontakt",
@@ -133,6 +133,8 @@ norsyss_fetch_raw_data_and_aggregate <- function(
     )
     d <- RODBC::sqlQuery(db, command)
     d <- data.table(d)
+    # taskt 1be should only apply to R991
+    d <- d[!(Diagnose!="R991" & Takst=="1be")]
     d <- norsyss_aggregate_raw_data(d, diags = diags)
     if (i == 1) {
       utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
@@ -184,6 +186,7 @@ norsyss_aggregate_raw_data <- function(d, diags) {
     d[Takst == takstkode, Kontaktype := takstkoder[takstkode]]
   }
 
+  # select "best"??
   dups <- d[, .(n_diff = length(unique(Kontaktype))), by = .(Id)]
   d <- d[!(Id %in% dups[n_diff >= 2, Id] & Kontaktype == "telefonkontakt")]
 

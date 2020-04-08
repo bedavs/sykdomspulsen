@@ -194,9 +194,19 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       list(
-        name = "data_normomo",
+        name = "datar_normomo",
         type = "data",
-        action = "data_normomo",
+        action = "datar_normomo",
+        schema = list(output = config$schema$datar_normomo)
+      )
+    )
+  )
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "datar_normomo_drop",
+        type = "data",
+        action = "datar_normomo_drop",
         schema = list(output = config$schema$datar_normomo)
       )
     )

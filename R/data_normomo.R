@@ -1,4 +1,4 @@
-data_normomo_internal <- function(){
+datar_pre_normomo <- function(){
   if(config$is_production){
     data_grab <- glue::glue(
       'get -r "ut" /input/normomo/\n',
@@ -15,7 +15,45 @@ data_normomo_internal <- function(){
     )
     system(cmd)
   }
+}
 
+
+#' DataNormomo
+#'
+#' Get and clean NorMOMO data
+#'
+#'  @import data.table
+#'
+#' @export
+datar_normomo <- function(data, argset, schema){
+  # tm_run_task("datar_normomo")
+  # data <- tm_get_data("data_normomo")
+  # argset <- tm_get_argset("data_normomo")
+  # schema <- tm_get_schema("data_normomo")
+
+  d <- datar_normomo_internal()
+  schema$output$db_drop_table()
+  schema$output$db_connect()
+  schema$output$db_drop_constraint()
+  schema$output$db_load_data_infile(d)
+  schema$output$db_add_constraint()
+}
+
+datar_normomo_drop <- function(data, argset, schema){
+  # tm_run_task("datar_normomo_drop")
+  # data <- tm_get_data("datar_normomo_drop")
+  # argset <- tm_get_argset("datar_normomo_drop")
+  # schema <- tm_get_schema("datar_normomo_drop")
+
+  schema$output$db_drop_table()
+  schema$output$db_connect()
+  schema$output$db_drop_constraint()
+  schema$output$db_load_data_infile(d)
+  schema$output$db_add_constraint()
+}
+
+
+datar_normomo_internal <- function(){
   files <- fs::dir_ls(path("input", "normomo"), regexp="FHIDOD2_[0-9]+.txt$")
   file <- max(files)
   date_extracted <- stringr::str_extract(file, "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
@@ -73,29 +111,5 @@ data_normomo_internal <- function(){
   d[,uuid:=1:.N]
   d[, date_extracted:=date_extracted]
 
-  return(d)
+  d
 }
-
-#' DataNormomo
-#'
-#' Get and clean NorMOMO data
-#'
-#'  @import data.table
-#'
-#' @export
-data_normomo <- function(data, argset, schema){
-  # data <- tm_get_data("data_normomo")
-  # argset <- tm_get_argset("data_normomo")
-  # schema <- tm_get_schema("data_normomo")
-
-  d <- data_normomo_internal()
-  schema$output$db_drop_table()
-  schema$output$db_connect()
-  schema$output$db_drop_constraint()
-  schema$output$db_load_data_infile(d)
-  schema$output$db_add_constraint()
-}
-
-
-
-
