@@ -46,10 +46,6 @@ datar_normomo_drop <- function(data, argset, schema){
   # schema <- tm_get_schema("datar_normomo_drop")
 
   schema$output$db_drop_table()
-  schema$output$db_connect()
-  schema$output$db_drop_constraint()
-  schema$output$db_load_data_infile(d)
-  schema$output$db_add_constraint()
 }
 
 
