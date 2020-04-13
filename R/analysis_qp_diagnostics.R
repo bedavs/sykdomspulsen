@@ -40,11 +40,10 @@ qp_diagnostics_keys <- c(
   "age"
 )
 
-#' get_schema_qp_diagnostics_weekly
-#'
-#' DB schema for qp_diagnostics_weekly
-#'
-#' @export
+# get_schema_qp_diagnostics_weekly
+#
+# DB schema for qp_diagnostics_weekly
+#
 get_schema_qp_diagnostics <- function() {
   return(fd::schema$new(
     db_table = glue::glue("spuls_qp_diagnostics"),
@@ -54,12 +53,11 @@ get_schema_qp_diagnostics <- function() {
   ))
 }
 
-#'
-#' extracts diangostics data from a regression fit
-#'
-#' @param fit QP regression fit
-#'
-#' @export
+#
+# extracts diangostics data from a regression fit
+#
+# @param fit QP regression fit
+#
 extract_diagnostics <- function(fit) {
   df <- new_diagnostics_df(n_row = 1)
   sum <- summary(fit)
@@ -76,13 +74,13 @@ extract_diagnostics <- function(fit) {
   df$failed <- 0
   return(df)
 }
-#'
-#' new_diagnostics_df
-#'
-#' returns a data frame with the columns as needed for the diagnostics
-#' @param n_row determines the number of rows in the data frame.
-#'
-#' @export
+
+#
+# new_diagnostics_df
+#
+# returns a data frame with the columns as needed for the diagnostics
+# @param n_row determines the number of rows in the data frame.
+#
 new_diagnostics_df <- function(n_row = 0) {
   df <- data.frame(matrix(ncol = length(qp_diagnostics_field_types), nrow = n_row))
   colnames(df) <- names(qp_diagnostics_field_types)
@@ -110,15 +108,14 @@ fix_name <- function(name) {
 }
 
 
-#' update_diagnostics
-#'
-#' Updates diagnostics results with common data
-#'
-#' @param diagnostics Diagnostics results
-#' @param conf configuration object
-#' @param x analysis run
-#'
-#' @export
+# update_diagnostics
+#
+# Updates diagnostics results with common data
+#
+# @param diagnostics Diagnostics results
+# @param conf configuration object
+# @param x analysis run
+#
 update_diagnostics <- function(diagnostics, argset) {
   diagnostics$tag <- argset$tag
   diagnostics$location_code <- argset$location_code

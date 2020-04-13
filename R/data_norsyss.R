@@ -1,12 +1,4 @@
-#' Format the raw data
-#' @param d Raw data
-#' @param syndrome syndrome of interest
-#' @param population Population dataset
-#' @param hellidager Hellidager dataset
-#' @param testIfHelligdagIndikatorFileIsOutdated Boolean. Test if the current date is older than the last hellidag recorded in the fiel?
-#' @param removeMunicipsWithoutConsults Boolean. Remove municipalities that do not have any consultations?
-#' @import data.table
-#' @export CleanData
+# Format the raw data
 CleanData <- function(d,
                       syndrome,
                       skeleton_date_max = max(d$date),
@@ -293,11 +285,10 @@ CleanData <- function(d,
   return(data)
 }
 
-#' Identify the latest raw/clean datasets
-#' @param raw Folder containing raw data
-#' @param clean Folder containing clean data
-#' @import data.table
-#' @export IdentifyDatasets
+# Identify the latest raw/clean datasets
+# @param raw Folder containing raw data
+# @param clean Folder containing clean data
+# @import data.table
 IdentifyDatasets <-
   function(raw = list.files(path("input", "norsyss"), "^partially_formatted_"))
   {
@@ -312,14 +303,12 @@ IdentifyDatasets <-
   }
 
 
-#' get_NorSySS_data
-#'
-#' Get and clean from file
-#'
-#'
-#' @import data.table
-#'
-#' @export
+# get_NorSySS_data
+#
+# Get and clean from file
+#
+#
+# @import data.table
 data_norsyss <- function(data, argset, schema){
   # tm_run_task("data_norsyss")
   # argset <- tm_get_argset("data_norsyss")

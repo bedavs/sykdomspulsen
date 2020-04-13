@@ -1,14 +1,3 @@
-
-#' Calculate completeness
-#'
-#' @param location location to calculate for
-#' @param x_year to calculate for
-#' @param x_granularity_time granularity_time
-#' @param table db table
-#'
-#' @import data.table
-#'
-#' @export
 calculate_completeness <- function(location, x_year, x_granularity_time = "weekly", table = NULL) {
   if (is.null(table)) {
     table <- fd::tbl("results_qp")
@@ -29,14 +18,12 @@ calculate_completeness <- function(location, x_year, x_granularity_time = "weekl
 }
 
 
-#' Calculate Confidence Interval
-#'
-#' @param data the data to include
-#' @param last_weeks if we only inlcude uncertainty for the last weeks
-#'
-#' @import data.table
-#'
-#' @export
+# Calculate Confidence Interval
+#
+# @param data the data to include
+# @param last_weeks if we only inlcude uncertainty for the last weeks
+#
+# @import data.table
 calculate_confidence_interval <- function(data, last_weeks = NULL) {
   setDT(data)
   table <- fd::tbl("results_qp")

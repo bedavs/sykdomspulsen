@@ -1,12 +1,6 @@
-
-#' get_NorSySS_data
-#'
-#' Get and clean from file
-#'
-#'
-#' @import data.table
-#'
-#' @export
+# get_NorSySS_data
+#
+# Get and clean from file
 data_pre_norsyss <- function(data, argset, schema){
   # tm_run_task("data_pre_norsyss")
   # argset = tm_get_argset("data_pre_norsyss")
@@ -443,13 +437,9 @@ old_delete_norsyss_aggregate_format_raw_data <- function(d, configs) {
   return(d)
 }
 
-#' get_n_doctors
-#'
-#' A function to extract the number of doctors per week
-
-#' @param folder a
-#' @import data.table
-#' @export
+# get_n_doctors
+#
+# A function to extract the number of doctors per week
 get_n_doctors <- function(folder = "/input/norsyss/") {
   db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
   res <- RODBC::sqlQuery(db, 'select count(distinct(Behandler_Id)) as behandlere, DATEPART("ISO_WEEK", Konsultasjonsdato) as week ,DATEPART("YEAR", Konsultasjonsdato) as year from Konsultasjon group by DATEPART("ISO_WEEK", Konsultasjonsdato) ,DATEPART("YEAR", Konsultasjonsdato)')

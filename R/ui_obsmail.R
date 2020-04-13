@@ -1,6 +1,4 @@
-#' ui_obsmail
-#'
-#' @export
+
 ui_obsmail<- function(data, argset, schema) {
   max_date_q <- schema$input$dplyr_tbl() %>%
     dplyr::summarise(m=max(date)) %>% dplyr::collect()
@@ -21,7 +19,7 @@ ui_obsmail<- function(data, argset, schema) {
   results[, to_keep := NULL]
 
   results <- results[norway_locations(), on=c("location_code"="municip_code"), nomatch=0]
-  
+
   setorder(results, tag, location_code, age, yrwk)
   results[, week_id := 1:.N, by = .(tag, location_code, age)]
   results[, location_name:=get_location_name(location_code)]

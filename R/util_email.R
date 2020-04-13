@@ -32,18 +32,17 @@ e_footer <- function() {
 }
 
 
-#' mailgun
-#' @param subject a
-#' @param html a
-#' @param to a
-#' @param bcc a
-#' @param attachments a
-#' @param inlines a
-#' @param include_footer a
-#' @param is_final Is this a final or preliminary email?
-#' @param cleanup_outlook Do we need to clean up problems with outlook?
-#' @param ... a
-#' @export
+# mailgun
+# @param subject a
+# @param html a
+# @param to a
+# @param bcc a
+# @param attachments a
+# @param inlines a
+# @param include_footer a
+# @param is_final Is this a final or preliminary email?
+# @param cleanup_outlook Do we need to clean up problems with outlook?
+# @param ... a
 mailgun <- function(
                     subject,
                     html = " ",
@@ -147,10 +146,9 @@ mailgun <- function(
   )
 }
 
-#' e_emails
-#' @param project a
-#' @param is_final Is final or preliminary email?
-#' @export
+# e_emails
+# @param project a
+# @param is_final Is final or preliminary email?
 e_emails <- function(project, is_final = TRUE) {
   if (config$is_production & is_final) {
     email_loc <- "/etc/gmailr/emails.xlsx"

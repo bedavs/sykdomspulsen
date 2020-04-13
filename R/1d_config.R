@@ -36,6 +36,7 @@ set_config <- function() {
       gastro="Mage-tarm"
     )
   )
+  set_permissions()
   set_tasks()
   # if(!foreach::getDoParRegistered()){
   #   future::plan(future::sequential)
@@ -56,7 +57,7 @@ set_computer_name <- function() {
 }
 
 set_computer_type <- function() {
-  if (config$computer_name %in% config$production_name) {
+  if (Sys.getenv("SYKDOMSPULSEN_PRODUCTION") == "1") {
     config$is_production <- TRUE
   } else if (config$computer_name %in% config$name_testing) {
     config$is_testing <- TRUE

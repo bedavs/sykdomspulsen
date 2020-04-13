@@ -1,11 +1,4 @@
 
-#' analyse_simple
-#'
-#' Get and clean MSIS data from msis.no 
-#'
-#' @import ggplot2
-#' 
-#' @export
 UI_create_threshold_plot <-  function(data, argset, schema){
   folder <- argset$folder
   filename <- argset$filename

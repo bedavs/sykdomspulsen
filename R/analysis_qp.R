@@ -1,8 +1,7 @@
-#' analyse_simple
-#'
-#' Running QP analsys
-#'
-#' @export
+# analyse_simple
+#
+# Running QP analsys
+#
 analysis_qp <- function(data, argset, schema){
   # tm_update_plans("analysis_norsyss_qp_weekly")
   # data <- tm_get_data("analysis_norsyss_qp_weekly", index_plan = 1)
@@ -62,20 +61,7 @@ analysis_qp <- function(data, argset, schema){
 }
 
 
-
-  #' Adds seasonal week to dataset
-#'
-#' We often want to graph seasons. This function adds the seasonal week
-#' to the dataset \code{data} as the variable \code{x}.
-#'
-#' @param data A data.table containing the variable \code{week}
-#' @return A data.table with the extra variable \code{x}
-#' @examples
-#' library(data.table)
-#' d <- data.table(week = 1:52)
-#' AddXToWeekly(d)
-#' @import data.table
-#' @export AddXToWeekly
+# Adds seasonal week to dataset
 AddXToWeekly <- function(data) {
   week <- NULL
   x <- NULL
@@ -161,7 +147,7 @@ FormatDatasetWeekly <- function(
 #' @importFrom glm2 glm2
 #' @import stats
 #' @import data.table
-#' @export QuasipoissonTrainPredictData
+#' @export
 QuasipoissonTrainPredictData <- function(
                                          datasetTrain,
                                          datasetPredict,
@@ -359,13 +345,12 @@ FarringtonSEinGammaSpace <- function(pred, phi, alpha = NULL, z = NULL, skewness
   return(se)
 }
 
-#' Calculate Farrington threshold
-#' @param pred Point estimate
-#' @param phi Dispersion
-#' @param alpha Alpha (e.g 0.05)
-#' @param z Similar to \code{alpha} (e.g. 1.96)
-#' @param skewness.transform "none"/"1/2","2/3"
-#' @export FarringtonThreshold
+# Calculate Farrington threshold
+# @param pred Point estimate
+# @param phi Dispersion
+# @param alpha Alpha (e.g 0.05)
+# @param z Similar to \code{alpha} (e.g. 1.96)
+# @param skewness.transform "none"/"1/2","2/3"
 FarringtonThreshold <- function(pred, phi, alpha = NULL, z = NULL, skewness.transform = "none") {
   mu0 <- pred$fit
   tau <- phi + (pred$se.fit^2) / mu0
@@ -388,14 +373,13 @@ FarringtonThreshold <- function(pred, phi, alpha = NULL, z = NULL, skewness.tran
   return(lu)
 }
 
-#' Farrington Z score
-#' @param pred Point estimate
-#' @param phi Dispersion
-#' @param alpha Alpha (e.g 0.05)
-#' @param z Similar to \code{alpha} (e.g. 1.96)
-#' @param skewness.transform "none"/"1/2","2/3"
-#' @param y Observation
-#' @export FarringtonZscore
+# Farrington Z score
+# @param pred Point estimate
+# @param phi Dispersion
+# @param alpha Alpha (e.g 0.05)
+# @param z Similar to \code{alpha} (e.g. 1.96)
+# @param skewness.transform "none"/"1/2","2/3"
+# @param y Observation
 FarringtonZscore <- function(pred, phi, alpha = NULL, z = NULL, skewness.transform = "none", y) {
   mu0 <- pred$fit
   tau <- phi + (pred$se.fit^2) / mu0
@@ -418,13 +402,12 @@ FarringtonZscore <- function(pred, phi, alpha = NULL, z = NULL, skewness.transfo
 }
 
 
-#' Normal <= threshold2
-#' threshold2 < Medium <= threshold4
-#' threshold4 < High
-#'
-#' @param data A data.table containing the variables \code{n}, \code{threshold2}, and \code{threshold4}
-#' @import data.table
-#' @export DetermineStatus
+# Normal <= threshold2
+# threshold2 < Medium <= threshold4
+# threshold4 < High
+#
+# @param data A data.table containing the variables \code{n}, \code{threshold2}, and \code{threshold4}
+# @import data.table
 DetermineStatus <- function(data) {
   n_status <- NULL
   n <- NULL
@@ -437,10 +420,9 @@ DetermineStatus <- function(data) {
   data[n > 1 & n > n_baseline_thresholdu1, n_status := "High"]
 }
 
-#' clean_post_analysis
-#' @param res a
-#' @param stack a
-#' @export clean_post_analysis
+# clean_post_analysis
+# @param res a
+# @param stack a
 clean_post_analysis <- function(res, argset) {
   ## res <- res[!is.na(threshold2) & !is.infinite(threshold2)]
 

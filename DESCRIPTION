@@ -59,7 +59,19 @@ Imports:
   rlang,
   tidyr,
   withr,
-  xlsx
+  xlsx,
+  RAWmisc,
+  RODBC,
+  asbio,
+  car,
+  fd,
+  huxtable,
+  lemon,
+  lme4,
+  mem,
+  ncdf4,
+  samplingbook,
+  xml2
 Suggests: testthat,
     knitr,
     usethis

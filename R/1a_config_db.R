@@ -41,6 +41,35 @@ set_db <- function(){
       )
     ),
 
+    datar_weather = schema$new(
+      db_config = config$db_config,
+      db_table = "datar_weather",
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+        "tg" = "DOUBLE",
+        "tx" = "DOUBLE",
+        "tn" = "DOUBLE",
+        "rr" = "DOUBLE",
+        "forecast" = "BOOLEAN"
+      ),
+      db_load_folder = "/xtmp/",
+      keys =  c(
+        "location_code",
+        "date"
+      )
+    ),
+
     data_weather = schema$new(
       db_config = config$db_config,
       db_table = "data_weather",

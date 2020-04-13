@@ -1,6 +1,4 @@
-#' ui_mem_plots
-#'
-#' @export
+
 ui_mem_plots <- function(data, argset, schema){
   outputs <- list(
     charts = create_plots,

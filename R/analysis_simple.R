@@ -1,8 +1,7 @@
-#' analyse_simple
-#'
-#' Get and clean MSIS data from msis.no
-#'
-#' @export
+# analyse_simple
+#
+# Get and clean MSIS data from msis.no
+#
 analysis_simple <- function(data, argset, schema){
   # arguments start
   group_by <- argset$group_by

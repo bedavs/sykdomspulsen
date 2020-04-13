@@ -191,6 +191,7 @@ set_tasks <- function() {
     )
   )
 
+  # normomo
   config$tasks$add_task(
     task_from_config(
       list(
@@ -211,16 +212,33 @@ set_tasks <- function() {
       )
     )
   )
+
+  # weather
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "datar_weather",
+        type = "data",
+        action = "datar_weather",
+        schema = list(output = config$schema$datar_weather)
+      )
+    )
+  )
   config$tasks$add_task(
     task_from_config(
       list(
         name = "data_weather",
         type = "data",
         action = "data_weather",
-        schema = list(output = config$schema$data_weather)
+        schema = list(
+          input = config$schema$datar_weather,
+          output = config$schema$data_weather
+        )
       )
     )
   )
+
+  # covid19
   config$tasks$add_task(
     task_from_config(
       list(

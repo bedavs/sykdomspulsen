@@ -1,6 +1,3 @@
-#'ui_norsyss_pdf
-#'
-#' @export
 ui_norsyss_pdf <- function(data, argset, schema) {
   fs::dir_create(sykdomspulspdf_folder("rmarkdown", argset$today))
   fs::dir_create(sykdomspulspdf_folder("pdf", argset$today))

@@ -7,5 +7,5 @@
 data_msis(data, argset, schema)
 }
 \description{
-Get and clean MSIS data from msis.no
+data_msis
 }

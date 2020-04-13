@@ -479,6 +479,7 @@ drop_rows_where <- function(conn, table, condition) {
 #' @param port port
 #' @param user user
 #' @param password password
+#' @param db database
 #' @param db_config A list containing driver, server, port, user, password
 #' @export get_db_connection
 get_db_connection <- function(
@@ -487,6 +488,7 @@ get_db_connection <- function(
                               port = NULL,
                               user = NULL,
                               password = NULL,
+                              db = NULL,
                               db_config = config$db_config
                               ) {
 
@@ -505,10 +507,12 @@ get_db_connection <- function(
   if(!is.null(db_config) & is.null(password)){
     password <- db_config$password
   }
+  if(!is.null(db_config) & is.null(db)){
+    db <- db_config$db
+  }
 
   if(db_config$driver %in% c("ODBC Driver 17 for SQL Server")){
-    return(
-      DBI::dbConnect(
+    conn <- DBI::dbConnect(
         odbc::odbc(),
         driver = db_config$driver,
         server = db_config$server,
@@ -516,10 +520,9 @@ get_db_connection <- function(
         #uid = db_config$user,
         #Pwd = db_config$password#,
         trusted_connection = "yes"
-      ))
+      )
   } else {
-    return(
-      DBI::dbConnect(
+    conn <- DBI::dbConnect(
         odbc::odbc(),
         driver = driver,
         server = server,
@@ -527,8 +530,10 @@ get_db_connection <- function(
         user = user,
         password = password,
         encoding = "utf8"
-      ))
+      )
   }
+  if(!is.null(db)) use_db(conn, db)
+  return(conn)
 }
 
 #' tbl

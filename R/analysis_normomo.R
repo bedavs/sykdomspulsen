@@ -1,8 +1,7 @@
-#' analysis_normomo
-#'
-#' Get and clean MSIS data from msis.no
-#'
-#' @export
+# analysis_normomo
+#
+# Get and clean MSIS data from msis.no
+#
 analysis_normomo <-  function(data, argset, schema, ...){
   # tm_update_plans("analysis_normomo")
   # tm_run_task("analysis_normomo")

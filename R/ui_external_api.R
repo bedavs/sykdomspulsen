@@ -1,6 +1,3 @@
-#'ui_external_api
-#' 
-#' @export
 ui_external_api <- function(data, argset, schema) {
   fd::msg("Saving config for the external api")
   f <- path("output", "externalapi", argset$today)
@@ -83,7 +80,7 @@ ui_external_api <- function(data, argset, schema) {
     path("output", "externalapi", argset$today,"resYearLineMunicip.RDS"),
     version = 2
   )
-  
+
   fd::msg("Saving weekly not municip data for the external api")
 
   df <- schema$input$dplyr_tbl() %>%
@@ -104,9 +101,9 @@ ui_external_api <- function(data, argset, schema) {
     path("output", "externalapi",  argset$today,"resYearLine.RDS"),
     version = 2
   )
-  
+
   fd::msg("Saving outbreaks for the external api")
-  
+
   outbreaks <- GenerateOutbreakListAPI(
     df = df,
     dk = dk,
@@ -115,14 +112,7 @@ ui_external_api <- function(data, argset, schema) {
   saveRDS(outbreaks, path("output", "externalapi", argset$today, "outbreaks.RDS"), version = 2)
 }
 
-#' Generates the external outbreak list
-#' Generates the internal outbreak list
-#' @param df Data inside resYearLine.RDS
-#' @param dk Data inside resYearLineMunicip.RDS
-#' @param saveFiles Where are you saving the outbreak lists?
-#' @param useType Use type or tag as variable name
-#' @import data.table
-#' @export
+
 GenerateOutbreakListAPI <- function(df,
                                     dk,
                                     useType = FALSE) {
@@ -263,8 +253,7 @@ GenerateOutbreakListAPI <- function(df,
 
 
 
-#' Convert the new \code{CONFIG} for use in the old external API
-#' @export ConvertConfigForAPI
+
 ConvertConfigForAPI <- function(argset) {
   CONFIG_NEW <- new.env(parent = emptyenv())
   CONFIG_NEW$AGES <- argset$ages
@@ -274,7 +263,7 @@ ConvertConfigForAPI <- function(argset) {
   names(CONFIG_NEW$SYNDROMES_SHORT) <- argset$hort
 
 
-  
+
   ## CONFIG_NEW$SYNDROMES_ALERT_INTERNAL <- CONFIG$SYNDROMES[alertInternal == TRUE]$tag
   ## names(CONFIG_NEW$SYNDROMES_ALERT_INTERNAL) <- CONFIG$SYNDROMES[alertInternal == TRUE]$namesLong
 
@@ -285,7 +274,7 @@ ConvertConfigForAPI <- function(argset) {
 
 fix_columns <- function(d){
   d[location_code == "norge", location_code := "Norge"]
-  
+
   d[, type := tag_outcome]
   d[, tag := tag_outcome]
   d[, HelligdagIndikator := 0]

@@ -1,11 +1,9 @@
-
-#' data_covid19_msis
-#'
-#' Get and clean NorMOMO data
-#'
-#'  @import data.table
-#'
-#' @export
+# data_covid19_msis
+#
+# Get and clean NorMOMO data
+#
+#  @import data.table
+#
 data_covid19_msis <- function(data, argset, schema){
   # data <- tm_get_data("data_covid19_msis")
   # argset <- tm_get_argset("data_covid19_msis")

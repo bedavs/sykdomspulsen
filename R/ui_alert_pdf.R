@@ -1,8 +1,5 @@
-#' ui_alert_pdf
-#'
-#' @export 
 ui_alert_pdf <- function(data, argset, schema) {
-  
+
   fd::msg("Sykdomspuls: creating alerts pdf", slack = T)
   max_date_q <- schema$input$dplyr_tbl() %>%
     dplyr::summarise(m=max(date)) %>% dplyr::collect()
@@ -67,7 +64,7 @@ ui_alert_pdf <- function(data, argset, schema) {
       "These are the municipalities with at least one z-score above 4<br><br>",
       "{tab}"
     )
-    
+
   attachments <- d$attachment
   if (length(attachments) > 10) attachments <- attachments[1:10]
 

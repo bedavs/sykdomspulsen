@@ -18,13 +18,12 @@ datar_pre_normomo <- function(){
 }
 
 
-#' DataNormomo
-#'
-#' Get and clean NorMOMO data
-#'
-#'  @import data.table
-#'
-#' @export
+# DataNormomo
+#
+# Get and clean NorMOMO data
+#
+#  @import data.table
+#
 datar_normomo <- function(data, argset, schema){
   # tm_run_task("datar_normomo")
   # data <- tm_get_data("data_normomo")

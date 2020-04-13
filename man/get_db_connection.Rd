@@ -5,7 +5,8 @@
 \title{get_db_connection}
 \usage{
 get_db_connection(driver = NULL, server = NULL, port = NULL,
-  user = NULL, password = NULL, db_config = config$db_config)
+  user = NULL, password = NULL, db = NULL,
+  db_config = config$db_config)
 }
 \arguments{
 \item{driver}{driver}
@@ -17,6 +18,8 @@ get_db_connection(driver = NULL, server = NULL, port = NULL,
 \item{user}{user}
 
 \item{password}{password}
+
+\item{db}{database}
 
 \item{db_config}{A list containing driver, server, port, user, password}
 }
