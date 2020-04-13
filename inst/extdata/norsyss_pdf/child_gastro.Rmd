@@ -1,7 +1,7 @@
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 x_tag <- "{{x_tag}}"
 location_code <- "{{location_code}}"
-location_name <- fd::norway_locations()[county_code==location_code]$county_name[1]
+location_name <- norway_locations()[county_code==location_code]$county_name[1]
 table <- sykdomspulsen::tbl("results_qp")
 
 ```

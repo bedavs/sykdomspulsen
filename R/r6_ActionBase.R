@@ -12,7 +12,7 @@ ActionBase <- R6::R6Class(
     },
     can_run = function(){
       return(T)
-      rundates <- fd::get_rundate()
+      rundates <- get_rundate()
       last_run_date <- head(rundates[package == task_name]$date_run, 1)
       curr_date <- lubridate::today()
       dependencies <- c()
@@ -42,9 +42,9 @@ ActionBase <- R6::R6Class(
         self$run()
       },
       error = function(e) {
-        if (fd::config$is_production) {
-          fd::msg("ERROR", slack = T)
-          fd::msg(e, slack = T)
+        if (config$is_production) {
+          msg("ERROR", slack = T)
+          msg(e, slack = T)
         } else {
           stop(e)
         }

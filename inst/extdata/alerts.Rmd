@@ -19,19 +19,17 @@ x_tag <- params$tag
 x_county_code <- fhidata::norway_locations_current[municip_code==x_municip_code]$county_code
 x_municip_name <- sykdomspulsen::get_location_name(x_municip_code)
 
-fd::initialize("sykdomspuls")
-
 library(data.table)
 library(ggplot2)
 library(kableExtra)
 
-d <- fd::tbl("results_qp") %>% 
+d <- spulsconnect::tbl("results_qp") %>% 
   dplyr::filter(
     tag== !! x_tag & 
     county_code == !! x_county_code &
     granularity_time=="weekly") %>% 
   dplyr::collect() %>%
-  fd::latin1_to_utf8()
+  latin1_to_utf8()
 
 yrwks_summary <- rev(unique(d[,yrwk]))[1:12]
 yrwks_lines <- rev(unique(d[,yrwk]))[1:25]

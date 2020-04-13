@@ -6,7 +6,7 @@ get_weather <- function(impute_missing = FALSE) {
 
   temp <- tbl("data_weather") %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
 
   if (impute_missing) {
     fit <- lme4::lmer(tx ~ tg + (1 | location_code), data = temp)
@@ -26,7 +26,7 @@ get_weather <- function(impute_missing = FALSE) {
   }
 
   temp[, year := data.table::year(date)]
-  to_merge <- fd::norway_fixing_merged_municips()[, c(
+  to_merge <- norway_fixing_merged_municips()[, c(
     "municip_code_original",
     "municip_code_current",
     "year",
@@ -52,7 +52,7 @@ get_weather <- function(impute_missing = FALSE) {
     date
   )]
 
-  pop <- fd::norway_population()[, .(
+  pop <- norway_population()[, .(
     pop = sum(pop)
   ), keyby = .(location_code, year)]
 
@@ -60,7 +60,7 @@ get_weather <- function(impute_missing = FALSE) {
   temp[pop, on = c("location_code", "year"), pop := pop]
   temp <- temp[!is.na(pop)]
 
-  temp[fd::norway_locations(),
+  temp[norway_locations(),
     on = "location_code==municip_code",
     county_code := county_code
   ]

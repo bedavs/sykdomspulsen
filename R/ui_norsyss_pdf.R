@@ -3,12 +3,12 @@ ui_norsyss_pdf <- function(data, argset, schema) {
   fs::dir_create(sykdomspulspdf_folder("pdf", argset$today))
   fs::dir_create(sykdomspulspdf_folder("svg", argset$today))
 
-  locs <- unique(fd::norway_locations()[, c("county_code", "county_name")])
+  locs <- unique(norway_locations()[, c("county_code", "county_name")])
 
   table <- schema$input$dplyr_tbl()
 
   for (tag in argset$tags) {
-    fd::msg(glue::glue("sykdomspulspdf {tag}"), slack = T)
+    msg(glue::glue("sykdomspulspdf {tag}"), slack = T)
     # setup
     files <- c("monthly_report.Rmd", "monthly_reportALL.Rmd")
 
@@ -107,7 +107,7 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
     dplyr::filter(tag_outcome == !!x_tag) %>%
     dplyr::filter(age == "totalt") %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
   # remove last 3 weeks
   yrwks <- rev(sort(unique(data_long$yrwk)))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]
@@ -168,7 +168,7 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
     dplyr::filter(tag_outcome == !!x_tag) %>%
     dplyr::filter(age != "totalt") %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
   # remove last 3 weeks
   yrwks <- rev(unique(data_long$yrwk))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]

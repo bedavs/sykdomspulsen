@@ -1,5 +1,5 @@
 ui_external_api <- function(data, argset, schema) {
-  fd::msg("Saving config for the external api")
+  msg("Saving config for the external api")
   f <- path("output", "externalapi", argset$today)
   fs::dir_create(f)
   saveRDS(ConvertConfigForAPI(argset), path("output", "externalapi", argset$today,
@@ -34,7 +34,7 @@ ui_external_api <- function(data, argset, schema) {
   )
   x_tags <- argset$tags
 
-  fd::msg("Saving daily data for the external api")
+  msg("Saving daily data for the external api")
 
   d <- schema$input$dplyr_tbl() %>%
     dplyr::filter(
@@ -43,7 +43,7 @@ ui_external_api <- function(data, argset, schema) {
         tag_outcome %in% x_tags
     ) %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
 
 
 
@@ -60,7 +60,7 @@ ui_external_api <- function(data, argset, schema) {
   rm("d")
   gc()
 
-  fd::msg("Saving weekly municip data for the external api")
+  msg("Saving weekly municip data for the external api")
 
   dk <- schema$input$dplyr_tbl() %>%
     dplyr::filter(
@@ -70,7 +70,7 @@ ui_external_api <- function(data, argset, schema) {
         granularity_geo == "municip"
     ) %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
   fix_columns(dk)
   for (i in names(dk)) {
     if (!i %in% names_req) dk[, (i) := NULL]
@@ -81,7 +81,7 @@ ui_external_api <- function(data, argset, schema) {
     version = 2
   )
 
-  fd::msg("Saving weekly not municip data for the external api")
+  msg("Saving weekly not municip data for the external api")
 
   df <- schema$input$dplyr_tbl() %>%
     dplyr::filter(
@@ -91,7 +91,7 @@ ui_external_api <- function(data, argset, schema) {
         granularity_geo != "municip"
     ) %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
   fix_columns(df)
   for (i in names(df)) {
     if (!i %in% names_req) df[, (i) := NULL]
@@ -102,7 +102,7 @@ ui_external_api <- function(data, argset, schema) {
     version = 2
   )
 
-  fd::msg("Saving outbreaks for the external api")
+  msg("Saving outbreaks for the external api")
 
   outbreaks <- GenerateOutbreakListAPI(
     df = df,

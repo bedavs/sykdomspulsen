@@ -94,7 +94,7 @@ norsyss_fetch_raw_data_and_aggregate <- function(
       max_date <- as.Date(max(x$date, na.rm = T))
       # as long as last date in the file is within 2 days of the requested date
       if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
-        fd::msg("file already exists! exiting...", slack = T)
+        msg("file already exists! exiting...", slack = T)
         return()
       }
     }

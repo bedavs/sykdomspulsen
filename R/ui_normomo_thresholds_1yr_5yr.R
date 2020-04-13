@@ -212,7 +212,7 @@ normomo_graphs_deaths <- function(
       title1 = title1,
       title2 = title2,
       includeRealDeaths = FALSE,
-      caption = paste("Sist oppdatert: ", strftime(fd::get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y"), sep = "")
+      caption = paste("Sist oppdatert: ", strftime(get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y"), sep = "")
     )
     fhiplot::save_a4(q, filename = paste0(folder, "/excl_reported_", runName, "-", i, "-", normomo_yrwk(), ".png"))
 
@@ -221,7 +221,7 @@ normomo_graphs_deaths <- function(
       title1 = title1,
       title2 = title2,
       includeRealDeaths = TRUE,
-      caption = paste("Sist oppdatert: ", strftime(fd::get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y"), sep = "")
+      caption = paste("Sist oppdatert: ", strftime(get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y"), sep = "")
     )
     fhiplot::save_a4(q, filename = paste0(folder, "/incl_reported_", runName, "-", i, "-", normomo_yrwk(), ".png"))
   }

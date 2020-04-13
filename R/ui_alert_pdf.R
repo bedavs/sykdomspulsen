@@ -1,6 +1,6 @@
 ui_alert_pdf <- function(data, argset, schema) {
 
-  fd::msg("Sykdomspuls: creating alerts pdf", slack = T)
+  msg("Sykdomspuls: creating alerts pdf", slack = T)
   max_date_q <- schema$input$dplyr_tbl() %>%
     dplyr::summarise(m=max(date)) %>% dplyr::collect()
   max_yrwk <- fhi::isoyearweek(max_date_q$m)
@@ -12,7 +12,7 @@ ui_alert_pdf <- function(data, argset, schema) {
     dplyr::filter(n_status == "High") %>%
     dplyr::filter(tag_outcome %in% tags) %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
   if (nrow(d) == 0) {
     return()
   }
@@ -69,10 +69,10 @@ ui_alert_pdf <- function(data, argset, schema) {
   if (length(attachments) > 10) attachments <- attachments[1:10]
 
 
-  fd::mailgun(
+  mailgun(
     subject = "Sykdomspuls alert pdfs",
     html = html,
-    bcc = fd::e_emails(
+    bcc = e_emails(
       "sykdomspuls_utbrudd",
       is_final = is_final()
     ),

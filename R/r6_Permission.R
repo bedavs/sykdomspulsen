@@ -81,7 +81,7 @@ Permission <- R6::R6Class(
     current_value = function() {
       temp <- tbl("permission") %>%
         dplyr::collect() %>%
-        fd::latin1_to_utf8()
+        latin1_to_utf8()
 
       return(temp[xkey == key, value])
     }

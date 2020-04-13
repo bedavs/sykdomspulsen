@@ -279,7 +279,6 @@ CleanData <- function(d,
   ## data[, season := fhi::season(yrwk)]
 
   ## if (!ValidateDataClean(data)) {
-  ##   fd::msg("Clean data not validated", type = "err")
   ## }
 
   return(data)
@@ -395,7 +394,6 @@ data_norsyss <- function(data, argset, schema){
 
     schema$output$db_load_data_infile(res)
   }
-  #fd::msg("Adding db constraint")
   #schema$output$db_add_constraint()
   msg("New data is now formatted and ready")
   return(TRUE)

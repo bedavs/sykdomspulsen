@@ -154,14 +154,14 @@ data_msis <- function(data, argset, schema){
   }
   data <- rbindlist(data_list)
   cleaned_data <- clean_data(data)
-  with_loc <- cleaned_data[fd::norway_locations()[, .(location_code=municip_code, municip_name)], on=c("municip"="municip_name")]
+  with_loc <- cleaned_data[norway_locations()[, .(location_code=municip_code, municip_name)], on=c("municip"="municip_name")]
   with_loc[, tag_outcome :=Sykdom]
   with_loc <- with_loc[tag_outcome %in% argset$tags]
 
   with_loc <- with_loc[!is.na(tag_outcome),]
   with_loc[, granularity_time:="month"]
   with_loc[, granularity_geo:="municip"]
-  with_loc[, border:=fd::config$border]
+  with_loc[, border:=config$border]
   with_loc[, age:="totalt"]
   with_loc[, sex:="totalt"]
 

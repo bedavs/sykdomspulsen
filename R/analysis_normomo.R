@@ -148,7 +148,7 @@ analysis_normomo_plans <- function(){
       )
     )
   }
-  for(j in unique(fd::norway_locations()$county_code)){
+  for(j in unique(norway_locations()$county_code)){
     list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
     list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
       tbl("datar_normomo") %>%

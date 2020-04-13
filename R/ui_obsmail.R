@@ -10,7 +10,7 @@ ui_obsmail<- function(data, argset, schema) {
     dplyr::filter(yrwk %in% !!yrwks) %>%
     dplyr::filter(tag_outcome %in% tag_relevant) %>%
     dplyr::collect() %>%
-    fd::latin1_to_utf8()
+    latin1_to_utf8()
   results[, tag :=tag_outcome]
   results[, to_keep := FALSE]
   results[n_status != "Normal", to_keep := TRUE]
@@ -29,7 +29,7 @@ ui_obsmail<- function(data, argset, schema) {
 
   email_subject <- glue::glue("OBS varsel fra Sykdomspulsen {yrwks[1]}")
 
-  if (!fd::config$is_production) {
+  if (!config$is_production) {
     if (!"test@rwhite.no" %in% unique(alerts$email)) stop("THIS IS NOT A TEST EMAIL DATASET")
   }
 
@@ -143,7 +143,7 @@ ui_obsmail<- function(data, argset, schema) {
     # add in bottom text
     email_text <- paste0(email_text, email_text_bottom)
 
-    fd::mailgun(
+    mailgun(
       subject = email_subject,
       html = email_text,
       to = em,

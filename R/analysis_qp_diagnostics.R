@@ -45,7 +45,7 @@ qp_diagnostics_keys <- c(
 # DB schema for qp_diagnostics_weekly
 #
 get_schema_qp_diagnostics <- function() {
-  return(fd::schema$new(
+  return(schema$new(
     db_table = glue::glue("spuls_qp_diagnostics"),
     db_field_types = qp_diagnostics_field_types,
     db_load_folder = "/xtmp/",
