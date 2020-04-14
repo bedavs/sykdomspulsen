@@ -5,6 +5,7 @@
 #  @import data.table
 #
 data_covid19_msis <- function(data, argset, schema){
+  # tm_run_task("data_covid19_msis")
   # data <- tm_get_data("data_covid19_msis")
   # argset <- tm_get_argset("data_covid19_msis")
   # schema <- tm_get_schema("data_covid19_msis")
@@ -74,15 +75,37 @@ data_covid19_msis <- function(data, argset, schema){
   d[, yrwk := fhi::isoyearweek(date)]
   d[, year:= fhi::isoyear_n(date)]
   d[, week := fhi::isoweek_n(date)]
-  d[, month := lubridate::month(date)]
   d[, season := fhi::season(yrwk)]
   d[, x := fhi::x(week)]
 
+  d_week <- d[,.(
+    n=sum(n)
+  ), keyby=.(
+    location_code,
+    granularity_geo,
+    tag_outcome,
+    border,
+    age,
+    sex,
+    yrwk,
+    year,
+    week,
+    season,
+    x
+  )]
+  d_week[
+    fhidata::days,
+    on="yrwk",
+    date:=as.Date(sun)
+  ]
+  d_week[,granularity_time:="week"]
+  setcolorder(d_week,names(d))
+  retval <- rbind(d,d_week)
 
   schema$output$db_drop_table()
   schema$output$db_connect()
   schema$output$db_drop_constraint()
-  schema$output$db_load_data_infile(d)
+  schema$output$db_load_data_infile(retval)
   schema$output$db_add_constraint()
 }
 

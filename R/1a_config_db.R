@@ -99,6 +99,46 @@ set_db <- function(){
       )
     ),
 
+    # covid19
+    data_covid19_model = schema$new(
+      db_table = "data_covid19_model",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "infectious_prev_est" = "DOUBLE",
+        "infectious_prev_thresholdl0" = "DOUBLE",
+        "infectious_prev_thresholdu0" = "DOUBLE",
+
+        "incidence_est" = "DOUBLE",
+        "incidence_thresholdl0" = "DOUBLE",
+        "incidence_thresholdu0" = "DOUBLE",
+
+        "hosp_prev_est" = "DOUBLE",
+        "hosp_prev_thresholdl0" = "DOUBLE",
+        "hosp_prev_thresholdu0" = "DOUBLE",
+
+        "icu_prev_est" = "DOUBLE",
+        "icu_prev_thresholdl0" = "DOUBLE",
+        "icu_prev_thresholdu0" = "DOUBLE"
+      ),
+      db_load_folder = "/xtmp/",
+      keys =  c(
+        "location_code",
+        "date"
+      )
+    ),
     data_covid19_msis = schema$new(
       db_table = "data_covid19_msis",
       db_config = config$db_config,
@@ -114,13 +154,13 @@ set_db <- function(){
         "yrwk" = "TEXT",
         "year" = "INTEGER",
         "week" = "INTEGER",
-        "month" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
         "n" = "INTEGER"
       ),
       db_load_folder = "/xtmp/",
       keys =  c(
+        "granularity_time",
         "tag_outcome",
         "location_code",
         "date"

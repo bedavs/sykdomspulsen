@@ -242,6 +242,16 @@ set_tasks <- function() {
   config$tasks$add_task(
     task_from_config(
       list(
+        name = "data_covid19_model",
+        type = "data",
+        action = "data_covid19_model",
+        schema = list(output = config$schema$data_covid19_model)
+      )
+    )
+  )
+  config$tasks$add_task(
+    task_from_config(
+      list(
         name = "data_covid19_msis",
         type = "data",
         action = "data_covid19_msis",

@@ -57,10 +57,6 @@ Permission <- R6::R6Class(
         permission <- TRUE
       }
 
-      if (config$is_production) {
-        permission <- FALSE
-      }
-
       return(permission)
     },
     revoke_permission = function() {
