@@ -10,7 +10,7 @@ set_db <- function(){
 
   # set schema
   config$schema <- list(
-    rundate = schema$new(
+    rundate = Schema$new(
       db_config = config$db_config,
       db_table = "rundate",
       db_field_types = c(
@@ -23,7 +23,7 @@ set_db <- function(){
       check_fields_match = TRUE
     ),
 
-    datar_normomo = schema$new(
+    datar_normomo = Schema$new(
       db_config = config$db_config,
       db_table = "datar_normomo",
       db_field_types =  c(
@@ -41,7 +41,7 @@ set_db <- function(){
       )
     ),
 
-    datar_weather = schema$new(
+    datar_weather = Schema$new(
       db_config = config$db_config,
       db_table = "datar_weather",
       db_field_types =  c(
@@ -70,7 +70,7 @@ set_db <- function(){
       )
     ),
 
-    data_weather = schema$new(
+    data_weather = Schema$new(
       db_config = config$db_config,
       db_table = "data_weather",
       db_field_types =  c(
@@ -100,7 +100,7 @@ set_db <- function(){
     ),
 
     # covid19
-    data_covid19_model = schema$new(
+    data_covid19_model = Schema$new(
       db_table = "data_covid19_model",
       db_config = config$db_config,
       db_field_types =  c(
@@ -139,7 +139,7 @@ set_db <- function(){
         "date"
       )
     ),
-    data_covid19_msis = schema$new(
+    data_covid19_msis = Schema$new(
       db_table = "data_covid19_msis",
       db_config = config$db_config,
       db_field_types =  c(
@@ -167,7 +167,7 @@ set_db <- function(){
       )
     ),
 
-    results_normomo_standard = schema$new(
+    results_normomo_standard = Schema$new(
       db_config = config$db_config,
       db_table = "results_normomo_standard",
       db_field_types =  c(
@@ -213,7 +213,7 @@ set_db <- function(){
       db_load_folder = "/xtmp/",
       check_fields_match = TRUE
     ),
-    data_msis = schema$new(
+    data_msis = Schema$new(
       db_config = config$db_config,
       db_table = "data_msis",
       db_field_types =  c(
@@ -240,7 +240,7 @@ set_db <- function(){
         "date"
       )
     ),
-    data_norsyss = schema$new(
+    data_norsyss = Schema$new(
       db_table = "data_norsyss",
       db_config = config$db_config,
       db_field_types =  c(
@@ -273,7 +273,7 @@ set_db <- function(){
         "age"
       )
     ),
-    results_simple = schema$new(
+    results_simple = Schema$new(
       db_table = "results_simple",
       db_config = config$db_config,
       db_field_types =  c(
@@ -304,7 +304,7 @@ set_db <- function(){
         "date"
       )
     ),
-    results_mem = schema$new(
+    results_mem = Schema$new(
       db_table = "results_mem",
       db_config = config$db_config,
       db_field_types =  c(
@@ -339,7 +339,7 @@ set_db <- function(){
         "age"
       )
     ),
-    results_norsyss_standard = schema$new(
+    results_norsyss_standard = Schema$new(
       db_table = "results_norsyss_standard",
       db_config = config$db_config,
       db_field_types =  c(
@@ -378,7 +378,7 @@ set_db <- function(){
         "date"
       )
     ),
-    results_mem_limits = schema$new(
+    results_mem_limits = Schema$new(
       db_table = "results_mem_limits",
       db_config = config$db_config,
       db_field_types = list(

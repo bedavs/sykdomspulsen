@@ -161,3 +161,116 @@ e_emails <- function(project, is_final = TRUE) {
 
   return(emails)
 }
+
+mailr <- function(
+  subject,
+  html = " ",
+  to = NULL,
+  bcc = NULL,
+  attachments = NULL,
+  inlines = NULL,
+  include_footer = F,
+  is_final = TRUE,
+  cleanup_outlook = TRUE,
+  ...) {
+
+  if (is.null(to) & !is.null(bcc)) to <- "dashboardsfhi@gmail.com"
+
+  html <- stringr::str_remove(html, "<html>")
+  html <- stringr::str_remove(html, "</html>")
+
+  if (cleanup_outlook) {
+    new_head <- glue::glue("
+    <head>
+    <style>
+     /* Stop Outlook resizing small text. */
+     * {{
+         -ms-text-size-adjust: 100%;
+     }}
+
+     /* Stop Outlook from adding extra spacing to tables. */
+     table, td {{
+         mso-table-lspace: 0pt !important;
+         mso-table-rspace: 0pt !important;
+     }}
+
+     /* Use a better rendering method when resizing images in Outlook IE. */
+     img {{
+         -ms-interpolation-mode:bicubic;
+     }}
+
+   /* Prevent Windows 10 Mail from underlining links. Styles for underlined links should be inline. */
+     a {{
+         text-decoration: none;
+     }}
+  </style>
+  </head>
+  <body style='!important; mso-line-height-rule: exactly;'>
+  ")
+
+    new_end <- glue::glue("
+  </body>
+  </html>
+  ")
+
+    html <- stringr::str_replace_all(html, "<table [^>]*>", "<table>")
+    html <- stringr::str_replace_all(html, "<table>", '<table role="presentation" cellspacing="0" cellpadding="0" border="0">')
+  } else {
+    new_head <- "<html>"
+    new_end <- glue::glue("
+    </html>
+    ")
+  }
+  if (include_footer) {
+    html <- glue::glue(html, e_footer())
+  }
+  html <- paste0(new_head, html, new_end)
+
+  if (!is.null(to)) to <- glue::glue_collapse(to, sep = ",")
+  if (!is.null(bcc)) bcc <- glue::glue_collapse(bcc, sep = ",")
+
+  config$email$mailer$start()
+
+  msg = config$email$mm$Message(
+    author = config$email$values$author,
+    to = to
+  )
+  msg$subject <- subject
+  msg$plain <- html
+  msg$rich <- html
+
+  if (!is.null(attachments)) {
+    for (i in attachments) {
+      msg$attach(i, inline=FALSE)
+    }
+  }
+  if (!is.null(inlines)) {
+    for (i in inlines) {
+      msg$attach(i, inline=TRUE)
+    }
+  }
+  config$email$mailer$send(msg)
+}
+
+test_email <- function(){
+  q <- ggplot(cars, aes(x=speed, y=dist))
+  q <- q + geom_point()
+  fhiplot::save_a4(q, "/tmp/test.png")
+
+
+  mailr(
+    subject = "hello with attachment",
+    html = "<h1>ok</h1>",
+    to = "riwh@fhi.no",
+    attachments = "/tmp/test.png"
+  )
+
+  mailr(
+    subject = "hello with attachment",
+    html = "<h1>ok</h1><img src='cid:test.png'>",
+    to = "riwh@fhi.no",
+    inline = "/tmp/test.png"
+  )
+}
+
+

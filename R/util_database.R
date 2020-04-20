@@ -577,8 +577,8 @@ drop_table <- function(table, db = "Sykdomspulsen_surv") {
 #'
 #' @import data.table
 #' @import R6
-#' @export schema
-schema <- R6Class("schema",
+#' @export Schema
+Schema <- R6Class("Schema",
   public = list(
     dt = NULL,
     conn = NULL,
