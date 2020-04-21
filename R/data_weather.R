@@ -255,9 +255,6 @@ datar_weather <- function(data, argset, schema) {
     }
   }
 
-  download_dates <- "2020-04-01"
-  download_years <- NULL
-
   if (!is.null(download_dates)) {
     for (i in download_dates) {
       msg(glue::glue("Downloading weather for {i}"))
