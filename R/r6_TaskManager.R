@@ -33,6 +33,7 @@ tm_update_plans <- function(task_name, index_plan = NULL, index_argset = NULL) {
 #' @param index_argset Not used
 #' @export
 tm_run_task <- function(task_name, index_plan = NULL, index_argset = NULL) {
+  msg(glue::glue("sykdomspulsen {packageVersion('sykdomspulsen')}"))
   task <- tm_get_task(
     task_name = task_name,
     index_plan = index_plan,
@@ -158,7 +159,7 @@ TaskManager <- R6::R6Class(
 
       }
 
-    },   
+    },
     task_run = function(name, log = TRUE) {
       list_task[[name]]$run(log)
     },

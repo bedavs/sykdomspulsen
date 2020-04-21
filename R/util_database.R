@@ -45,7 +45,7 @@ random_file <- function(folder, extension = ".csv") {
 
 write_data_infile <- function(
   dt,
-  file = "/xtmp/x123.csv",
+  file = tempfile(),
   colnames=T,
   eol="\n",
   quote = "auto",
