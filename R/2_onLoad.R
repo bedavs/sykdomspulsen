@@ -1,5 +1,5 @@
 .onLoad <- function(libname, pkgname) {
-  system("/bin/authenticate.sh")
+  system2("/bin/authenticate.sh", stdout = NULL)
 
   set_config()
 

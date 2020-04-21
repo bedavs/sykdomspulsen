@@ -557,7 +557,7 @@ get_db_connection <- function(
 #' @param table table
 #' @param db db
 #' @export
-tbl <- function(table, db = "Sykdomspulsen_surv") {
+tbl <- function(table, db = config$db_config$db) {
   if (is.null(connections[[db]])) {
     connections[[db]] <- get_db_connection()
     use_db(connections[[db]], db)
@@ -568,12 +568,46 @@ tbl <- function(table, db = "Sykdomspulsen_surv") {
 #' list_tables
 #' @param db db
 #' @export
-list_tables <- function(db = "Sykdomspulsen_surv") {
+list_tables <- function(db = config$db_config$db) {
   if (is.null(connections[[db]])) {
-    connections[[db]] <- get_db_connection()
+    connections[[db]] <- get_db_connection(db = db)
     use_db(connections[[db]], db)
   }
-  return(DBI::dbListTables(connections[[db]]))
+  retval <- DBI::dbListTables(connections[[db]])
+  last_val <- which(retval == "trace_xe_action_map") - 1
+  retval <- retval[1:last_val]
+
+  # remove airflow tables
+  if (db == "Sykdomspulsen_surv") {
+    retval <- retval[
+      which(!retval %in% c(
+        "alembic_version",
+        "chart",
+        "connection",
+        "dag",
+        "dag_pickle",
+        "dag_run",
+        "dag_tag",
+        "import_error",
+        "job",
+        "known_event",
+        "known_event_type",
+        "kube_resource_version",
+        "kube_worker_uuid",
+        "log",
+        "serialized_dag",
+        "sla_miss",
+        "slot_pool",
+        "task_fail",
+        "task_instance",
+        "task_reschedule",
+        "users",
+        "variable",
+        "xcom"
+      ))
+      ]
+  }
+  return(retval)
 }
 
 
@@ -581,7 +615,7 @@ list_tables <- function(db = "Sykdomspulsen_surv") {
 #' @param table table
 #' @param db db
 #' @export
-drop_table <- function(table, db = "Sykdomspulsen_surv") {
+drop_table <- function(table, db = config$db_config$db) {
   if (is.null(connections[[db]])) {
     connections[[db]] <- get_db_connection()
     use_db(connections[[db]], db)

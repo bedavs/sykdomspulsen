@@ -38,7 +38,7 @@ Permission <- R6::R6Class(
         db_config = config$db_config,
         db_table = "permission",
         db_field_types = field_types,
-        db_load_folder = "/xtmp/",
+        db_load_folder = tempdir(),
         keys = keys,
         check_fields_match = TRUE
       )

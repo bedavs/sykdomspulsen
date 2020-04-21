@@ -18,7 +18,7 @@ set_db <- function(){
         "task" = "TEXT",
         "date_run" = "DATE"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys = c(
         "task"),
       check_fields_match = TRUE
@@ -36,7 +36,7 @@ set_db <- function(){
         "location_code" = "TEXT",
         "date_extracted" = "DATE"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "uuid"
       )
@@ -64,7 +64,7 @@ set_db <- function(){
         "rr" = "DOUBLE",
         "forecast" = "BOOLEAN"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "location_code",
         "date"
@@ -93,7 +93,7 @@ set_db <- function(){
         "rr" = "DOUBLE",
         "forecast" = "BOOLEAN"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "location_code",
         "date"
@@ -134,7 +134,7 @@ set_db <- function(){
         "icu_prev_thresholdl0" = "DOUBLE",
         "icu_prev_thresholdu0" = "DOUBLE"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "location_code",
         "date"
@@ -159,7 +159,7 @@ set_db <- function(){
         "x" = "DOUBLE",
         "n" = "INTEGER"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "granularity_time",
         "tag_outcome",
@@ -211,7 +211,7 @@ set_db <- function(){
         "week",
         "date"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       check_fields_match = TRUE
     ),
     data_msis = Schema$new(
@@ -233,7 +233,7 @@ set_db <- function(){
         "month" = "TEXT",
         "n" = "INTEGER"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "tag_outcome",
         "location_code",
@@ -265,7 +265,7 @@ set_db <- function(){
         "consult_with_influenza" = "INTEGER",
         "consult_without_influenza" = "INTEGER"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "tag_outcome",
         "location_code",
@@ -297,7 +297,7 @@ set_db <- function(){
         "n_threshold_0" = "DOUBLE",
         "n_status"= "TEXT"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "tag_outcome",
         "location_code",
@@ -331,7 +331,7 @@ set_db <- function(){
         "rp100_baseline_thresholdu3" = "DOUBLE",
         "rp100_status"= "TEXT"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "tag_outcome",
         "location_code",
@@ -367,7 +367,7 @@ set_db <- function(){
         "failed" = "TINYINT",
         "source" = "TEXT"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys =  c(
         "granularity_time",
         "granularity_geo",
@@ -392,11 +392,9 @@ set_db <- function(){
         "rp100_baseline_thresholdu2" = "DOUBLE",
         "rp100_baseline_thresholdu3" = "DOUBLE"
       ),
-      db_load_folder = "/xtmp/",
+      db_load_folder = tempdir(),
       keys = c("season", "tag_outcome", "age", "location_code")
     )
   )
-
-  try(config$schema$rundate$db_connect(),TRUE)
 }
 
