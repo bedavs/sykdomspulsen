@@ -5,7 +5,8 @@ set_db <- function(){
     port = as.integer(Sys.getenv("DB_PORT", 3306)),
     user = Sys.getenv("DB_USER", "root"),
     password = Sys.getenv("DB_PASSWORD", "example"),
-    db = Sys.getenv("DB_DB", "sykdomspuls")
+    db = Sys.getenv("DB_DB", "sykdomspuls"),
+    trusted_connection = Sys.getenv("DB_TRUSTED_CONNECTION")
   )
 
   # set schema

@@ -480,6 +480,7 @@ drop_rows_where <- function(conn, table, condition) {
 #' @param user user
 #' @param password password
 #' @param db database
+#' @param trusted_connection trusted connection yes/no
 #' @param db_config A list containing driver, server, port, user, password
 #' @export get_db_connection
 get_db_connection <- function(
@@ -489,6 +490,7 @@ get_db_connection <- function(
                               user = NULL,
                               password = NULL,
                               db = NULL,
+                              trusted_connection = NULL,
                               db_config = config$db_config
                               ) {
 
@@ -511,26 +513,41 @@ get_db_connection <- function(
     db <- db_config$db
   }
 
-  if(db_config$driver %in% c("ODBC Driver 17 for SQL Server")){
-    conn <- DBI::dbConnect(
-        odbc::odbc(),
-        driver = db_config$driver,
-        server = db_config$server,
-        port = db_config$port,
-        #uid = db_config$user,
-        #Pwd = db_config$password#,
-        trusted_connection = "yes"
-      )
-  } else {
+  if(!is.null(db_config) & is.null(trusted_connection)){
+    trusted_connection <- db_config$trusted_connection
+  }
+
+  use_trusted <- FALSE
+  if(!is.null(trusted_connection)) if(trusted_connection=="yes") use_trusted <- TRUE
+
+  if(use_trusted & driver %in% c("ODBC Driver 17 for SQL Server")){
     conn <- DBI::dbConnect(
         odbc::odbc(),
         driver = driver,
         server = server,
         port = port,
-        user = user,
-        password = password,
-        encoding = "utf8"
+        trusted_connection = "yes"
       )
+  } else if(driver %in% c("ODBC Driver 17 for SQL Server")){
+    conn <- DBI::dbConnect(
+      odbc::odbc(),
+      driver = driver,
+      server = server,
+      port = port,
+      uid = user,
+      pwd = password,
+      encoding = "utf8"
+    )
+  } else {
+    conn <- DBI::dbConnect(
+      odbc::odbc(),
+      driver = driver,
+      server = server,
+      port = port,
+      user = user,
+      password = password,
+      encoding = "utf8"
+    )
   }
   if(!is.null(db)) use_db(conn, db)
   return(conn)
