@@ -397,6 +397,6 @@ set_db <- function(){
     )
   )
 
-  config$schema$rundate$db_connect()
+  try(config$schema$rundate$db_connect(),TRUE)
 }
 
