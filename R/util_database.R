@@ -45,7 +45,7 @@ random_file <- function(folder, extension = ".csv") {
 
 write_data_infile <- function(
   dt,
-  file = tempfile(),
+  file = paste0(tempfile(),".csv"),
   colnames=T,
   eol="\n",
   quote = "auto",
