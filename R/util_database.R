@@ -161,7 +161,7 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     db_config$password
   )
   if(db_config$trusted_connection=="yes"){
-    args <- args(c,"-T")
+    args <- c(args,"-T")
   }
   system2(
     "bcp",
@@ -185,7 +185,7 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     format_file
   )
   if(db_config$trusted_connection=="yes"){
-    args <- args(c,"-T")
+    args <- c(args,"-T")
   }
   system2(
     "bcp",
