@@ -396,5 +396,7 @@ set_db <- function(){
       keys = c("season", "tag_outcome", "age", "location_code")
     )
   )
+
+  config$schema$rundate$db_connect()
 }
 

@@ -227,6 +227,10 @@ add_info_for_weather <- function(da){
 datar_weather <- function(data, argset, schema) {
   # tm_run_task("datar_weather")
 
+  # data <- tm_get_data("datar_weather")
+  # argset <- tm_get_argset("datar_weather")
+  # schema <- tm_get_schema("datar_weather")
+
   val <- schema$output$dplyr_tbl() %>%
     dplyr::filter(forecast == 0) %>%
     dplyr::summarize(last_date = max(date, na.rm = T)) %>%
@@ -250,6 +254,9 @@ datar_weather <- function(data, argset, schema) {
       download_years <- lubridate::year(val$last_date):lubridate::year(lubridate::today())
     }
   }
+
+  download_dates <- "2020-04-01"
+  download_years <- NULL
 
   if (!is.null(download_dates)) {
     for (i in download_dates) {

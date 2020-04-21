@@ -158,13 +158,15 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     "-U",
     db_config$user,
     "-P",
-    db_config$password,
-    "-T"
+    db_config$password
   )
-  processx::run(
+  if(db_config$trusted_connection=="yes"){
+    args <- args(c,"-T")
+  }
+  system2(
     "bcp",
-    args,
-    echo_cmd = F
+    args=args,
+    stdout=NULL
   )
 
   args <- c(
@@ -180,9 +182,11 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     "-P",
     db_config$password,
     "-f",
-    format_file,
-    "-T"
+    format_file
   )
+  if(db_config$trusted_connection=="yes"){
+    args <- args(c,"-T")
+  }
   system2(
     "bcp",
     args=args,
@@ -245,7 +249,7 @@ upsert_load_data_infile_internal.default <- function(
   db_config = NULL,
   table,
   dt,
-  file = "/xtmp/x123.csv",
+  file = "/tmp/x123.csv",
   fields,
   keys = NULL,
   drop_indexes = NULL
