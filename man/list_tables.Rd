@@ -4,7 +4,7 @@
 \alias{list_tables}
 \title{list_tables}
 \usage{
-list_tables(db = "Sykdomspulsen_surv")
+list_tables(db = config$db_config$db)
 }
 \arguments{
 \item{db}{db}

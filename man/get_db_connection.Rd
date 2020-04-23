@@ -6,7 +6,7 @@
 \usage{
 get_db_connection(driver = NULL, server = NULL, port = NULL,
   user = NULL, password = NULL, db = NULL,
-  db_config = config$db_config)
+  trusted_connection = NULL, db_config = config$db_config)
 }
 \arguments{
 \item{driver}{driver}
@@ -20,6 +20,8 @@ get_db_connection(driver = NULL, server = NULL, port = NULL,
 \item{password}{password}
 
 \item{db}{database}
+
+\item{trusted_connection}{trusted connection yes/no}
 
 \item{db_config}{A list containing driver, server, port, user, password}
 }

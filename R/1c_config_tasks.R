@@ -342,7 +342,7 @@ set_tasks <- function() {
           years = c(2018, 2019, 2020),
           weeklyDenominatorFunction = sum,
           denominator = "consult_without_influenza",
-          granularity_time = "weekly"
+          granularity_time = "week"
         )
       )
     )
@@ -378,7 +378,7 @@ set_tasks <- function() {
           years = c(2018, 2019, 2020),
           weeklyDenominatorFunction = sum,
           denominator = "consult_without_influenza",
-          granularity_time = "daily"
+          granularity_time = "day"
         )
       )
     )

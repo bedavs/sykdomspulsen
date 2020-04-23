@@ -14,7 +14,7 @@ analysis_qp <- function(data, argset, schema){
 
   d[, denominator:=get(argset$denominator)]
   argset$granularity_geo <- d[1, granularity_geo]
-  if(argset$granularity_time == "weekly"){
+  if(argset$granularity_time == "week"){
     d <- d[,
                  .(n=sum(n),
                    denominator=argset$weeklyDenominatorFunction(denominator),
@@ -47,7 +47,7 @@ analysis_qp <- function(data, argset, schema){
     ret <- QuasipoissonTrainPredictData(
       datasetTrain = run_data_train,
       datasetPredict = run_data_predict,
-      isDaily = argset$granularity_time == "daily",
+      isDaily = argset$granularity_time == "day",
       weeklyDenominatorFunction = argset$weeklyDenominatorFunction
     )
     diagnostics <- update_diagnostics(attr(ret, "diagnostics"),argset)

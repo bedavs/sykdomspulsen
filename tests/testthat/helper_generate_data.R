@@ -77,7 +77,7 @@ GenFakeDataAnalysis <- function(syndrome = "influensa", xage = "total", xmunicip
 #' @param xmunicipEnd municipality
 #' @import data.table
 #' @export GenFakeResultsFull
-GenFakeResultsFull <- function(granularity = "weekly", syndrome = "influensa", xage = "total", xmunicipEnd = "municip5054") {
+GenFakeResultsFull <- function(granularity = "week", syndrome = "influensa", xage = "total", xmunicipEnd = "municip5054") {
   age <- NULL
 
   d <- GenFakeDataClean(syndrome = syndrome, xmunicipEnd = xmunicipEnd)[age == xage]
@@ -99,7 +99,7 @@ GenFakeResultsFull <- function(granularity = "weekly", syndrome = "influensa", x
   res <- QuasipoissonTrainPredictData(
     datasetTrain = d,
     datasetPredict = d,
-    isDaily = stack$granularity_time == "daily",
+    isDaily = stack$granularity_time == "day",
     v = 1,
     weeklyDenominatorFunction = ifelse(stack$weeklyDenominatorFunction == "sum", sum, mean),
     uuid = stack$uuid

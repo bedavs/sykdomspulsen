@@ -271,7 +271,7 @@ clean_exported_momo_data <- function(
   data_dirty[ncor_est > ncor_baseline_thresholdu1, ncor_status := "high"]
   data_dirty[fhidata::days, on = "yrwk", date := sun]
 
-  data_dirty[,granularity_time := "day"]
+  data_dirty[,granularity_time := "week"]
   data_dirty[,granularity_geo := dplyr::case_when(
     location_code == "norge" ~ "nation",
     TRUE ~ "county"

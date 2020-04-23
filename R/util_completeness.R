@@ -1,4 +1,4 @@
-calculate_completeness <- function(location, x_year, x_granularity_time = "weekly", table = NULL) {
+calculate_completeness <- function(location, x_year, x_granularity_time = "week", table = NULL) {
   if (is.null(table)) {
     table <- tbl("results_qp")
   }
