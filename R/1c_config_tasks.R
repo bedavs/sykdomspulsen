@@ -1,10 +1,53 @@
 set_tasks <- function() {
   config$tasks <- TaskManager$new()
 
-  ##############
-  #### data ####
+  # covid19 ----
+  # data_covid19_model ----
   config$tasks$add_task(
     task_from_config(
+      list(
+        name = "data_covid19_model",
+        type = "data",
+        action = "data_covid19_model",
+        schema = list(output = config$schema$data_covid19_model)
+      )
+    )
+  )
+
+  # data_covid19_daily_report ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_covid19_daily_report",
+        type = "data",
+        action = "data_covid19_daily_report",
+        schema = list(
+          data_covid19_msis_by_time_location = config$schema$data_covid19_msis_by_time_location,
+          data_covid19_msis_by_time_infected_abroad = config$schema$data_covid19_msis_by_time_infected_abroad,
+          data_covid19_msis_by_sex_age = config$schema$data_covid19_msis_by_sex_age,
+          data_covid19_lab_by_time = config$schema$data_covid19_lab_by_time,
+          data_covid19_nir_by_time = config$schema$data_covid19_nir_by_time
+        )
+      )
+    )
+  )
+
+  # data_covid19_msis ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_covid19_msis",
+        type = "data",
+        action = "data_covid19_msis",
+        schema = list(output = config$schema$data_covid19_msis)
+      )
+    )
+  )
+
+  # data ----
+  config$tasks$add_task(
+    task_from_config(
+      # data_pre_norsyss ----
       list(
         name = "data_pre_norsyss",
         type = "data",
@@ -70,6 +113,7 @@ set_tasks <- function() {
     )
   )
 
+  # data_norsyss ----
   config$tasks$add_task(
     task_from_config(
       list(
@@ -191,7 +235,7 @@ set_tasks <- function() {
     )
   )
 
-  # normomo
+  # datar_normomo ----
   config$tasks$add_task(
     task_from_config(
       list(
@@ -202,6 +246,7 @@ set_tasks <- function() {
       )
     )
   )
+  # datar_normomo_drop ----
   config$tasks$add_task(
     task_from_config(
       list(
@@ -213,7 +258,7 @@ set_tasks <- function() {
     )
   )
 
-  # weather
+  # datar_weather ----
   config$tasks$add_task(
     task_from_config(
       list(
@@ -224,6 +269,7 @@ set_tasks <- function() {
       )
     )
   )
+  # data_weather ----
   config$tasks$add_task(
     task_from_config(
       list(
@@ -237,28 +283,7 @@ set_tasks <- function() {
       )
     )
   )
-
-  # covid19
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_covid19_model",
-        type = "data",
-        action = "data_covid19_model",
-        schema = list(output = config$schema$data_covid19_model)
-      )
-    )
-  )
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_covid19_msis",
-        type = "data",
-        action = "data_covid19_msis",
-        schema = list(output = config$schema$data_covid19_msis)
-      )
-    )
-  )
+  # data_msis ----
   config$tasks$add_task(
     task_from_config(
       list(
@@ -275,8 +300,8 @@ set_tasks <- function() {
     )
   )
 
-  ##################
-  #### analysis ####
+  # analysis ----
+  # analysis_normomo ----
   config$tasks$add_task(
     Task$new(
       name = "analysis_normomo",
@@ -288,6 +313,7 @@ set_tasks <- function() {
     )
   )
 
+  # analysis_norsyss_qp_weekly ----
   config$tasks$add_task(
     task_from_config(
       conf = list(
@@ -322,6 +348,7 @@ set_tasks <- function() {
     )
   )
 
+  # analysis_norsyss_qp_daily ----
   config$tasks$add_task(
     task_from_config(
       conf = list(
@@ -357,6 +384,7 @@ set_tasks <- function() {
     )
   )
 
+  # analysis_norsyss_mem_influensa ----
   config$tasks$add_task(
     task_from_config(
       list(

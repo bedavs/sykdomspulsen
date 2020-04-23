@@ -9,7 +9,7 @@ set_db <- function(){
     trusted_connection = Sys.getenv("DB_TRUSTED_CONNECTION")
   )
 
-  # set schema
+  # set schema ----
   config$schema <- list(
     rundate = Schema$new(
       db_config = config$db_config,
@@ -24,83 +24,8 @@ set_db <- function(){
       check_fields_match = TRUE
     ),
 
-    datar_normomo = Schema$new(
-      db_config = config$db_config,
-      db_table = "datar_normomo",
-      db_field_types =  c(
-        "uuid" = "TEXT",
-        "DoD" = "DATE",
-        "DoR" = "DATE",
-        "DoB" = "DATE",
-        "age" = "INTEGER",
-        "location_code" = "TEXT",
-        "date_extracted" = "DATE"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "uuid"
-      )
-    ),
-
-    datar_weather = Schema$new(
-      db_config = config$db_config,
-      db_table = "datar_weather",
-      db_field_types =  c(
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "location_code" = "TEXT",
-        "border" = "INTEGER",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "season" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "yrwk" = "TEXT",
-        "x" = "DOUBLE",
-        "date" = "DATE",
-        "tg" = "DOUBLE",
-        "tx" = "DOUBLE",
-        "tn" = "DOUBLE",
-        "rr" = "DOUBLE",
-        "forecast" = "BOOLEAN"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "location_code",
-        "date"
-      )
-    ),
-
-    data_weather = Schema$new(
-      db_config = config$db_config,
-      db_table = "data_weather",
-      db_field_types =  c(
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "location_code" = "TEXT",
-        "border" = "INTEGER",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "season" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "yrwk" = "TEXT",
-        "x" = "DOUBLE",
-        "date" = "DATE",
-        "tg" = "DOUBLE",
-        "tx" = "DOUBLE",
-        "tn" = "DOUBLE",
-        "rr" = "DOUBLE",
-        "forecast" = "BOOLEAN"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "location_code",
-        "date"
-      )
-    ),
-
-    # covid19
+    # covid19 ----
+    # data_covid19_model ----
     data_covid19_model = Schema$new(
       db_table = "data_covid19_model",
       db_config = config$db_config,
@@ -140,6 +65,150 @@ set_db <- function(){
         "date"
       )
     ),
+
+    # data_covid19_msis_by_time_location ----
+    data_covid19_msis_by_time_location = Schema$new(
+      db_table = "data_covid19_msis_by_time_location",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      )
+    ),
+
+    # data_covid19_msis_by_time_infected_abroad ----
+    data_covid19_msis_by_time_infected_abroad = Schema$new(
+      db_table = "data_covid19_msis_by_time_infected_abroad",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "tag_location_infected" = "TEXT",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date",
+        "tag_location_infected"
+      )
+    ),
+
+    # data_covid19_msis_by_sex_age ----
+    data_covid19_msis_by_sex_age = Schema$new(
+      db_table = "data_covid19_msis_by_sex_age",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "age",
+        "sex",
+        "date"
+      )
+    ),
+
+    # data_covid19_lab_by_time ----
+    data_covid19_lab_by_time = Schema$new(
+      db_table = "data_covid19_lab_by_time",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "n_neg" = "INTEGER",
+        "n_pos" = "INTEGER",
+        "pr100_pos" = "DOUBLE"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      )
+    ),
+
+    # data_covid19_nir_by_time ----
+    data_covid19_nir_by_time = Schema$new(
+      db_table = "data_covid19_nir_by_time",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "n_icu" = "INTEGER",
+        "cum_n_icu" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      )
+    ),
+
+    # data_covid19_msis ----
     data_covid19_msis = Schema$new(
       db_table = "data_covid19_msis",
       db_config = config$db_config,
@@ -168,6 +237,153 @@ set_db <- function(){
       )
     ),
 
+    # datar ----
+    # datar_normomo ----
+    datar_normomo = Schema$new(
+      db_config = config$db_config,
+      db_table = "datar_normomo",
+      db_field_types =  c(
+        "uuid" = "TEXT",
+        "DoD" = "DATE",
+        "DoR" = "DATE",
+        "DoB" = "DATE",
+        "age" = "INTEGER",
+        "location_code" = "TEXT",
+        "date_extracted" = "DATE"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "uuid"
+      )
+    ),
+
+    # datar_weather ----
+    datar_weather = Schema$new(
+      db_config = config$db_config,
+      db_table = "datar_weather",
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+        "tg" = "DOUBLE",
+        "tx" = "DOUBLE",
+        "tn" = "DOUBLE",
+        "rr" = "DOUBLE",
+        "forecast" = "BOOLEAN"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "location_code",
+        "date"
+      )
+    ),
+
+    # data ----
+    # data_weather ----
+    data_weather = Schema$new(
+      db_config = config$db_config,
+      db_table = "data_weather",
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+        "tg" = "DOUBLE",
+        "tx" = "DOUBLE",
+        "tn" = "DOUBLE",
+        "rr" = "DOUBLE",
+        "forecast" = "BOOLEAN"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "location_code",
+        "date"
+      )
+    ),
+
+    # data_norsyss ----
+    data_norsyss = Schema$new(
+      db_table = "data_norsyss",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "tag_outcome" = "TEXT",
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "holiday" = "DOUBLE",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "month" = "INTEGER",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "n" = "INTEGER",
+        "pop" = "INTEGER",
+        "consult_with_influenza" = "INTEGER",
+        "consult_without_influenza" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome",
+        "location_code",
+        "year",
+        "date",
+        "age"
+      )
+    ),
+
+    # data_msis ----
+    data_msis = Schema$new(
+      db_config = config$db_config,
+      db_table = "data_msis",
+      db_field_types =  c(
+        "tag_outcome" = "TEXT",
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "date" = "DATE",
+        "season" = "TEXT",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "month" = "TEXT",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome",
+        "location_code",
+        "year",
+        "date"
+      )
+    ),
+
+    # results ----
+    # results_normomo_standard ----
     results_normomo_standard = Schema$new(
       db_config = config$db_config,
       db_table = "results_normomo_standard",
@@ -214,66 +430,7 @@ set_db <- function(){
       db_load_folder = tempdir(),
       check_fields_match = TRUE
     ),
-    data_msis = Schema$new(
-      db_config = config$db_config,
-      db_table = "data_msis",
-      db_field_types =  c(
-        "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "border" = "INTEGER",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "date" = "DATE",
-        "season" = "TEXT",
-        "yrwk" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "month" = "TEXT",
-        "n" = "INTEGER"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "tag_outcome",
-        "location_code",
-        "year",
-        "date"
-      )
-    ),
-    data_norsyss = Schema$new(
-      db_table = "data_norsyss",
-      db_config = config$db_config,
-      db_field_types =  c(
-        "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "border" = "INTEGER",
-        "holiday" = "DOUBLE",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "date" = "DATE",
-        "yrwk" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "month" = "INTEGER",
-        "season" = "TEXT",
-        "x" = "DOUBLE",
-        "n" = "INTEGER",
-        "pop" = "INTEGER",
-        "consult_with_influenza" = "INTEGER",
-        "consult_without_influenza" = "INTEGER"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "tag_outcome",
-        "location_code",
-        "year",
-        "date",
-        "age"
-      )
-    ),
+
     results_simple = Schema$new(
       db_table = "results_simple",
       db_config = config$db_config,
