@@ -257,7 +257,7 @@ clean_exported_momo_data <- function(
     GROUP == "65to74" ~ "65-74",
     GROUP == "75to84" ~ "75-84",
     GROUP == "85P" ~ "85+",
-    GROUP == "Total" ~ "totalt",
+    GROUP == "Total" ~ "total",
     GROUP == "65P" ~ "65+"
   )]
 
@@ -277,7 +277,7 @@ clean_exported_momo_data <- function(
     TRUE ~ "county"
   )]
   data_dirty[,border := config$border]
-  data_dirty[,sex:="totalt"]
+  data_dirty[,sex:="total"]
   data_dirty[,season:=fhi::season(yrwk)]
   data_dirty[,x:=fhi::x(week)]
 

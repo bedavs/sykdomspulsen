@@ -10,10 +10,10 @@ fill_in_missing <- function(d){
     d[, border:=config$border]
   }
   if(!"age" %in% names(d)){
-    d[, age := "totalt"]
+    d[, age := "total"]
   }
   if(!"sex" %in% names(d)){
-    d[,sex := "totalt"]
+    d[,sex := "total"]
   }
   if(!"date" %in% names(d) & "yrwk" %in% names(d)){
     d[

@@ -162,8 +162,8 @@ data_msis <- function(data, argset, schema){
   with_loc[, granularity_time:="month"]
   with_loc[, granularity_geo:="municip"]
   with_loc[, border:=config$border]
-  with_loc[, age:="totalt"]
-  with_loc[, sex:="totalt"]
+  with_loc[, age:="total"]
+  with_loc[, sex:="total"]
 
   dates <- unique(with_loc[, "date", with = F])
   dates[, datex := date]

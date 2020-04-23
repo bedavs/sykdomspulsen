@@ -5,7 +5,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
   # argset <- tm_get_argset("ui_normomo_thresholds_1yr_5yr", index_plan=1, index_argset = 1)
   # schema <- tm_get_schema("ui_normomo_thresholds_1yr_5yr")
 
-  if(argset$age=="totalt"){
+  if(argset$age=="total"){
     title1 <- glue::glue("Totalt antall d{fhi::nb$oe}de per uke siste {fhi::nb$aa}r")
     title2 <- glue::glue("Totalt antall d{fhi::nb$oe}de per uke siste 5 {fhi::nb$aa}r")
   } else {

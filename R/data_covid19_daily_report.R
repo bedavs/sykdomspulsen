@@ -142,13 +142,13 @@ data_covid19_daily_report <- function(data, argset, schema){
   master$data_covid19_msis_by_sex_age[
     ,
     sex := dplyr::case_when(
-      sex == "Kvinne" ~ "kvinne",
-      sex == "Mann" ~ "mann"
+      sex == "Kvinne" ~ "female",
+      sex == "Mann" ~ "male"
     )
     ]
 
   retval <- master$data_covid19_msis_by_sex_age
-  retval[, granularity_time := "totalt"]
+  retval[, granularity_time := ""]
   retval[,location_code:="norge"]
 
   fill_in_missing(retval)

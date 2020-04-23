@@ -326,7 +326,7 @@ set_tasks <- function() {
         action = "analysis_qp",
         for_each_plan = list(
           "age" = "all",
-          "sex" = "totalt",
+          "sex" = "total",
           "tag_outcome" = c(
             "gastro_vk_ot",
             "respiratoryexternal_vk_ot"
@@ -362,7 +362,7 @@ set_tasks <- function() {
         filter = "(granularity_geo=='county' | granularity_geo=='nation')",
         for_each_plan = list(
           "age" = "all",
-          "sex" = "totalt",
+          "sex" = "total",
           "tag_outcome" = c(
             "gastro_vk_ot",
             "respiratoryexternal_vk_ot"
@@ -400,7 +400,7 @@ set_tasks <- function() {
           output_limits = config$schema$results_mem_limits
         ),
         args = list(
-          age = jsonlite::toJSON(list("totalt" = c("totalt"))),
+          age = jsonlite::toJSON(list("total" = c("total"))),
           tag = "influensa",
           weeklyDenominatorFunction = "sum",
           multiplicative_factor = 100,

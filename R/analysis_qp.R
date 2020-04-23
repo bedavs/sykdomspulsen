@@ -457,9 +457,9 @@ clean_post_analysis <- function(res, argset) {
   # add location name
 
   # cleaning on small municipalities
-  res[location_code %in% config$smallMunicips & age != "totalt", n := 0 ]
-  res[location_code %in% config$smallMunicips & age != "totalt", threshold2 := 5 ]
-  res[location_code %in% config$smallMunicips & age != "totalt", threshold4 := 10 ]
+  res[location_code %in% config$smallMunicips & age != "total", n := 0 ]
+  res[location_code %in% config$smallMunicips & age != "total", threshold2 := 5 ]
+  res[location_code %in% config$smallMunicips & age != "total", threshold4 := 10 ]
 
   return(res)
 }

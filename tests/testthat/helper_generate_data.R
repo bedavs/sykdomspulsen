@@ -35,7 +35,7 @@ GenFakeDataRaw <- function(xmunicipEnd = "municip5054", syndromes=c()) {
     }
   }
   data <- rbindlist(data)
-  data <- data[age != "totalt"]
+  data <- data[age != "total"]
 
   return(data)
 }
@@ -61,7 +61,7 @@ GenFakeDataClean <- function(syndrome = "influensa", xmunicipEnd = "municip5054"
 #' @param xmunicipEnd municipality
 #' @import data.table
 #' @export GenFakeDataAnalysis
-GenFakeDataAnalysis <- function(syndrome = "influensa", xage = "totalt", xmunicipEnd = "municip5054") {
+GenFakeDataAnalysis <- function(syndrome = "influensa", xage = "total", xmunicipEnd = "municip5054") {
   age <- NULL
 
   d <- GenFakeDataClean(syndrome = syndrome, xmunicipEnd = xmunicipEnd)[age == xage]
@@ -77,7 +77,7 @@ GenFakeDataAnalysis <- function(syndrome = "influensa", xage = "totalt", xmunici
 #' @param xmunicipEnd municipality
 #' @import data.table
 #' @export GenFakeResultsFull
-GenFakeResultsFull <- function(granularity = "weekly", syndrome = "influensa", xage = "totalt", xmunicipEnd = "municip5054") {
+GenFakeResultsFull <- function(granularity = "weekly", syndrome = "influensa", xage = "total", xmunicipEnd = "municip5054") {
   age <- NULL
 
   d <- GenFakeDataClean(syndrome = syndrome, xmunicipEnd = xmunicipEnd)[age == xage]

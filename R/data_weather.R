@@ -216,8 +216,8 @@ add_info_for_weather <- function(da){
     stringr::str_detect(location_code,"county") ~ "county",
     stringr::str_detect(location_code,"norge") ~ "nation",
   )]
-  da[, age:="totalt"]
-  da[, sex:="totalt"]
+  da[, age:="total"]
+  da[, sex:="total"]
   return(da)
 }
 

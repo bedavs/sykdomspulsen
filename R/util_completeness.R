@@ -8,7 +8,7 @@ calculate_completeness <- function(location, x_year, x_granularity_time = "weekl
       year == x_year &
       granularity_time == x_granularity_time &
       tag_outcome == "consult_without_influenza" &
-      age == "totalt") %>%
+      age == "total") %>%
     dplyr::collect()
   setDT(results)
   results[, completeness := n / threshold0 * 100]

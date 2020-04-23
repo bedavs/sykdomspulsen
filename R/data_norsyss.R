@@ -28,7 +28,7 @@ CleanData <- function(d,
   # end
   CONFIG <- config
   # fix population age categories
-  for (i in which(names(CONFIG$def$age$norsyss) != "totalt")) {
+  for (i in which(names(CONFIG$def$age$norsyss) != "total")) {
     population[age %in% CONFIG$def$age$norsyss[[i]], agex := names(CONFIG$def$age$norsyss)[i]]
   }
   population[, age := NULL]
@@ -45,7 +45,7 @@ CleanData <- function(d,
   ), keyby = .(
     location_code, year
   )]
-  total[, age := "totalt"]
+  total[, age := "total"]
 
   population <- rbind(population, total)
   # end population fix
@@ -109,7 +109,7 @@ CleanData <- function(d,
     keyby = .(date, municip),
     .SDcols = syndromeAndConsult
   ]
-  total[, age := "totalt"]
+  total[, age := "total"]
   data <- rbind(total, data[age != "ukjent"])
 
   dates <- unique(data[, "date", with = F])
@@ -270,7 +270,7 @@ CleanData <- function(d,
 
   ))
 
-  data[, sex:="totalt"]
+  data[, sex:="total"]
   data[, border:=config$border]
   data[, granularity_time:="day"]
   ## data[, yrwk := fhi::isoyearweek(date)]
@@ -388,7 +388,7 @@ data_norsyss <- function(data, argset, schema){
       skeleton_date_min = skeleton_date_min
     )
     res[, tag_outcome:=conf$tag_output]
-    res[, gender:="totalt"]
+    res[, gender:="total"]
     # make sure there's nothing funny going on with week 53
     res <- res[year %in% years_to_process]
 
