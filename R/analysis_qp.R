@@ -460,6 +460,7 @@ clean_post_analysis <- function(res, argset) {
   res[location_code %in% config$smallMunicips & age != "total", n := 0 ]
   res[location_code %in% config$smallMunicips & age != "total", threshold2 := 5 ]
   res[location_code %in% config$smallMunicips & age != "total", threshold4 := 10 ]
+  res[, border := config$border]
 
   return(res)
 }

@@ -136,6 +136,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_msis_by_time_infected_abroad$db_drop_constraint()
   schema$data_covid19_msis_by_time_infected_abroad$db_load_data_infile(retval)
   schema$data_covid19_msis_by_time_infected_abroad$db_add_constraint()
+  # tbl("data_covid19_msis_by_time_infected_abroad")
 
   # data_covid19_msis_by_sex_age ----
   master$data_covid19_msis_by_sex_age
@@ -148,7 +149,7 @@ data_covid19_daily_report <- function(data, argset, schema){
     ]
 
   retval <- master$data_covid19_msis_by_sex_age
-  retval[, granularity_time := ""]
+  retval[, granularity_time := "total"]
   retval[,location_code:="norge"]
 
   fill_in_missing(retval)
@@ -158,6 +159,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_msis_by_sex_age$db_drop_constraint()
   schema$data_covid19_msis_by_sex_age$db_load_data_infile(retval)
   schema$data_covid19_msis_by_sex_age$db_add_constraint()
+  # tbl("data_covid19_msis_by_sex_age")
 
   # data_covid19_lab_by_time ----
   master$data_covid19_lab_by_time

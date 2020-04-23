@@ -25,9 +25,9 @@ set_db <- function(){
     ),
 
     # covid19 ----
-    # data_covid19_model ----
-    data_covid19_model = Schema$new(
-      db_table = "data_covid19_model",
+    # results_covid19_model ----
+    results_covid19_model = Schema$new(
+      db_table = "results_covid19_model",
       db_config = config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -71,9 +71,9 @@ set_db <- function(){
       db_table = "data_covid19_msis_by_time_location",
       db_config = config$db_config,
       db_field_types =  c(
-        "location_code" = "TEXT",
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
         "border" = "INTEGER",
         "age" = "TEXT",
         "sex" = "TEXT",
@@ -83,6 +83,7 @@ set_db <- function(){
         "week" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
+
         "n" = "INTEGER"
       ),
       db_load_folder = tempdir(),
@@ -98,9 +99,9 @@ set_db <- function(){
       db_table = "data_covid19_msis_by_time_infected_abroad",
       db_config = config$db_config,
       db_field_types =  c(
-        "location_code" = "TEXT",
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
         "border" = "INTEGER",
         "age" = "TEXT",
         "sex" = "TEXT",
@@ -110,6 +111,7 @@ set_db <- function(){
         "week" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
+
         "tag_location_infected" = "TEXT",
         "n" = "INTEGER"
       ),
@@ -127,9 +129,9 @@ set_db <- function(){
       db_table = "data_covid19_msis_by_sex_age",
       db_config = config$db_config,
       db_field_types =  c(
-        "location_code" = "TEXT",
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
         "border" = "INTEGER",
         "age" = "TEXT",
         "sex" = "TEXT",
@@ -139,6 +141,7 @@ set_db <- function(){
         "week" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
+
         "n" = "INTEGER"
       ),
       db_load_folder = tempdir(),
@@ -168,6 +171,7 @@ set_db <- function(){
         "week" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
+
         "n_neg" = "INTEGER",
         "n_pos" = "INTEGER",
         "pr100_pos" = "DOUBLE"
@@ -197,8 +201,8 @@ set_db <- function(){
         "week" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
-        "n_icu" = "INTEGER",
-        "cum_n_icu" = "INTEGER"
+
+        "n_icu" = "INTEGER"
       ),
       db_load_folder = tempdir(),
       keys =  c(
@@ -208,7 +212,7 @@ set_db <- function(){
       )
     ),
 
-    # data_covid19_msis ----
+    # delete me soon data_covid19_msis ----
     data_covid19_msis = Schema$new(
       db_table = "data_covid19_msis",
       db_config = config$db_config,
@@ -226,6 +230,7 @@ set_db <- function(){
         "week" = "INTEGER",
         "season" = "TEXT",
         "x" = "DOUBLE",
+
         "n" = "INTEGER"
       ),
       db_load_folder = tempdir(),
@@ -238,25 +243,6 @@ set_db <- function(){
     ),
 
     # datar ----
-    # datar_normomo ----
-    datar_normomo = Schema$new(
-      db_config = config$db_config,
-      db_table = "datar_normomo",
-      db_field_types =  c(
-        "uuid" = "TEXT",
-        "DoD" = "DATE",
-        "DoR" = "DATE",
-        "DoB" = "DATE",
-        "age" = "INTEGER",
-        "location_code" = "TEXT",
-        "date_extracted" = "DATE"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "uuid"
-      )
-    ),
-
     # datar_weather ----
     datar_weather = Schema$new(
       db_config = config$db_config,
@@ -274,6 +260,7 @@ set_db <- function(){
         "yrwk" = "TEXT",
         "x" = "DOUBLE",
         "date" = "DATE",
+
         "tg" = "DOUBLE",
         "tx" = "DOUBLE",
         "tn" = "DOUBLE",
@@ -284,6 +271,24 @@ set_db <- function(){
       keys =  c(
         "location_code",
         "date"
+      )
+    ),
+    # datar_normomo ----
+    datar_normomo = Schema$new(
+      db_config = config$db_config,
+      db_table = "datar_normomo",
+      db_field_types =  c(
+        "uuid" = "TEXT",
+        "DoD" = "DATE",
+        "DoR" = "DATE",
+        "DoB" = "DATE",
+        "age" = "INTEGER",
+        "location_code" = "TEXT",
+        "date_extracted" = "DATE"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "uuid"
       )
     ),
 
@@ -305,6 +310,7 @@ set_db <- function(){
         "yrwk" = "TEXT",
         "x" = "DOUBLE",
         "date" = "DATE",
+
         "tg" = "DOUBLE",
         "tx" = "DOUBLE",
         "tn" = "DOUBLE",
@@ -323,21 +329,21 @@ set_db <- function(){
       db_table = "data_norsyss",
       db_config = config$db_config,
       db_field_types =  c(
-        "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
         "border" = "INTEGER",
-        "holiday" = "DOUBLE",
         "age" = "TEXT",
         "sex" = "TEXT",
-        "date" = "DATE",
-        "yrwk" = "TEXT",
+        "season" = "TEXT",
         "year" = "INTEGER",
         "week" = "INTEGER",
-        "month" = "INTEGER",
-        "season" = "TEXT",
+        "yrwk" = "TEXT",
         "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "holiday" = "DOUBLE",
         "n" = "INTEGER",
         "pop" = "INTEGER",
         "consult_with_influenza" = "INTEGER",
@@ -430,6 +436,48 @@ set_db <- function(){
       db_load_folder = tempdir(),
       check_fields_match = TRUE
     ),
+    # results_norsyss_standard ----
+    results_norsyss_standard = Schema$new(
+      db_table = "results_norsyss_standard",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "n" = "INTEGER",
+        "n_denominator" = "INTEGER",
+        "n_baseline_expected" = "DOUBLE",
+        "n_baseline_thresholdu0" = "DOUBLE",
+        "n_baseline_thresholdu1" = "DOUBLE",
+        "n_baseline_thresholdu2" = "DOUBLE",
+        "n_zscore" = "DOUBLE",
+        "n_status" = "TEXT",
+        "failed" = "TINYINT",
+        "source" = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "granularity_geo",
+        "tag_outcome",
+        "location_code",
+        "age",
+        "year",
+        "week",
+        "date"
+      )
+    ),
 
     results_simple = Schema$new(
       db_table = "results_simple",
@@ -495,45 +543,6 @@ set_db <- function(){
         "year",
         "date",
         "age"
-      )
-    ),
-    results_norsyss_standard = Schema$new(
-      db_table = "results_norsyss_standard",
-      db_config = config$db_config,
-      db_field_types =  c(
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "yrwk" = "TEXT",
-        "year" = "DOUBLE",
-        "week" = "DOUBLE",
-        "season" = "TEXT",
-        "x" = "DOUBLE",
-        "date" = "DATE",
-        "n" = "INTEGER",
-        "n_denominator" = "INTEGER",
-        "n_baseline_expected" = "DOUBLE",
-        "n_baseline_thresholdu0" = "DOUBLE",
-        "n_baseline_thresholdu1" = "DOUBLE",
-        "n_baseline_thresholdu2" = "DOUBLE",
-        "n_zscore" = "DOUBLE",
-        "n_status" = "TEXT",
-        "failed" = "TINYINT",
-        "source" = "TEXT"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "granularity_time",
-        "granularity_geo",
-        "tag_outcome",
-        "location_code",
-        "age",
-        "year",
-        "week",
-        "date"
       )
     ),
     results_mem_limits = Schema$new(

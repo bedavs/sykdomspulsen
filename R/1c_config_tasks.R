@@ -9,7 +9,7 @@ set_tasks <- function() {
         name = "data_covid19_model",
         type = "data",
         action = "data_covid19_model",
-        schema = list(output = config$schema$data_covid19_model)
+        schema = list(output = config$schema$results_covid19_model)
       )
     )
   )
