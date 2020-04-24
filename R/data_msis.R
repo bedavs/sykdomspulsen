@@ -128,7 +128,7 @@ clean_data <- function(data){
     return(data)
 }
 
-#' data_msis
+# data_msis
 #
 # Get and clean MSIS data from msis.no
 #

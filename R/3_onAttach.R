@@ -1,3 +1,3 @@
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage(glue::glue("sykdomspulsen {packageVersion('sykdomspulsen')}"))
+  packageStartupMessage(glue::glue("sykdomspulsen {utils::packageVersion('sykdomspulsen')}"))
 }

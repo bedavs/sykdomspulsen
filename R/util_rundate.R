@@ -12,9 +12,8 @@ update_rundate <- function(task, date_run){
   config$schema$rundate$db_upsert_load_data_infile(to_upload)
 }
 
-#' get_rundate
-#' Gets the rundate db table
-#' @export
+# get_rundate
+# Gets the rundate db table
 get_rundate <- function(task=NULL) {
   x_task <- task
   if(!is.null(task)){
@@ -30,10 +29,8 @@ get_rundate <- function(task=NULL) {
   return(temp)
 }
 
-#' greater_than_rundate
-#' Checks to see if the rundate exists fora particular package
-#' @param pkg Package
-#' @export
+# greater_than_rundate
+# Checks to see if the rundate exists fora particular package
 exists_rundate <- function(pkg) {
   rd <- get_rundate()
   if (pkg %in% rd$package) {

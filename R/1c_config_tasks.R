@@ -457,7 +457,38 @@ set_tasks <- function() {
   )
 
   ############
-  #### ui ####
+  # ui ----
+  # ui_surveillance_data ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "ui_surveillance_data",
+        type = "single",
+        action = "ui_surveillance_data",
+        schema = list(
+          data_covid19_msis_by_time_location=config$schema$data_covid19_msis_by_time_location
+        )
+      )
+    )
+  )
+
+  # ui_normomo_ssi ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "ui_normomo_ssi",
+        type = "single",
+        action = "ui_normomo_ssi",
+        schema = list(input=config$schema$results_normomo_standard),
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
+          folder = "normomo/{today}/graphs_status"
+        )
+      )
+    )
+  )
+
   config$tasks$add_task(
     task_from_config(
       list(
@@ -595,22 +626,6 @@ set_tasks <- function() {
       )
     )
   )
-
- config$tasks$add_task(
-   task_from_config(
-     list(
-       name = "ui_normomo_ssi",
-       type = "single",
-       action = "ui_normomo_ssi",
-       schema = list(input=config$schema$results_normomo_standard),
-       dependencies = c("results_normomo_standard"),
-       args = list(
-         filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
-         folder = "normomo/{today}/graphs_status"
-       )
-     )
-   )
- )
 
  config$tasks$add_task(
    task_from_config(

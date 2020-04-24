@@ -253,7 +253,7 @@ mailr <- function(
 }
 
 test_email <- function(){
-  q <- ggplot(cars, aes(x=speed, y=dist))
+  q <- ggplot(datasets::cars, aes(x=speed, y=dist))
   q <- q + geom_point()
   fhiplot::save_a4(q, "/tmp/test.png")
 

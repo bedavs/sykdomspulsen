@@ -6,6 +6,9 @@
 \usage{
 task_from_config(conf)
 }
+\arguments{
+\item{conf}{config}
+}
 \description{
 task_from_config
 }

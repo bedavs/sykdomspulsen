@@ -98,7 +98,7 @@ ui_obsmail<- function(data, argset, schema) {
 
   setorder(results, -n_zscore)
   results[, tag_pretty := tag]
-  RAWmisc::RecodeDT(results, switch = sykdomspuls::CONFIG$tagsWithLong, var = "tag_pretty", oldOnLeft = FALSE)
+  #RAWmisc::RecodeDT(results, switch = sykdomspuls::CONFIG$tagsWithLong, var = "tag_pretty", oldOnLeft = FALSE)
   results[, link := sprintf("<a href='http://sykdomspulsen.fhi.no/lege123/#/ukentlig/%s/%s/%s/%s'>%s</a>", county_code, location_code, tag, age, location_name)]
   results[is.na(county_code), link := sprintf("<a href='http://sykdomspulsen.fhi.no/lege123/#/ukentlig/%s/%s/%s/%s'>%s</a>", location_code, location_code, tag, age, location_name)]
 
@@ -123,9 +123,9 @@ ui_obsmail<- function(data, argset, schema) {
     email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>")
 
     # include outbreaks
-    for (tag in sykdomspuls::CONFIG$SYNDROMES[alertExternal == T]$tag) {
-      email_text <- paste0(email_text, EmailExternalGenerateTable(results = r, xtag = tag))
-    }
+    #for (tag in sykdomspuls::CONFIG$SYNDROMES[alertExternal == T]$tag) {
+    #  email_text <- paste0(email_text, EmailExternalGenerateTable(results = r, xtag = tag))
+    #}
 
     email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>")
 
@@ -160,9 +160,9 @@ EmailExternalGenerateTable <- function(results, xtag) {
   r_long <- results[tag == xtag]
   setorder(r_long, tag, -n_zscore)
 
-  if (nrow(r_long) == 0) {
-    return(sprintf("<br><b>%s:</b> <span style='color:red;text-decoration:underline;'>Ingen utbrudd registrert</span><br><br>", sykdomspuls::CONFIG$SYNDROMES[tag == xtag]$namesLong))
-  }
+  #if (nrow(r_long) == 0) {
+  #  return(sprintf("<br><b>%s:</b> <span style='color:red;text-decoration:underline;'>Ingen utbrudd registrert</span><br><br>", sykdomspuls::CONFIG$SYNDROMES[tag == xtag]$namesLong))
+  #}
 
   r_long[, excessp := ceiling(pmax(0, n - n_baseline_thresholdu0))]
   r_long[, n_zscorep := fhiplot::format_nor(n_zscore, 1)]

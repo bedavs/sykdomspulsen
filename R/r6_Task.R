@@ -38,7 +38,7 @@ get_filters <- function(for_each, table_name, filter=""){
 }
 
 #' task_from_config
-#'
+#' @param conf config
 #' @export
 task_from_config <- function(conf) {
   name <- conf$name

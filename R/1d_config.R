@@ -11,6 +11,7 @@ set_config <- function() {
   set_db()
   set_progressr()
   set_email()
+  set_git_cred()
 
   config$def <- list(
     smallMunicips = c(
@@ -113,7 +114,9 @@ set_email <- function(){
 }
 
 
-
+set_git_cred <- function(){
+  config$git_cred <- git2r::cred_ssh_key(git2r::ssh_path("id_rsa.pub"), git2r::ssh_path("id_rsa"))
+}
 
 
 

@@ -35,7 +35,7 @@ calculate_confidence_interval <- function(data, last_weeks = NULL) {
   cat(file=stderr(), nrow(data))
   N <- min(nrow(data), N)
   location <- data[1, location_code]
-  yrwks <- tail(data[, yrwk], N)
+  yrwks <- utils::tail(data[, yrwk], N)
   x_granularity_time <- data[1, granularity_time]
   x_age <- data[1, age]
 
