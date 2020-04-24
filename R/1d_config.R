@@ -115,8 +115,8 @@ set_email <- function(){
 
 
 set_git_cred <- function(){
-  config$git_cred <- git2r::cred_ssh_key(git2r::ssh_path("id_rsa.pub"), git2r::ssh_path("id_rsa"))
-}
+  config$git_cred <- git2r::cred_token()
+ }
 
 
 
