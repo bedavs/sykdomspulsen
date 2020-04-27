@@ -12,6 +12,11 @@ data_covid19_daily_report <- function(data, argset, schema){
 
   file <- fs::dir_ls("/input/covid19/", regexp="dagsrapport_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].RDS")
   file <- max(file)
+  file_processed <- stringr::str_replace(
+    file,
+    "/input/covid19/",
+    "/input/covid19/processed_"
+  )
   master <- readRDS(file)
 
   date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
@@ -191,6 +196,11 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_nir_by_time$db_load_data_infile(retval)
   schema$data_covid19_nir_by_time$db_add_constraint()
 
+  # move processed file ----
+  fs::file_move(
+    path = file,
+    new_path = file_processed
+  )
 }
 
 

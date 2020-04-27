@@ -1,13 +1,13 @@
 #' update_rundate
 #' Updates the rundate db tables
 #' @param task a
-#' @param date_run the date when the analysis was run
 #' @export
-update_rundate <- function(task, date_run){
-  # date_run = the date when the analysis was run
+update_rundate <- function(task){
+  if(is.null(config$schema$rundate$conn)) config$schema$rundate$db_connect()
   to_upload <- data.table(
     task = task,
-    date_run = as.Date(date_run)
+    date = lubridate::today(),
+    datetime = as.character(lubridate::now())
   )
   config$schema$rundate$db_upsert_load_data_infile(to_upload)
 }
@@ -15,6 +15,8 @@ update_rundate <- function(task, date_run){
 # get_rundate
 # Gets the rundate db table
 get_rundate <- function(task=NULL) {
+  if(is.null(config$schema$rundate$conn)) config$schema$rundate$db_connect()
+
   x_task <- task
   if(!is.null(task)){
     temp <- config$schema$rundate$dplyr_tbl() %>%
@@ -32,6 +34,8 @@ get_rundate <- function(task=NULL) {
 # greater_than_rundate
 # Checks to see if the rundate exists fora particular package
 exists_rundate <- function(pkg) {
+  if(is.null(config$schema$rundate$conn)) config$schema$rundate$db_connect()
+
   rd <- get_rundate()
   if (pkg %in% rd$package) {
     return(TRUE)

@@ -1,4 +1,4 @@
-data_function_factory <- function(table_name, filter){
+data_function_factory <- function(table_name, filter) {
   force(table_name)
   force(filter)
   function() {
@@ -15,7 +15,7 @@ data_function_factory <- function(table_name, filter){
   }
 }
 
-get_filters <- function(for_each, table_name, filter=""){
+get_filters <- function(for_each, table_name, filter = "") {
   retval <- list()
   for (t in names(for_each)) {
     message(glue::glue("{Sys.time()} Starting pulling plan data for {t} from {table_name}"))
@@ -47,12 +47,12 @@ task_from_config <- function(conf) {
   cores <- get_list(conf, "cores", 1)
   chunk_size <- get_list(conf, "chunk_size", 1)
   task <- NULL
-  if (conf$type %in% c("data","single")) {
+  if (conf$type %in% c("data", "single")) {
     plan <- plnr::Plan$new()
     arguments <- list(
       fn = get(conf$action),
       name = name,
-      today=Sys.Date()
+      today = Sys.Date()
     )
     if ("args" %in% names(conf)) {
       arguments <- c(arguments, conf$args)
@@ -123,10 +123,10 @@ task_from_config <- function(conf) {
           arguments <- c(arguments, conf$args)
         }
 
-        if(nrow(filters_argset)==0){
+        if (nrow(filters_argset) == 0) {
           do.call(current_plan$add_analysis, arguments)
         } else {
-          for(j in 1:nrow(filters_argset)){
+          for (j in 1:nrow(filters_argset)) {
             for (n in names(filters_argset)) {
               arguments[n] <- filters_argset[j, n]
             }
@@ -162,16 +162,15 @@ Task <- R6::R6Class(
     name = NULL,
     update_plans_fn = NULL,
     initialize = function(
-      name,
-      type,
-      plans=NULL,
-      update_plans_fn=NULL,
-      schema,
-      dependencies = c(),
-      cores = 1,
-      chunk_size = 100,
-      upsert_at_end_of_each_plan = FALSE
-      ) {
+                              name,
+                              type,
+                              plans = NULL,
+                              update_plans_fn = NULL,
+                              schema,
+                              dependencies = c(),
+                              cores = 1,
+                              chunk_size = 100,
+                              upsert_at_end_of_each_plan = FALSE) {
       self$name <- name
       self$type <- type
       self$plans <- plans
@@ -202,140 +201,105 @@ Task <- R6::R6Class(
 
       upsert_at_end_of_each_plan <- self$upsert_at_end_of_each_plan
 
-      if (log == FALSE | can_run()) {
-        self$update_plans()
 
-        # progressr::with_progress({
-        #   pb <- progressr::progressor(steps = self$num_argsets())
-        #   for (i in seq_along(plans)) {
-        #     if(!interactive()) print(i)
-        #     plans[[i]]$set_progress(pb)
-        #     plans[[i]]$run_all(schema = schema)
-        #   }
-        # })
+      self$update_plans()
 
-        message(glue::glue("Running task={self$name} with plans={length(self$plans)} and argsets={self$num_argsets()}"))
+      # progressr::with_progress({
+      #   pb <- progressr::progressor(steps = self$num_argsets())
+      #   for (i in seq_along(plans)) {
+      #     if(!interactive()) print(i)
+      #     plans[[i]]$set_progress(pb)
+      #     plans[[i]]$run_all(schema = schema)
+      #   }
+      # })
 
-        if(cores != 1){
-          doFuture::registerDoFuture()
+      message(glue::glue("Running task={self$name} with plans={length(self$plans)} and argsets={self$num_argsets()}"))
 
-          if(length(self$plans)==1){
-            # parallelize the inner loop
-            future::plan(list(
-              future::sequential,
-              future::multisession,
-              workers = cores,
-              earlySignal = TRUE
-            ))
+      if (cores != 1) {
+        doFuture::registerDoFuture()
 
-            parallel <- "plans=sequential, argset=multisession"
-          } else {
-            # parallelize the outer loop
-            future::plan(future::multisession, workers = cores)
+        if (length(self$plans) == 1) {
+          # parallelize the inner loop
+          future::plan(list(
+            future::sequential,
+            future::multisession,
+            workers = cores,
+            earlySignal = TRUE
+          ))
 
-            parallel <- "plans=multisession, argset=sequential"
-          }
+          parallel <- "plans=sequential, argset=multisession"
         } else {
-          data.table::setDTthreads()
+          # parallelize the outer loop
+          future::plan(future::multisession, workers = cores)
 
-          parallel <- "plans=sequential, argset=sequential"
-        }
-
-        message(glue::glue("{parallel} with cores={cores} and chunk_size={self$chunk_size}"))
-
-        if(cores == 1){
-          # not running in parallel
-          pb <- progress::progress_bar$new(
-            format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
-            clear = FALSE,
-            total = self$num_argsets()
-          )
-          for(s in schema) s$db_connect()
-          for(x in self$plans){
-            x$set_progress(pb)
-            retval <- x$run_all(schema = schema)
-            if(upsert_at_end_of_each_plan){
-              retval <- rbindlist(retval)
-              schema$output$db_upsert_load_data_infile(retval, verbose=F)
-            }
-            rm("retval")
-          }
-          for(s in schema) s$db_disconnect()
-
-        } else {
-          # running in parallel
-          message("\n***** REMEMBER TO INSTALL SYKDOMSPULSEN *****")
-          message("***** OR ELSE THE PARALLEL PROCESSES WON'T HAVE ACCESS *****")
-          message("***** TO THE NECESSARY FUNCTIONS *****\n")
-
-          progressr::with_progress(
-            {
-              pb <- progressr::progressor(steps = self$num_argsets())
-              y <- foreach(x = self$plans) %dopar% {
-                data.table::setDTthreads(1)
-
-                for(s in schema) s$db_connect()
-                x$set_progressor(pb)
-                retval <- x$run_all(schema = schema)
-                if(upsert_at_end_of_each_plan){
-                  retval <- rbindlist(retval)
-                  schema$output$db_upsert_load_data_infile(retval, verbose=F)
-                }
-                rm("retval")
-                for(s in schema) s$db_disconnect()
-
-                #################################
-                # NEVER DELETE gc()             #
-                # IT CAUSES 2x SPEEDUP          #
-                # AND 10x MEMORY EFFICIENCY     #
-                gc()                            #
-                #################################
-                1
-              }
-            },
-            delay_stdout=FALSE,
-            delay_conditions = ""
-          )
-        }
-
-        future::plan(future::sequential)
-        foreach::registerDoSEQ()
-        data.table::setDTthreads()
-
-        if (log) {
-          update_rundate(
-            task = self$name,
-            date_run = lubridate::today()
-          )
+          parallel <- "plans=multisession, argset=sequential"
         }
       } else {
-        print(glue::glue("Not running {self$name}"))
-      }
-    },
-    can_run = function() {
-      rundates <- get_rundate(task=self$name)
-      if(nrow(rundates) > 0){
-        last_run_date <- max(rundates$date_run)
-      } else{
-        last_run_date <- as.Date("2000-01-01")
-      }
-      curr_date <- lubridate::today()
-      dependencies <- c()
-      if(curr_date <= last_run_date){
-        return(FALSE)
+        data.table::setDTthreads()
+
+        parallel <- "plans=sequential, argset=sequential"
       }
 
-      for(dependency in self$dependencies){
-        dep_run_date <- get_rundate(task=dependency)
-        if(nrow(dep_run_date) == 0){
-          return(FALSE)
-        }else if(last_run_date >= max(dep_run_date$date_run)){
-            return(FALSE)
+      message(glue::glue("{parallel} with cores={cores} and chunk_size={self$chunk_size}"))
+
+      if (cores == 1) {
+        # not running in parallel
+        pb <- progress::progress_bar$new(
+          format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
+          clear = FALSE,
+          total = self$num_argsets()
+        )
+        for (s in schema) s$db_connect()
+        for (x in self$plans) {
+          x$set_progress(pb)
+          retval <- x$run_all(schema = schema)
+          if (upsert_at_end_of_each_plan) {
+            retval <- rbindlist(retval)
+            schema$output$db_upsert_load_data_infile(retval, verbose = F)
+          }
+          rm("retval")
         }
+        for (s in schema) s$db_disconnect()
+      } else {
+        # running in parallel
+        message("\n***** REMEMBER TO INSTALL SYKDOMSPULSEN *****")
+        message("***** OR ELSE THE PARALLEL PROCESSES WON'T HAVE ACCESS *****")
+        message("***** TO THE NECESSARY FUNCTIONS *****\n")
+
+        progressr::with_progress({
+          pb <- progressr::progressor(steps = self$num_argsets())
+          y <- foreach(x = self$plans) %dopar% {
+            data.table::setDTthreads(1)
+
+            for (s in schema) s$db_connect()
+            x$set_progressor(pb)
+            retval <- x$run_all(schema = schema)
+            if (upsert_at_end_of_each_plan) {
+              retval <- rbindlist(retval)
+              schema$output$db_upsert_load_data_infile(retval, verbose = F)
+            }
+            rm("retval")
+            for (s in schema) s$db_disconnect()
+
+            # ***************************** #
+            # NEVER DELETE gc()             #
+            # IT CAUSES 2x SPEEDUP          #
+            # AND 10x MEMORY EFFICIENCY     #
+            gc() #
+            # ***************************** #
+            1
+          }
+        },
+        delay_stdout = FALSE,
+        delay_conditions = ""
+        )
       }
 
+      future::plan(future::sequential)
+      foreach::registerDoSEQ()
+      data.table::setDTthreads()
 
-      return(TRUE)
+      update_rundate(task = self$name)
     }
   )
 )

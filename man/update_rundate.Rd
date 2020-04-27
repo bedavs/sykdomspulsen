@@ -5,12 +5,10 @@
 \title{update_rundate
 Updates the rundate db tables}
 \usage{
-update_rundate(task, date_run)
+update_rundate(task)
 }
 \arguments{
 \item{task}{a}
-
-\item{date_run}{the date when the analysis was run}
 }
 \description{
 update_rundate

@@ -21,7 +21,7 @@ ui_normomo_ssi <- function(data, argset, schema) {
   )
 
   if(config$permissions$ui_normomo_email_ssi$has_permission()){
-    mailgun(
+    mailr(
       subject = glue::glue("[euromomo input] [Norway] [{yrwk}]"),
       html = html,
       to = e_emails(

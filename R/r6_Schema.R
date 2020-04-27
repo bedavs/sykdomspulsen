@@ -13,8 +13,7 @@ Schema <- R6Class("Schema",
                     db_load_folder = NULL,
                     keys = NULL,
                     keys_with_length = NULL,
-                    check_fields_match = FALSE,
-                    initialize = function(dt = NULL, conn = NULL, db_config = NULL, db_table, db_field_types, db_load_folder, keys, check_fields_match = TRUE) {
+                    initialize = function(dt = NULL, conn = NULL, db_config = NULL, db_table, db_field_types, db_load_folder, keys) {
                       self$dt <- dt
                       self$conn <- conn
                       self$db_config <- db_config
@@ -23,7 +22,6 @@ Schema <- R6Class("Schema",
                       self$db_load_folder <- db_load_folder
                       self$keys <- keys
                       self$keys_with_length <- keys
-                      self$check_fields_match <- check_fields_match
 
                       ind <- self$db_field_types[self$keys] == "TEXT"
                       if (sum(ind) > 0) {
@@ -55,7 +53,7 @@ Schema <- R6Class("Schema",
                     db_create_table = function() {
                       create_tab <- TRUE
                       if (DBI::dbExistsTable(self$conn, self$db_table)) {
-                        if (self$check_fields_match & !self$db_check_fields_match()) {
+                        if (!self$db_check_fields_match()) {
                           message(glue::glue("Dropping table {self$db_table} because fields dont match"))
                           self$db_drop_table()
                         } else {
@@ -76,7 +74,14 @@ Schema <- R6Class("Schema",
                     },
                     db_check_fields_match = function() {
                       fields <- DBI::dbListFields(self$conn, self$db_table)
-                      return(identical(fields, names(self$db_field_types)))
+                      retval <- identical(fields, names(self$db_field_types))
+                      if(retval == FALSE){
+                        message(glue::glue(
+                          "given fields: {paste0(names(self$db_field_types),collapse=', ')}\n",
+                          "db fields: {paste0(fields,collapse=', ')}"
+                        ))
+                      }
+                      return(retval)
                     },
                     db_load_data_infile = function(newdata, verbose = TRUE) {
                       infile <- random_file(self$db_load_folder)

@@ -249,7 +249,9 @@ mailr <- function(
       msg$attach(i, inline=TRUE)
     }
   }
-  config$email$mailer$send(msg)
+  x <- reticulate::py_capture_output(config$email$mailer$send(msg))
+
+  x <- reticulate::py_capture_output(config$email$mailer$stop())
 }
 
 test_email <- function(){

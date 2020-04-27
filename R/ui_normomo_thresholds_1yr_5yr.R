@@ -36,10 +36,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
   )
   filename <- glue::glue(
     argset$filename,
-    tag = "excl_reported",
-    location_code = argset$location_code,
-    age = argset$age,
-    yrwk_minus_1 = fhi::isoyearweek(argset$today-7)
+    tag = "excl_reported"
   )
   fhiplot::save_a4(
     q,
@@ -56,10 +53,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
   )
   filename <- glue::glue(
     argset$filename,
-    tag = "incl_reported",
-    location_code = argset$location_code,
-    age = argset$age,
-    yrwk_minus_1 = fhi::isoyearweek(argset$today-7)
+    tag = "incl_reported"
   )
   fhiplot::save_a4(
     q,
@@ -163,68 +157,4 @@ normomo_graph_thresholds_1yr_5yr <- function(
   # q <- format_plot(q,2,2,stripes=TRUE, xangle=90)
   return(q)
 }
-
-normomo_graphs_deaths <- function(
-  runName = "norge",
-  data,
-  folder) {
-  storedData <- list()
-  if (runName == "norge") {
-    runList <- c("Total", "0to4", "5to14", "15to64", "65P")
-  } else {
-    runList <- "Total"
-  }
-  for (i in runList) {
-    if (i == "Total") {
-      title1 <- "Totalt antall d\u00F8de per uke siste \u00E5r"
-      title1a <- "Totalt antall d\u00F8de per uke siste \u00E5r (med rapporterte d\u00F8dsfall)"
-      title1b <- "Totalt antall d\u00F8de per uke siste \u00E5r (uten rapporterte d\u00F8dsfall)"
-      title2 <- "Totalt antall d\u00F8de per uke siste 5 \u00E5r"
-      titleBias <- "Bias i korrigering av totalt antall d\u00F8de per uke siste"
-    } else if (i == "0to4") {
-      title1 <- "Antall d\u00F8de (0-4 \u00E5r) per uke siste \u00E5r"
-      title1a <- "Antall d\u00F8de (0-4 \u00E5r) per uke siste \u00E5r (med rapporterte d\u00F8dsfall)"
-      title1b <- "Antall d\u00F8de (0-4 \u00E5r) per uke siste \u00E5r (uten rapporterte d\u00F8dsfall)"
-      title2 <- "Antall d\u00F8de (0-4 \u00E5r) per uke siste 5 \u00E5r"
-      titleBias <- "Bias i korrigering av antall d\u00F8de (0-4 \u00E5r) per uke"
-    } else if (i == "5to14") {
-      title1 <- "Antall (5-14 \u00E5r) d\u00F8de per uke siste \u00E5r"
-      title1a <- "Antall (5-14 \u00E5r) d\u00F8de per uke siste \u00E5r (med rapporterte d\u00F8dsfall)"
-      title1b <- "Antall (5-14 \u00E5r) d\u00F8de per uke siste \u00E5r (uten rapporterte d\u00F8dsfall)"
-      title2 <- "Antall (5-14 \u00E5r) d\u00F8de per uke siste 5 \u00E5r"
-      titleBias <- "Bias i korrigering av antall d\u00F8de (5-14 \u00E5r) per uke"
-    } else if (i == "15to64") {
-      title1 <- "Antall (15-64 \u00E5r) d\u00F8de per uke siste \u00E5r"
-      title1a <- "Antall (15-64 \u00E5r) d\u00F8de per uke siste \u00E5r (med rapporterte d\u00F8dsfall)"
-      title1b <- "Antall (15-64 \u00E5r) d\u00F8de per uke siste \u00E5r (uten rapporterte d\u00F8dsfall)"
-      title2 <- "Antall (15-64 \u00E5r) d\u00F8de per uke siste 5 \u00E5r"
-      titleBias <- "Bias i korrigering av antall d\u00F8de (15-64 \u00E5r) per uke"
-    } else if (i == "65P") {
-      title1 <- "Antall (65+ \u00E5r) d\u00F8de per uke siste \u00E5r"
-      title1a <- "Antall (65+ \u00E5r) d\u00F8de per uke siste \u00E5r (med rapporterte d\u00F8dsfall)"
-      title1b <- "Antall (65+ \u00E5r) d\u00F8de per uke siste \u00E5r (uten rapporterte d\u00F8dsfall)"
-      title2 <- "Antall (65+ \u00E5r) d\u00F8de per uke siste 5 \u00E5r"
-      titleBias <- "Bias i korrigering av antall d\u00F8de (65+ \u00E5r) per uke"
-    }
-
-    q <- GraphTogether(
-      data = data[age == i],
-      title1 = title1,
-      title2 = title2,
-      includeRealDeaths = FALSE,
-      caption = paste("Sist oppdatert: ", strftime(get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y"), sep = "")
-    )
-    fhiplot::save_a4(q, filename = paste0(folder, "/excl_reported_", runName, "-", i, "-", normomo_yrwk(), ".png"))
-
-    q <- GraphTogether(
-      data = data[age == i],
-      title1 = title1,
-      title2 = title2,
-      includeRealDeaths = TRUE,
-      caption = paste("Sist oppdatert: ", strftime(get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y"), sep = "")
-    )
-    fhiplot::save_a4(q, filename = paste0(folder, "/incl_reported_", runName, "-", i, "-", normomo_yrwk(), ".png"))
-  }
-}
-
 

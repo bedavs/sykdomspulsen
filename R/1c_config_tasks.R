@@ -480,10 +480,45 @@ set_tasks <- function() {
         type = "single",
         action = "ui_normomo_ssi",
         schema = list(input=config$schema$results_normomo_standard),
+        dependencies = c("results_normomo_standard")
+      )
+    )
+  )
+
+  # ui_normomo_thresholds_1yr_5yr ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "ui_normomo_thresholds_1yr_5yr",
+        type = "ui",
+        action = "ui_normomo_thresholds_1yr_5yr",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("location_code" = "all", "age" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
-          filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
-          folder = "normomo/{today}/graphs_status"
+          folder = "normomo/{argset$today}/graphs_thresholds",
+          filename = "{tag}_{argset$location_code}_{argset$age}_{argset$today}.png"
+        )
+      )
+    )
+  )
+
+  # ui_normomo_overview_by_location ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "ui_normomo_overview_by_location",
+        type = "ui",
+        action = "ui_normomo_overview",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("age" = "total"),
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          folder = "normomo/{argset$today}/overview",
+          filename = "by_{argset$by}_{argset$age}_{argset$today}.png",
+          by="location"
         )
       )
     )
@@ -627,23 +662,7 @@ set_tasks <- function() {
     )
   )
 
- config$tasks$add_task(
-   task_from_config(
-     list(
-       name = "ui_normomo_thresholds_1yr_5yr",
-       type = "ui",
-       action = "ui_normomo_thresholds_1yr_5yr",
-       db_table = "results_normomo_standard",
-       schema = list(input=config$schema$results_normomo_standard),
-       for_each_plan = list("location_code" = "all", "age" = "all"),
-       dependencies = c("results_normomo_standard"),
-       args = list(
-         filename = "{tag}_{location_code}_{age}_{yrwk_minus_1}.png",
-         folder = "normomo/{today}/graphs_thresholds"
-       )
-     )
-   )
- )
+
 
  p <- plnr::Plan$new(use_foreach=T)
  for(i in 1:30){

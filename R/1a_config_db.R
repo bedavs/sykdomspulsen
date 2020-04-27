@@ -11,17 +11,19 @@ set_db <- function(){
 
   # set schema ----
   config$schema <- list(
+    # rundate ----
     rundate = Schema$new(
       db_config = config$db_config,
       db_table = "rundate",
       db_field_types = c(
         "task" = "TEXT",
-        "date_run" = "DATE"
+        "date" = "DATE",
+        "datetime" = "DATETIME"
       ),
       db_load_folder = tempdir(),
       keys = c(
-        "task"),
-      check_fields_match = TRUE
+        "task"
+      )
     ),
 
     # covid19 ----
@@ -434,8 +436,7 @@ set_db <- function(){
         "week",
         "date"
       ),
-      db_load_folder = tempdir(),
-      check_fields_match = TRUE
+      db_load_folder = tempdir()
     ),
     # results_norsyss_standard ----
     results_norsyss_standard = Schema$new(
@@ -563,7 +564,5 @@ set_db <- function(){
       keys = c("season", "tag_outcome", "age", "location_code")
     )
   )
-
-  try(config$schema$rundate$db_connect(),TRUE)
 }
 
