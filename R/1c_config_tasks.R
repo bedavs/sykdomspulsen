@@ -524,6 +524,26 @@ set_tasks <- function() {
     )
   )
 
+  # ui_normomo_overview_by_age ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "ui_normomo_overview_by_age",
+        type = "ui",
+        action = "ui_normomo_overview",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("location_code" = "norge"),
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          folder = "normomo/{argset$today}/overview",
+          filename = "by_{argset$by}_{argset$location_code}_{argset$today}.png",
+          by="age"
+        )
+      )
+    )
+  )
+
   config$tasks$add_task(
     task_from_config(
       list(

@@ -5,6 +5,11 @@ ui_normomo_overview <- function(data, argset, schema) {
     data <- tm_get_data("ui_normomo_overview_by_location", index_plan=1)
     argset <- tm_get_argset("ui_normomo_overview_by_location", index_plan=1, index_argset = 1)
     schema <- tm_get_schema("ui_normomo_overview_by_location")
+
+    tm_update_plans("ui_normomo_overview_by_age")
+    data <- tm_get_data("ui_normomo_overview_by_age", index_plan=1)
+    argset <- tm_get_argset("ui_normomo_overview_by_age", index_plan=1, index_argset = 1)
+    schema <- tm_get_schema("ui_normomo_overview_by_age")
   }
 
   d <- copy(data$data)
@@ -37,15 +42,19 @@ ui_normomo_overview <- function(data, argset, schema) {
   )]
   plotData[, location_name := factor(location_name, levels = norway_locations_long()[location_code %in% plotData$location_code]$location_name)]
 
-  pretty_labs <- unique(plotData[, c("location_name", "age")])
-  setorder(pretty_labs, -location_name, age)
-  pretty_labs[, pretty_cat := glue::glue(
-    "{location_name}",
-    location_name = location_name
-  )]
-  pretty_labs[, pretty_cat := factor(pretty_cat, levels = pretty_cat)]
+  if(argset$by=="location"){
+    pretty_labs <- unique(plotData[, c("location_name", "age")])
+    setorder(pretty_labs, -location_name, age)
+    pretty_labs[, pretty_cat := glue::glue(
+      "{location_name}",
+      location_name = location_name
+    )]
+    pretty_labs[, pretty_cat := factor(pretty_cat, levels = pretty_cat)]
 
-  plotData[pretty_labs, on = c("location_name", "age"), pretty_cat := pretty_cat]
+    plotData[pretty_labs, on = c("location_name", "age"), pretty_cat := pretty_cat]
+  } else {
+    plotData[, pretty_cat := age]
+  }
 
   plotColours <- plotData[1:4]
   # plotColours[1,status:="4lower"]
@@ -67,13 +76,13 @@ ui_normomo_overview <- function(data, argset, schema) {
   q <- q + labs(title = "Antall d\u00F8de per uke siste \u00E5r")
   q <- q + scale_x_discrete("\u00C5r-uke", expand = c(0, 0))
   q <- q + scale_y_discrete("", expand = c(0, 0))
-  q <- q + labs(caption = sprintf("Sist oppdatert: %s", strftime(fd::get_rundate()[package == "normomo"]$date_extraction, format = "%d/%m/%Y")))
+  q <- q + labs(caption = caption)
   q <- q + fhiplot::theme_fhi_basic()
   q <- q + fhiplot::set_x_axis_vertical()
   # q
   fhiplot::save_a4(
     q,
-    fs::path(folder, glue::glue("Status_tiles_geo-{normomo_yrwk()}.png")),
+    filepath,
     landscape = T
   )
 

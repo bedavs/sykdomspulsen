@@ -32,6 +32,8 @@ analysis_normomo <-  function(data, argset, schema, ...){
     delayFunction = NULL,
     MOMOgroups = argset$momo_groups,
     MOMOmodels = argset$momo_models,
+    Ydrop = argset$Ydrop,
+    Wdrop = argset$Wdrop,
     verbose = FALSE
   )
 
@@ -68,7 +70,7 @@ analysis_normomo_plans <- function(){
   date_extracted <- val$date_extracted
 
   list_plan <- list()
-  # For SSI
+  # For SSI ----
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
   list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
     tbl("datar_normomo") %>%
@@ -101,16 +103,20 @@ analysis_normomo_plans <- function(){
       "65to74" = "LINE_SIN",
       "75to84" = "LINE_SIN",
       "85P" = "LINE_SIN"
-    )
+    ),
+    Ydrop = 2020,
+    Wdrop = 01
   )
 
-  # For FHI
+  # For FHI ----
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
   list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
     tbl("datar_normomo") %>%
       dplyr::collect() %>%
       latin1_to_utf8()
   })
+
+  # FHI - Norway ----
   for(i in 2012:fhi::isoyear_n(date_extracted)){
     if(i==fhi::isoyear_n(date_extracted)){
       date_extracted_year_specific <- date_extracted
@@ -145,9 +151,13 @@ analysis_normomo_plans <- function(){
         "85P" = "LINE_SIN",
         "Total" = "LINE_SIN",
         "65P" = "LINE_SIN"
-      )
+      ),
+      Ydrop = 2020,
+      Wdrop = 01
     )
   }
+
+  # FHI - County ----
   for(j in unique(norway_locations()$county_code)){
     list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
     list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
@@ -190,7 +200,9 @@ analysis_normomo_plans <- function(){
           "85P" = "LINE_SIN",
           "Total" = "LINE_SIN",
           "65P" = "LINE_SIN"
-        )
+        ),
+        Ydrop = 2020,
+        Wdrop = 01
       )
     }
   }
