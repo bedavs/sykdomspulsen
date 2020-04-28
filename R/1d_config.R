@@ -99,16 +99,16 @@ set_email <- function(){
     author = Sys.getenv("EMAIL_AUTHOR")
   )
   config$email$mailer <- config$email$mm$Mailer(reticulate::dict(
-      transport = reticulate::dict(
-        use = 'smtp',
-        host = config$email$values$host,
-        port = config$email$values$port,
-        username = config$email$values$username,
-        password = config$email$values$password,
-        tls = 'required',
-        debug = TRUE
-      )
+    transport = reticulate::dict(
+      use = 'smtp',
+      host = config$email$values$host,
+      port = config$email$values$port,
+      username = config$email$values$username,
+      password = config$email$values$password,
+      tls = 'required',
+      debug = TRUE
     )
+  )
   )
 
 }
