@@ -6,12 +6,7 @@ ui_surveillance_data <- function(data, argset, schema) {
 
   folder <- path("output", "surveillance_data")
   if(!fs::dir_exists(folder)){
-    fs::dir_create(folder)
-    git2r::clone(
-      url = "https://github.com/folkehelseinstituttet/surveillance_data",
-      local_path = folder,
-      credentials = config$git_cred
-    )
+    system("cd /output; sudo git clone https://github.com/folkehelseinstituttet/surveillance_data.git")
   }
   repo <- git2r::repository(folder)
   git2r::config(repo = repo, user.name="Sykdomspulsen",user.email="sykdomspulsen@fhi.no")
@@ -79,15 +74,11 @@ ui_surveillance_data <- function(data, argset, schema) {
     header = NULL
   )
 
-  git2r::add(
-    repo = repo,
-    path = "*"
+  system("sudo git -C /output/surveillance_data add -A")
+  cmd <- glue::glue(
+    'sudo git -C /output/surveillance_data commit --author="Sykdomspulsen <sykdomspulsen@fhi.no>" -m "Updated {lubridate::now()}"'
   )
-
-  git2r::commit(
-    repo = repo,
-    message = glue::glue("Updated {lubridate::now()}")
-  )
+  system(cmd)
 
   git2r::push(
     object = repo,
