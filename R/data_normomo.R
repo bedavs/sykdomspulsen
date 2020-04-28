@@ -1,4 +1,4 @@
-datar_pre_normomo <- function(){
+data_pre_normomo <- function(){
   if(config$is_production){
     data_grab <- glue::glue(
       'get -r "ut" /input/normomo/\n',

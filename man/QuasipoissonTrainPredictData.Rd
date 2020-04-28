@@ -4,9 +4,18 @@
 \alias{QuasipoissonTrainPredictData}
 \title{Quasipoisson Core Algorithm}
 \usage{
-QuasipoissonTrainPredictData(datasetTrain, datasetPredict, reweights = 1,
-  remove.pandemic.year = F, remove.highcounts = 0, sign.level = 0.05,
-  isDaily = TRUE, v = 1, weeklyDenominatorFunction = sum, uuid = 1)
+QuasipoissonTrainPredictData(
+  datasetTrain,
+  datasetPredict,
+  reweights = 1,
+  remove.pandemic.year = F,
+  remove.highcounts = 0,
+  sign.level = 0.05,
+  isDaily = TRUE,
+  v = 1,
+  weeklyDenominatorFunction = sum,
+  uuid = 1
+)
 }
 \arguments{
 \item{datasetTrain}{Training data.table}

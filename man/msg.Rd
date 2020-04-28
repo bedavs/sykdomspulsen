@@ -4,8 +4,7 @@
 \alias{msg}
 \title{Enhanced Messaging}
 \usage{
-msg(txt, type = "msg", syscalls_depth = 0, newLine = FALSE,
-  slack = FALSE)
+msg(txt, type = "msg", syscalls_depth = 0, newLine = FALSE, slack = FALSE)
 }
 \arguments{
 \item{txt}{Text}

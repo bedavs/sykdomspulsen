@@ -4,7 +4,9 @@
 \name{config}
 \alias{config}
 \title{Flags/values to be used in the 'dashboards' scene}
-\format{An object of class \code{environment} of length 16.}
+\format{
+An object of class \code{environment} of length 16.
+}
 \usage{
 config
 }

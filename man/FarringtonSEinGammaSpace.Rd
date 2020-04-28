@@ -4,8 +4,13 @@
 \alias{FarringtonSEinGammaSpace}
 \title{Calculate Farrington SE in gamma space}
 \usage{
-FarringtonSEinGammaSpace(pred, phi, alpha = NULL, z = NULL,
-  skewness.transform = "none")
+FarringtonSEinGammaSpace(
+  pred,
+  phi,
+  alpha = NULL,
+  z = NULL,
+  skewness.transform = "none"
+)
 }
 \arguments{
 \item{pred}{Point estimate}

@@ -235,6 +235,16 @@ set_tasks <- function() {
     )
   )
 
+  # data_pre_normomo ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "data_pre_normomo",
+        type = "data",
+        action = "data_pre_normomo"
+      )
+    )
+  )
   # datar_normomo ----
   config$tasks$add_task(
     task_from_config(
