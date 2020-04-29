@@ -11,6 +11,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   # schema <- tm_get_schema("data_covid19_daily_report")
 
   file <- fs::dir_ls("/input/covid19/", regexp="dagsrapport_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].RDS")
+  file <- file[!stringr::str_detect(file,"processed")]
   file <- max(file)
   file_processed <- stringr::str_replace(
     file,
