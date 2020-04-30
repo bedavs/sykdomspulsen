@@ -17,6 +17,17 @@ ui_normomo_table_excess_only <- function(data, argset, schema) {
   file <- glue::glue(argset$file)
   filepath <- fs::path(folder,file)
 
+  # if no excess mortality, then make empty graph
+  if(nrow(d)==0){
+    q <- no_data_plot()
+    fhiplot::save_a4(
+      q,
+      filepath
+    )
+    return()
+  }
+
+
   yrwks <- rev(unique(sort(d$yrwk)))[1:8]
   d <- d[ncor_status != "normal" & yrwk %in% yrwks]
   d[,location_name := get_location_name(location_code)]

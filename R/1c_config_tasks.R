@@ -627,6 +627,9 @@ set_tasks <- function() {
           tab1 = "overview_norge_{argset$today}.png",
           tab1_filepath = "normomo/{argset$today}/overview/overview_norge_{argset$today}.png",
 
+          tab2 = "overview_excess_only_{argset$today}.png",
+          tab2_filepath = "normomo/{argset$today}/overview/overview_excess_only_{argset$today}.png",
+
           fig1 = "incl_reported_norge_total_{argset$today}.png",
           fig1_filepath = "normomo/{argset$today}/graphs_thresholds/incl_reported_norge_total_{argset$today}.png",
 
