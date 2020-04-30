@@ -523,7 +523,7 @@ set_tasks <- function() {
         action = "ui_normomo_overview",
         db_table = "results_normomo_standard",
         schema = list(input=config$schema$results_normomo_standard),
-        for_each_plan = list("age" = "total"),
+        for_each_plan = list("age" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
           folder = "normomo/{argset$today}/overview",
@@ -543,7 +543,7 @@ set_tasks <- function() {
         action = "ui_normomo_overview",
         db_table = "results_normomo_standard",
         schema = list(input=config$schema$results_normomo_standard),
-        for_each_plan = list("location_code" = "norge"),
+        for_each_plan = list("location_code" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
           folder = "normomo/{argset$today}/overview",
@@ -554,21 +554,41 @@ set_tasks <- function() {
     )
   )
 
-  # ui_normomo_tables ----
+  # ui_normomo_table_overview ----
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "ui_normomo_tables",
+        name = "ui_normomo_table_overview",
         type = "ui",
-        action = "ui_normomo_tables",
+        action = "ui_normomo_table_overview",
         db_table = "results_normomo_standard",
         schema = list(input=config$schema$results_normomo_standard),
-        for_each_plan = list("location_code" = "norge"),
+        for_each_plan = list("location_code" = c("all")),
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
         args = list(
           folder = "normomo/{argset$today}/overview",
           filename = "overview_{argset$location_code}_{argset$today}.png"
+        )
+      )
+    )
+  )
+
+  # ui_normomo_table_excess_only ----
+  config$tasks$add_task(
+    task_from_config(
+      conf = list(
+        name = "ui_normomo_table_excess_only",
+        type = "ui",
+        action = "ui_normomo_table_excess_only",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("border" = 2020),
+        #filter = "age=='total'",
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          folder = "normomo/{argset$today}/overview",
+          filename = "overview_excess_only_{argset$today}.png"
         )
       )
     )

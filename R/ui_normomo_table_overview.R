@@ -1,10 +1,11 @@
 
-ui_normomo_tables <- function(data, argset, schema) {
+ui_normomo_table_overview <- function(data, argset, schema) {
   if(FALSE){
-    tm_update_plans("ui_normomo_tables")
-    data <- tm_get_data("ui_normomo_tables", index_plan=1)
-    argset <- tm_get_argset("ui_normomo_tables", index_plan=1, index_argset = 1)
-    schema <- tm_get_schema("ui_normomo_tables")
+    tm_update_plans("ui_normomo_table_overview")
+
+    data <- tm_get_data("ui_normomo_table_overview", index_plan=1)
+    argset <- tm_get_argset("ui_normomo_table_overview", index_plan=1, index_argset = 1)
+    schema <- tm_get_schema("ui_normomo_table_overview")
   }
 
   d <- copy(data$data)
@@ -111,6 +112,9 @@ ui_normomo_tables <- function(data, argset, schema) {
   huxtable::left_border_style(tab)[1:(nr0 - 1), 3] <- "double"
   huxtable::left_border_style(tab)[1:(nr0), 6] <- "double"
   huxtable::left_border_style(tab)[1:(nr0), 7] <- "double"
+
+  # add a header
+  tab <- huxtable::insert_row(tab, glue::glue("{get_location_name(argset$location_code)}"), fill = "", colspan = ncol(tab))
 
   # tab
   huxtable_to_png(tab, file = filepath)

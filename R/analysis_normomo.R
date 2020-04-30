@@ -3,11 +3,14 @@
 # Get and clean MSIS data from msis.no
 #
 analysis_normomo <-  function(data, argset, schema, ...){
-  # tm_update_plans("analysis_normomo")
-  # tm_run_task("analysis_normomo")
-  # data <- tm_get_data("analysis_normomo", index_plan=2)
-  # argset <- tm_get_argset("analysis_normomo", index_plan=2, index_argset = 1)
-  # schema <- tm_get_schema("analysis_normomo")
+  if(FALSE){
+    tm_run_task("analysis_normomo")
+
+    tm_update_plans("analysis_normomo")
+    data <- tm_get_data("analysis_normomo", index_plan=4)
+    argset <- tm_get_argset("analysis_normomo", index_plan=2, index_argset = 1)
+    schema <- tm_get_schema("analysis_normomo")
+  }
 
   fs::dir_create(argset$wdir)
 
@@ -61,6 +64,16 @@ analysis_normomo_hfile <- function() {
   hfile[, closed := 1]
   hfile[, is_holiday := NULL]
   return(as.data.frame(hfile))
+}
+
+analysis_normomo_function_factory <- function(location_code) {
+  force(location_code)
+  function(){
+    tbl("datar_normomo") %>%
+      dplyr::filter(location_code==!!location_code) %>%
+      dplyr::collect() %>%
+      latin1_to_utf8()
+  }
 }
 
 analysis_normomo_plans <- function(){
@@ -160,12 +173,8 @@ analysis_normomo_plans <- function(){
   # FHI - County ----
   for(j in unique(norway_locations()$county_code)){
     list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
-    list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
-      tbl("datar_normomo") %>%
-        dplyr::filter(location_code==!!j) %>%
-        dplyr::collect() %>%
-        latin1_to_utf8()
-    })
+
+    list_plan[[length(list_plan)]]$add_data(name = "raw", fn=analysis_normomo_function_factory(location_code = j))
     for(i in 2012:fhi::isoyear_n(date_extracted)){
       if(i==fhi::isoyear_n(date_extracted)){
         date_extracted_year_specific <- date_extracted

@@ -1,6 +1,9 @@
 
 ui_normomo_overview <- function(data, argset, schema) {
   if(FALSE){
+    tm_run_task("ui_normomo_overview_by_location")
+    tm_run_task("ui_normomo_overview_by_age")
+
     tm_update_plans("ui_normomo_overview_by_location")
     data <- tm_get_data("ui_normomo_overview_by_location", index_plan=1)
     argset <- tm_get_argset("ui_normomo_overview_by_location", index_plan=1, index_argset = 1)
@@ -52,8 +55,10 @@ ui_normomo_overview <- function(data, argset, schema) {
     pretty_labs[, pretty_cat := factor(pretty_cat, levels = pretty_cat)]
 
     plotData[pretty_labs, on = c("location_name", "age"), pretty_cat := pretty_cat]
+    title <- glue::glue("Antall d\u00F8de per uke siste \u00E5r (aldersgruppe: {stringr::str_to_title(argset$age)})")
   } else {
     plotData[, pretty_cat := age]
+    title <- glue::glue("Antall d\u00F8de per uke siste \u00E5r i {get_location_name(argset$location_code)}")
   }
 
   plotColours <- plotData[1:4]
@@ -73,7 +78,7 @@ ui_normomo_overview <- function(data, argset, schema) {
                                "Normalt"
                              )
   )
-  q <- q + labs(title = "Antall d\u00F8de per uke siste \u00E5r")
+  q <- q + labs(title = title)
   q <- q + scale_x_discrete("\u00C5r-uke", expand = c(0, 0))
   q <- q + scale_y_discrete("", expand = c(0, 0))
   q <- q + labs(caption = caption)

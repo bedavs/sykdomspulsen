@@ -3,7 +3,8 @@ ui_normomo_email_internal <- function(data, argset, schema) {
     tm_run_task("ui_normomo_thresholds_1yr_5yr")
     tm_run_task("ui_normomo_overview_by_location")
     tm_run_task("ui_normomo_overview_by_age")
-    tm_run_task("ui_normomo_tables")
+    tm_run_task("ui_normomo_table_overview")
+    tm_run_task("ui_normomo_table_excess_only")
 
     tm_run_task("ui_normomo_email_internal")
 
@@ -25,7 +26,7 @@ ui_normomo_email_internal <- function(data, argset, schema) {
 
   html <- glue::glue(
     "<html>",
-    "Resultater fra overv{fhi::nb$aa}kingssystemet for d{fhi::nb$oe}delighet (NorMOMO) er tilgjengelig p{fhi::nb$aa} <a href='file:///N:/Sykdomspulsen/analysis/output/normomo/{argset$today}'>N:/Sykdomspulsen/analysis/output/normomo/{argset$today}</a><br><br>",
+    "Resultater fra overv{fhi::nb$aa}kingssystemet for d{fhi::nb$oe}delighet (NorMOMO) er tilgjengelig p{fhi::nb$aa} <a href='file:///N:/Sykdomspulsen/analysis/output/normomo/{argset$today}'>N:/Sykdomspulsen/analysis/output/normomo/{argset$today}</a> (tilgangsbegrenset)<br><br>",
     "Her er nye resultater fra overv{fhi::nb$aa}kingssystemet for generell d{fhi::nb$oe}delighet i Norge (<a href='https://www.fhi.no/sv/influensa/influensaovervaking/overvakingssystem-for-dodelighet-eu/'>NorMOMO</a>).<br><br>",
     "NorMOMO er basert p{fhi::nb$aa} ukentlig oppdaterte anonyme data fra Folkeregisteret og analyseres ved bruk av <a href='http://www.euromomo.eu/methods/methods.html'>EuroMOMO-modellen</a>.<br><br>",
     "Under f{fhi::nb$oe}lger en oppsummering av forrige ukes resultater. Resultatene <span style='color:red'>er til intern bruk</span>, m{fhi::nb$aa} tolkes med varsomhet og kan justeres noe grunnet forsinkelse i rapporteringen av d{fhi::nb$oe}dsfall.<br><br><br>",
