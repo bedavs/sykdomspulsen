@@ -6,4 +6,11 @@ set_permissions <- function() {
     value = fhi::isoyearweek(),
     production_days = c(2, 3)
   )
+
+  config$permissions[["ui_normomo_email_internal"]] <- Permission$new(
+    key = "ui_normomo_email_internal",
+    value = fhi::isoyearweek(),
+    production_days = c(2, 3)
+  )
+
 }

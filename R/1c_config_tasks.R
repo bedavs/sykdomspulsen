@@ -105,7 +105,7 @@ set_tasks <- function() {
               #"R9910000"
             ),
 
-            "covid19" = c("R991"),
+            "covid19" = c("R991", "R992"),
             "engstelig_luftveissykdom_ika" = c("R27")
           )
         )
@@ -553,6 +553,73 @@ set_tasks <- function() {
       )
     )
   )
+
+  # ui_normomo_tables ----
+  config$tasks$add_task(
+    task_from_config(
+      conf = list(
+        name = "ui_normomo_tables",
+        type = "ui",
+        action = "ui_normomo_tables",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("location_code" = "norge"),
+        #filter = "age=='total'",
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          folder = "normomo/{argset$today}/overview",
+          filename = "overview_{argset$location_code}_{argset$today}.png"
+        )
+      )
+    )
+  )
+
+  # ui_normomo_data_files ----
+  config$tasks$add_task(
+    task_from_config(
+      conf = list(
+        name = "ui_normomo_data_files",
+        type = "ui",
+        action = "ui_normomo_data_files",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("border" = config$border),
+        #filter = "age=='total'",
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          folder = "normomo/{argset$today}/data",
+          filename = "data_{argset$today}.xlsx"
+        )
+      )
+    )
+  )
+
+  # ui_normomo_email_internal ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "ui_normomo_email_internal",
+        type = "single",
+        action = "ui_normomo_email_internal",
+        schema = list(input=config$schema$results_normomo_standard),
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          tab1 = "overview_norge_{argset$today}.png",
+          tab1_filepath = "normomo/{argset$today}/overview/overview_norge_{argset$today}.png",
+
+          fig1 = "incl_reported_norge_total_{argset$today}.png",
+          fig1_filepath = "normomo/{argset$today}/graphs_thresholds/incl_reported_norge_total_{argset$today}.png",
+
+          fig2 = "by_location_total_{argset$today}.png",
+          fig2_filepath = "normomo/{argset$today}/overview/by_location_total_{argset$today}.png",
+
+          fig3 = "by_age_norge_{argset$today}.png",
+          fig3_filepath = "normomo/{argset$today}/overview/by_age_norge_{argset$today}.png"
+        )
+      )
+    )
+  )
+
 
   config$tasks$add_task(
     task_from_config(

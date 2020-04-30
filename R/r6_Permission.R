@@ -74,6 +74,10 @@ Permission <- R6::R6Class(
       return(today %in% production_days)
     },
     current_value = function() {
+      if(!"permission" %in% list_tables()){
+        db_schema$db_connect()
+        db_schema$db_disconnect()
+      }
       temp <- tbl("permission") %>%
         dplyr::collect() %>%
         latin1_to_utf8()
