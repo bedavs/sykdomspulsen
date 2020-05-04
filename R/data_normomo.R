@@ -4,6 +4,9 @@ data_pre_normomo <- function(){
       'get -r "ut" /input/normomo/\n',
       'rm ut/*'
     )
+    data_grab <- glue::glue(
+      'get -r "ut" /input/normomo/\n'
+    )
     data_grab_txt <- tempfile()
     cat(data_grab, file = data_grab_txt)
 
