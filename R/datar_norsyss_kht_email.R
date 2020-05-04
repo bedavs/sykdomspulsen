@@ -27,8 +27,10 @@ datar_norsyss_kht_email <- function(data, argset, schema){
   d <- d[, email:=stringr::str_to_lower(email)]
   d <- d[!email %in% c(
     "post@fhi.no",
-    "postmottak@tullemail.kommune.no"
+    "postmottak@tullemail.kommune.no",
+    "postmottak@tullekommune.kommune.no"
   )]
+  d <- unique(d)
 
   if(!config$is_production){
     d <- d[
