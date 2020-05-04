@@ -38,13 +38,13 @@ datar_norsyss_kht_email <- function(data, argset, schema){
     ]
   } else {
     extra <- data.table(
-      location_code = norway_locations_long(),
+      location_code = norway_locations_long()$location_code,
       email = "sykdomspulsen@fhi.no"
     )
     d <- rbind(d, extra)
 
     extra <- data.table(
-      location_code = norway_locations_long(),
+      location_code = norway_locations_long()$location_code,
       email = "utbrudd@fhi.no"
     )
     d <- rbind(d, extra)
