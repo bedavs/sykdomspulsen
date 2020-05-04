@@ -113,6 +113,7 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   }
 
   setorder(r_long, tag_outcome, yrwk)
+  r_long[age=="total",age:="Totalt"]
   r_long[, week_id := 1:.N,by=.(location_code,age,sex)]
   r_long[, tag_pretty := tag_pretty]
   r_long[, excessp := fhiplot::format_nor(ceiling(pmax(0, n - n_baseline_thresholdu0)),0)]
@@ -124,6 +125,7 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
     tag_pretty + location_code + age ~ week_id,
     value.var = c("n", "excessp", "n_baseline_thresholdu0", "n_zscore", "zscorep", "n_status")
   )
+  r_wide <- r_wide[!(n_status_1=="normal" & n_status_2=="normal" & n_status_3=="normal" & n_status_4=="normal")]
   setorder(r_wide, -n_zscore_4)
   r_wide[,location_name := get_location_name(location_code)]
 
@@ -223,6 +225,7 @@ ui_norsyss_kht_email_function_factory <- function(location_codes, x_tags, yrwk, 
     retval <- list()
     for(tag in x_tags){
       x_location_codes <- tbl("results_norsyss_standard") %>%
+        dplyr::filter(granularity_time == "week") %>%
         dplyr::filter(location_code %in% !!location_codes) %>%
         dplyr::filter(tag_outcome %in% !!tag) %>%
         dplyr::filter(yrwk %in% !!yrwk) %>%
@@ -237,6 +240,7 @@ ui_norsyss_kht_email_function_factory <- function(location_codes, x_tags, yrwk, 
         retval[[tag]] <- data.table()
       } else {
         retval[[tag]] <- tbl("results_norsyss_standard") %>%
+          dplyr::filter(granularity_time == "week") %>%
           dplyr::filter(location_code %in% !!x_location_codes) %>%
           dplyr::filter(tag_outcome %in% !!tag) %>%
           dplyr::filter(yrwk %in% !!yrwk) %>%
@@ -251,7 +255,7 @@ ui_norsyss_kht_email_function_factory <- function(location_codes, x_tags, yrwk, 
 
 ui_norsyss_kht_email_plans <- function(){
   x_tags <- c("respiratoryexternal_vk_ot", "gastro_vk_ot")
-  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7))
+  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-1)
 
   #yrwk <- fhi::isoyearweek(lubridate::today()-seq(48,70,7))
 
