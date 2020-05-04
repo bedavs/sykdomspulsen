@@ -14,12 +14,15 @@ set_config <- function() {
   set_git_cred()
 
   config$def <- list(
+
+    # variables that are common to many tasks
     smallMunicips = c(
       "municip1151",
       "municip1835",
       "municip1252",
       "municip1739"
     ),
+
     age = list(
       norsyss=list(
         "total" = c(0:105),
@@ -31,11 +34,17 @@ set_config <- function() {
         "65+" = c(65:105)
       )
     ),
-    long_names = list(
-      gastro="Mage-tarminfeksjoner"
-    ),
-    short_names = list(
-      gastro="Mage-tarm"
+
+    # norsyss specific things that arent relevant to any other tasks
+    norsyss = list(
+      long_names = list(
+        gastro_vk_ot="Mage-tarminfeksjoner",
+        respiratoryexternal_vk_ot="Luftveisinfeksjoner"
+      ),
+      short_names = list(
+        gastro_vk_ot="Mage-tarm",
+        respiratoryexternal_vk_ot="Luftvei"
+      )
     )
   )
   set_permissions()

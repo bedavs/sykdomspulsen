@@ -214,8 +214,9 @@ mailr <- function(
   ")
 
     html <- stringr::str_replace_all(html, "<table [^>]*>", "<table>")
-    html <- stringr::str_replace_all(html, "<table>", '<table role="presentation" cellspacing="0" cellpadding="0" border="0">')
-  } else {
+    html <- stringr::str_replace_all(html, "<table>", '<table style="border-spacing:0px;border-collapse: collapse">')
+
+    } else {
     new_head <- "<html>"
     new_end <- glue::glue("
     </html>
@@ -235,6 +236,7 @@ mailr <- function(
     author = config$email$values$author,
     to = to
   )
+  if(!is.null(bcc)) msg$bcc <- bcc
   msg$subject <- subject
   msg$plain <- html
   msg$rich <- html

@@ -153,6 +153,7 @@ Task <- R6::R6Class(
   cloneable = TRUE,
   public = list(
     type = NULL,
+    permission = NULL,
     plans = list(),
     schema = list(),
     dependencies = list(),
@@ -164,6 +165,7 @@ Task <- R6::R6Class(
     initialize = function(
                               name,
                               type,
+                              permission = NULL,
                               plans = NULL,
                               update_plans_fn = NULL,
                               schema,
@@ -173,6 +175,7 @@ Task <- R6::R6Class(
                               upsert_at_end_of_each_plan = FALSE) {
       self$name <- name
       self$type <- type
+      self$permission <- permission
       self$plans <- plans
       self$update_plans_fn <- update_plans_fn
       self$schema <- schema
@@ -198,6 +201,7 @@ Task <- R6::R6Class(
       # task <- tm_get_task("analysis_norsyss_qp_gastro")
 
       message(glue::glue("task: {self$name}"))
+      if(!is.null(self$permission)) if(!self$permission$has_permission()) return(NULL)
 
       upsert_at_end_of_each_plan <- self$upsert_at_end_of_each_plan
 
@@ -300,6 +304,8 @@ Task <- R6::R6Class(
       data.table::setDTthreads()
 
       update_rundate(task = self$name)
+      if(!is.null(self$permission)) self$permission$revoke_permission()
+
     }
   )
 )

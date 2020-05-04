@@ -45,9 +45,65 @@ set_tasks <- function() {
   )
 
   # data ----
+  # data_pre_normomo ----
   config$tasks$add_task(
     task_from_config(
-      # data_pre_norsyss ----
+      list(
+        name = "data_pre_normomo",
+        type = "data",
+        action = "data_pre_normomo"
+      )
+    )
+  )
+  # datar_normomo ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "datar_normomo",
+        type = "data",
+        action = "datar_normomo",
+        schema = list(output = config$schema$datar_normomo)
+      )
+    )
+  )
+  # datar_normomo_drop ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "datar_normomo_drop",
+        type = "data",
+        action = "datar_normomo_drop",
+        schema = list(output = config$schema$datar_normomo)
+      )
+    )
+  )
+
+  # datar_norsyss_registration ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "datar_norsyss_kht_email",
+        type = "data",
+        action = "datar_norsyss_kht_email",
+        schema = list(output = config$schema$datar_norsyss_kht_email)
+      )
+    )
+  )
+  # datar_norsyss_kht_email_drop ----
+  config$tasks$add_task(
+    task_from_config(
+      list(
+        name = "datar_norsyss_kht_email_drop",
+        type = "data",
+        action = "datar_norsyss_kht_email_drop",
+        schema = list(output = config$schema$datar_norsyss_kht_email)
+      )
+    )
+  )
+
+  # data_pre_norsyss ----
+  config$tasks$add_task(
+    task_from_config(
       list(
         name = "data_pre_norsyss",
         type = "data",
@@ -231,39 +287,6 @@ set_tasks <- function() {
 
           )
         )
-      )
-    )
-  )
-
-  # data_pre_normomo ----
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "data_pre_normomo",
-        type = "data",
-        action = "data_pre_normomo"
-      )
-    )
-  )
-  # datar_normomo ----
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "datar_normomo",
-        type = "data",
-        action = "datar_normomo",
-        schema = list(output = config$schema$datar_normomo)
-      )
-    )
-  )
-  # datar_normomo_drop ----
-  config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "datar_normomo_drop",
-        type = "data",
-        action = "datar_normomo_drop",
-        schema = list(output = config$schema$datar_normomo)
       )
     )
   )
@@ -643,6 +666,16 @@ set_tasks <- function() {
     )
   )
 
+  # ui_norsyss_kht_email ----
+  config$tasks$add_task(
+    Task$new(
+      name = "ui_norsyss_kht_email",
+      type = "ui",
+      permission = config$permissions$ui_norsyss_kht_email,
+      update_plans_fn = ui_norsyss_kht_email_plans,
+      schema = c("input" = config$schema$results_norsyss_standard)
+    )
+  )
 
   config$tasks$add_task(
     task_from_config(
@@ -767,20 +800,7 @@ set_tasks <- function() {
       )
     )
   )
- config$tasks$add_task(
-    task_from_config(
-      list(
-        name = "ui_obsmail_norsyss",
-        type = "data",
-        schema=list(input=config$schema$results_norsyss_standard),
-        action="ui_obsmail",
-        args = list(
-          folder = "norsyss_qp",
-          tags = c("gastro")
-        )
-      )
-    )
-  )
+
 
 
 

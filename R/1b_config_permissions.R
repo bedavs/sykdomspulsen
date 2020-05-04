@@ -13,4 +13,10 @@ set_permissions <- function() {
     production_days = c(2, 3)
   )
 
+  config$permissions[["ui_norsyss_kht_email"]] <- Permission$new(
+    key = "ui_norsyss_kht_email",
+    value = fhi::isoyearweek(),
+    production_days = c(3)
+  )
+
 }

@@ -293,6 +293,20 @@ set_db <- function(){
         "uuid"
       )
     ),
+    # datar_norsyss_kht_email ----
+    datar_norsyss_kht_email = Schema$new(
+      db_config = config$db_config,
+      db_table = "datar_norsyss_kht_email",
+      db_field_types =  c(
+        "location_code" = "TEXT",
+        "email" = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "location_code",
+        "email"
+      )
+    ),
 
     # data ----
     # data_weather ----
