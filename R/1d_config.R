@@ -6,7 +6,6 @@ set_config <- function() {
 
   set_computer_name()
   set_computer_type()
-  set_dev_options()
   set_border()
   set_db()
   set_progressr()
@@ -55,25 +54,9 @@ set_config <- function() {
   # }
 }
 
-set_computer_name <- function() {
-  if (file.exists("/tmp/computer")) {
-    con <- file("/tmp/computer", "r")
-    computer_name <- readLines(con, n = 1)
-    close(con)
-  } else {
-    computer_name <- "NO_NAME_FOUND"
-  }
-  Sys.setenv(COMPUTER = computer_name)
-  config$computer_name <- computer_name
-}
-
 set_computer_type <- function() {
   if (Sys.getenv("SYKDOMSPULSEN_PRODUCTION") == "1") {
     config$is_production <- TRUE
-  } else if (config$computer_name %in% config$name_testing) {
-    config$is_testing <- TRUE
-  } else {
-    config$is_dev <- TRUE
   }
 }
 

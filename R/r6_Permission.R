@@ -69,6 +69,17 @@ Permission <- R6::R6Class(
       db_schema$db_upsert_load_data_infile(to_upload)
       db_schema$db_disconnect()
     },
+    grant_permission = function() {
+      db_schema$db_connect()
+
+      to_upload <- data.table(
+        xkey = key,
+        value = uuid::UUIDgenerate()
+      )
+
+      db_schema$db_upsert_load_data_infile(to_upload)
+      db_schema$db_disconnect()
+    },
     is_final = function() {
       today <- lubridate::wday(lubridate::today(), week_start = 1)
       return(today %in% production_days)

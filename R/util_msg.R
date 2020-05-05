@@ -37,16 +37,8 @@ msg <- function(txt, type = "msg", syscalls_depth = 0, newLine = FALSE, slack = 
   }
 
   if (type == "msg") {
-    if (config$is_initialized) {
-      fn(sprintf("%s%s/%s/%s %s\r", startOfLine, Sys.time(), config$name_computer, config$package, txt))
-    } else {
-      fn(sprintf("%s%s %s\r", startOfLine, Sys.time(), txt))
-    }
+    fn(sprintf("%s%s %s\r", startOfLine, Sys.time(), txt))
   } else {
-    if (config$is_initialized) {
-      fn(sprintf("%s%s/%s/%s %s\r", startOfLine, Sys.time(), config$name_computer, config$package, txt), call. = F)
-    } else {
-      fn(sprintf("%s%s %s\r", startOfLine, Sys.time(), txt), call. = F)
-    }
+    fn(sprintf("%s%s %s\r", startOfLine, Sys.time(), txt), call. = F)
   }
 }
