@@ -1,11 +1,17 @@
 
 ui_normomo_table_excess_only <- function(data, argset, schema) {
   if(FALSE){
-    tm_update_plans("ui_normomo_table_excess_only")
+    tm_update_plans("ui_normomo_table_excess_only_sort_location")
 
-    data <- tm_get_data("ui_normomo_table_excess_only", index_plan=1)
-    argset <- tm_get_argset("ui_normomo_table_excess_only", index_plan=1, index_argset = 1)
-    schema <- tm_get_schema("ui_normomo_table_excess_only")
+    data <- tm_get_data("ui_normomo_table_excess_only_sort_location", index_plan=1)
+    argset <- tm_get_argset("ui_normomo_table_excess_only_sort_location", index_plan=1, index_argset = 1)
+    schema <- tm_get_schema("ui_normomo_table_excess_only_sort_location")
+
+    tm_update_plans("ui_normomo_table_excess_only_sort_age")
+
+    data <- tm_get_data("ui_normomo_table_excess_only_sort_age", index_plan=1)
+    argset <- tm_get_argset("ui_normomo_table_excess_only_sort_age", index_plan=1, index_argset = 1)
+    schema <- tm_get_schema("ui_normomo_table_excess_only_sort_age")
   }
 
   d <- copy(data$data)
@@ -43,19 +49,40 @@ ui_normomo_table_excess_only <- function(data, argset, schema) {
 
   setorder(d,location_name, age, -yrwk)
   d <- rbind(d[location_code=="norge"],d[location_code!="norge"])
+  if(argset$sort=="age"){
+    location_code_order <- unique(d$location_code)
+    setorder(d,age, -yrwk, -location_code)
+  }
 
-  tab <- huxtable::hux(
-    "Omr\u00E5de" = d$location_name,
-    "Alder" = d$age,
-    "\u00C5r-uke" = d$yrwk,
-    "Registrert\\textsuperscript{1}" = d$n_obs,
-    "Korrigert\\textsuperscript{2}" = round(d$ncor_est),
-    "Z-score\\textsuperscript{3}" = fhiplot::format_nor(d$ncor_zscore, 2),
-    "Overd\u00F8delighet\\textsuperscript{4}" = ceiling(d$ncor_excess),
-    "Normalt\\textsuperscript{5}" = glue::glue("{round(d$ncor_baseline_thresholdl0)} - {round(d$ncor_baseline_thresholdu0)}"),
-    "Forh\u00F8yet" = glue::glue("{round(d$ncor_baseline_thresholdu0)} - {round(d$ncor_baseline_thresholdu1)}"),
-    "Betydelig forh\u00F8yet" = glue::glue(">{round(d$ncor_baseline_thresholdu1)}")
-  ) %>%
+  if(argset$sort=="location"){
+    tab <- huxtable::hux(
+      "Omr\u00E5de" = d$location_name,
+      "Alder" = d$age,
+      "\u00C5r-uke" = d$yrwk,
+      "Registrert\\textsuperscript{1}" = d$n_obs,
+      "Korrigert\\textsuperscript{2}" = round(d$ncor_est),
+      "Z-score\\textsuperscript{3}" = fhiplot::format_nor(d$ncor_zscore, 2),
+      "Overd\u00F8delighet\\textsuperscript{4}" = ceiling(d$ncor_excess),
+      "Normalt\\textsuperscript{5}" = glue::glue("{round(d$ncor_baseline_thresholdl0)} - {round(d$ncor_baseline_thresholdu0)}"),
+      "Forh\u00F8yet" = glue::glue("{round(d$ncor_baseline_thresholdu0)} - {round(d$ncor_baseline_thresholdu1)}"),
+      "Betydelig forh\u00F8yet" = glue::glue(">{round(d$ncor_baseline_thresholdu1)}")
+    )
+  } else if(argset$sort=="age"){
+    tab <- huxtable::hux(
+      "Alder" = d$age,
+      "\u00C5r-uke" = d$yrwk,
+      "Omr\u00E5de" = d$location_name,
+      "Registrert\\textsuperscript{1}" = d$n_obs,
+      "Korrigert\\textsuperscript{2}" = round(d$ncor_est),
+      "Z-score\\textsuperscript{3}" = fhiplot::format_nor(d$ncor_zscore, 2),
+      "Overd\u00F8delighet\\textsuperscript{4}" = ceiling(d$ncor_excess),
+      "Normalt\\textsuperscript{5}" = glue::glue("{round(d$ncor_baseline_thresholdl0)} - {round(d$ncor_baseline_thresholdu0)}"),
+      "Forh\u00F8yet" = glue::glue("{round(d$ncor_baseline_thresholdu0)} - {round(d$ncor_baseline_thresholdu1)}"),
+      "Betydelig forh\u00F8yet" = glue::glue(">{round(d$ncor_baseline_thresholdu1)}")
+    )
+  }
+
+  tab %<>%
     huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic() %>%
     huxtable::set_align(huxtable::everywhere, huxtable::everywhere, "center") %>%

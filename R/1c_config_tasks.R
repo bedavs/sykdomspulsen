@@ -597,11 +597,11 @@ set_tasks <- function() {
     )
   )
 
-  # ui_normomo_table_excess_only ----
+  # ui_normomo_table_excess_only_sort_location ----
   config$tasks$add_task(
     task_from_config(
       conf = list(
-        name = "ui_normomo_table_excess_only",
+        name = "ui_normomo_table_excess_only_sort_location",
         type = "ui",
         action = "ui_normomo_table_excess_only",
         db_table = "results_normomo_standard",
@@ -611,7 +611,29 @@ set_tasks <- function() {
         dependencies = c("results_normomo_standard"),
         args = list(
           folder = "normomo/{argset$today}/overview",
-          filename = "overview_excess_only_{argset$today}.png"
+          filename = "overview_excess_only_sort_{argset$sort}_{argset$today}.png",
+          sort = "location"
+        )
+      )
+    )
+  )
+
+  # ui_normomo_table_excess_only_sort_age ----
+  config$tasks$add_task(
+    task_from_config(
+      conf = list(
+        name = "ui_normomo_table_excess_only_sort_age",
+        type = "ui",
+        action = "ui_normomo_table_excess_only",
+        db_table = "results_normomo_standard",
+        schema = list(input=config$schema$results_normomo_standard),
+        for_each_plan = list("border" = 2020),
+        #filter = "age=='total'",
+        dependencies = c("results_normomo_standard"),
+        args = list(
+          folder = "normomo/{argset$today}/overview",
+          filename = "overview_excess_only_sort_{argset$sort}_{argset$today}.png",
+          sort = "age"
         )
       )
     )
@@ -650,8 +672,8 @@ set_tasks <- function() {
           tab1 = "overview_norge_{argset$today}.png",
           tab1_filepath = "normomo/{argset$today}/overview/overview_norge_{argset$today}.png",
 
-          tab2 = "overview_excess_only_{argset$today}.png",
-          tab2_filepath = "normomo/{argset$today}/overview/overview_excess_only_{argset$today}.png",
+          tab2 = "overview_excess_only_sort_location_{argset$today}.png",
+          tab2_filepath = "normomo/{argset$today}/overview/overview_excess_only_sort_location_{argset$today}.png",
 
           fig1 = "incl_reported_norge_total_{argset$today}.png",
           fig1_filepath = "normomo/{argset$today}/graphs_thresholds/incl_reported_norge_total_{argset$today}.png",
