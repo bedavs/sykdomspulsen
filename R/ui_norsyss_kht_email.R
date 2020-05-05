@@ -1,7 +1,9 @@
 ui_norsyss_kht_email <- function(data, argset, schema) {
   if(FALSE){
     tm_run_task("ui_norsyss_kht_email")
+  }
 
+  if(plnr::is_run_directly()){
     tm_update_plans("ui_norsyss_kht_email")
 
     data <- tm_get_data("ui_norsyss_kht_email", index_plan=1)
@@ -12,64 +14,68 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_subject <- glue::glue("OBS varsel fra Sykdomspulsen {lubridate::today()}")
 
   email_text_top <- glue::glue(
-    "<b>Dette er et OBS varsel fra Sykdomspulsen for kommunehelsetjenesten, logg dere p\u00E5 her! https://spuls.fhi.no</b><br><br>",
+    "<b>Dette er et OBS varsel fra Sykdomspulsen for kommunehelsetjenesten</b><br><br>",
+
+    "Nytt fra Sykdomspulsen:<br>",
+    "- Vi har endret websiden som kommer etter p{fhi::nb$aa}loggingen p{fhi::nb$aa} ",
+    "<a href='https://spuls.fhi.no'>https://spuls.fhi.no</a> s{fhi::nb$aa} det skal v{fhi::nb$ae}re ",
+    "lettere {fhi::nb$aa} se hvor man skal trykke for {fhi::nb$aa} komme seg videre.<br>",
+    "- 04.05.2020 ble det opprettet en ny ICPC-2 kode for covid-19 ",
+    "(<a href='https://fastlegen.no/artikkel/diagnosekoder-ved-covid-19'>https://fastlegen.no/artikkel/diagnosekoder-ved-covid-19</a>). ",
+    "Denne uken vil vi fortsatt kun ha den gamle koden (R991: covid-19 (mistenkt eller bekreftet), ",
+    "men fra neste uke vil vi inkludere den nye koden i oversikten. <br>",
+    "-  Vi {fhi::nb$oe}nsker s{fhi::nb$aa}rt deltakere til et brukerpanel som kan gi innspill om websiden og OBS varselet, send mail til sykdomspulsen@fhi.no<br><br>",
+
+    "Mer informasjon om Sykdomspulsen og OBS varselet finner du under tabellene og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
+
     "Dersom dere har problemer med p{fhi::nb$aa}loggingen eller andre sp\u00F8rsm\u00E5l, vennligst send en mail til sykdomspulsen@fhi.no<br><br><br>"
   )
 
   email_text_bottom <- glue::glue(
-    "<b>Sykdomspulsen til kommunehelsetjenesten</b> f\u00E5r et varsel p\u00E5",
-    "e-post dersom deres kommune eller et fylke har flere konsultasjoner enn ",
-    "forventet av henholdsvis mage-tarminfeksjoner eller luftveisinfeksjoner en av de siste 4 ukene.<br><br>",
+    "Dette er et OBS varsel fra Sykdomspulsen.<br><br>",
 
-    "Tabellen under viser informasjon om stedet der det er mer enn forventet ",
-    "antall meldte tilfeller og aldersgruppe, antallet tilfeller flere enn normalt ",
-    "og en verdi som viser hvor ekstremt signalet er (z-score). ",
-    "Hvis z-scoret er mellom 2 og 4 er antallet konsultasjoner h{fhi::nb$oe}yere enn ",
-    "forventet og man vil se at det ligger i gul sone p\u00E5 Sykdomspulsen websiden. ",
-    "Dersom z-scoret er over 4 er antallet konsultasjoner betydelig h\u00F8yere ",
-    "enn forventet og man vil se at det ligger i r\u00F8d sone p\u00E5 Sykdomspulsen websiden.<br><br>",
+    "Dette OBS varslet er for det geografiske omr{fhi::nb$aa}det ",
+    "du valgte i websiden Sykdomspulsen for kommunehelsetjenesten.<br><br>",
 
-    "I tabellen over er det en link til stedet der du kan se OBS varselet i Sykdomspulsen. ",
-    "Denne virker ikke dersom den \u00E5pnes i Internet explorer. Dersom du har problemer ",
-    "med linken kan du h\u00F8yreklikke p\u00E5 koblingen og kopiere den for deretter ",
-    "\u00E5 lime den inn i for eksempel Google chrome eller en annen nettleser. ",
-    "Du kan ogs\u00E5 logge deg inn p\u00E5 Sykdomspulsen p\u00E5 vanlig m\u00E5te ",
-    "(<a href='http://sykdomspulsen.fhi.no/lege123/'>http://sykdomspulsen.fhi.no/lege123/</a>) ",
-    "og selv finne aktuell kommune eller fylke.<br><br>",
+    "Tabellen med covid-19 viser antall konsultasjoner og andel konsultasjoner ",
+    "hos lege og legevakt (NorSySS) og antall bekreftede tilfeller registrert i MSIS.<br><br>",
 
-    "Varselet er en informasjon om at det kan v\u00E6re noe som b\u00F8r f\u00F8lges ",
-    "opp i din kommune eller i et fylke. Det anbefales \u00E5 g\u00E5 inn i Sykdomspulsen ",
-    "websiden og sjekke det ut. Varselet beh\u00F8ver ikke \u00E5 bety noe alvorlig.<br><br>",
+    "Tabellene med mage-tarminfeksjoner og luftveisinfeksjoner har kun NorSySS data og viser disse verdiene:<br>",
+    "Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
+    "g{fhi::nb$aa}r til legen flere ganger.<br>",
+    "Flere enn normalt: Differansen mellom antall registrerte og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
+    "Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner.<br>",
+    "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
+    "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
+    "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br><br>",
 
-    "Nederst i denne mailen viser vi hvilke(n) kommune(r) du f\u00E5r varsel for. ",
-    "Alle f\u00E5r varsel for alle fylker og hele Norge. Dersom det ikke st\u00E5r noen ",
-    "kommune i tabellen mangler vi det for deg og vi ber deg kontakte oss for \u00E5 ",
-    "f\u00E5 satt opp riktig kommune(r).<br><br>",
+    "Varselet er en informasjon om at det kan v{fhi::nb$ae}re noe som b{fhi::nb$oe}r f{fhi::nb$oe}lges opp i din kommune eller i et fylke. ",
+    "Det anbefales {fhi::nb$ae} g{fhi::nb$ae} inn i Sykdomspulsen websiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
 
-    "Sykdomspulsen kan i noen tilfeller generere et OBS varsel selv om det bare er en ",
-    "eller to konsultasjoner for et symptom/sykdom. Dette sees som oftest i sm\u00E5 ",
-    "kommuner der det vanligvis ikke er mange konsultasjoner. For ikke \u00E5 bli forstyrret ",
-    "av slike signaler har vi n\u00E5 lagt inn en nedre grense for gult signal p\u00E5 to ",
-    "konsultasjoner og en nedre grense for r\u00F8dt signal p\u00E5 tre konsultasjoner.<br><br>",
+    "Sykdomspulsen kan i noen tilfeller generere et OBS varsel selv om det bare er en eller to konsultasjoner for et symptom/sykdom. ",
+    "Dette sees som oftest i sm{fhi::nb$aa} kommuner der det vanligvis ikke er mange konsultasjoner. For ikke {fhi::nb$aa} bli forstyrret ",
+    "av slike signaler har vi nå lagt inn en nedre grense for gult signal p{fhi::nb$aa} p{fhi::nb$aa} minst tre konsultasjoner og en nedre grense for ",
+    "r{fhi::nb$oe}dt signal p{fhi::nb$aa} minst fire konsultasjoner.<br><br>",
 
-    "Ta kontakt med oss om du har sp\u00F8rsm\u00E5l eller om det er noe som er uklart ",
-    "p\u00E5 sykdomspulsen@fhi.no.<br><br>",
+    "Ta kontakt med oss om du har sp{fhi::nb$oe}rsm{fhi::nb$aa}l eller om det er noe som er uklart p{fhi::nb$aa} sykdomspulsen@fhi.no.<br><br>",
 
-    "Send oss ogs\u00E5 en tilbakemelding dersom du \u00F8nsker varsel for andre kommuner ",
-    "eller fylker.<br><br>",
-
-    "Vi \u00F8nsker ogs\u00E5 tilbakemelding p\u00E5 om dette varselet er nyttig for ",
-    "dere eller ikke.<br><br>",
-
-    "<b> NB! Oppdatering av Sykdomspulsen vil n\u00E5 skje p\u00E5 onsdager istedenfor ",
-    "tirsdager. H\u00E5per dette ikke vil for\u00E5rsake noen ulemper for dere.</b> <br><br>",
+    "Vi {fhi::nb$oe}nsker ogs{fhi::nb$aa} tilbakemelding p{fhi::nb$aa} om dette varselet er nyttig for dere eller ikke.<br><br>",
 
     "Hilsen:<br><br>",
+
     "Sykdomspulsen ved Folkehelseinstituttet<br>",
-    "v/Gry M Gr\u00F8neng (prosjektleder) og Richard White (statistiker og webansvarlig)<br><br>"
+    "v/Gry M Gr{fhi::nb$oe}neng (prosjektleder), Richard White (statistiker og webansvarlig) og Gunnar R{fhi::nb$oe} (statistiker og webansvarlig)<br><br>"
   )
 
   email_text <- email_text_top
+
+  email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>\n")
+
+  email_text <- paste0(
+    email_text,
+    "<h2>NorSySS+MSIS: covid-19 oversikt</h2>",
+    norsyss_kht_covid19_table(data = data)
+    )
 
   email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>\n")
 
@@ -77,6 +83,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   for(tag_outcome in argset$tag_outcome){
     email_text <- paste0(
       email_text,
+      "<h2>NorSySS: ",config$def$norsyss$long_names[[tag_outcome]]," varsler</h2>",
       norsyss_kht_obs_table(
         results = data$alert[[tag_outcome]],
         tag_outcome = tag_outcome
@@ -109,7 +116,7 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   tag_pretty <- config$def$norsyss$long_names[[tag_outcome]]
 
   if (nrow(r_long) == 0) {
-    return(sprintf("<b>%s:</b> <span style='color:red;text-decoration:underline;'>Ingen utbrudd registrert</span><br><br><br>", tag_pretty))
+    return(sprintf("<b>%s:</b> <span style='color:red;text-decoration:underline;'>Ingen varsler registrert</span><br><br><br>", tag_pretty))
   }
 
   setorder(r_long, tag_outcome, yrwk)
@@ -133,7 +140,6 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   setorder(yrwks, week_id)
 
   tab <- huxtable::huxtable(
-    Syndrom = r_wide$tag_pretty,
     geo = r_wide$location_name,
     Alder = r_wide$age,
     `n_1` = r_wide$n_1,
@@ -155,7 +161,7 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   # coloring in
   for (i in 1:4) {
     z <- glue::glue("n_status_{i}")
-    column_to_color <- c(3, 7, 11) + i
+    column_to_color <- c(2, 6, 10) + i
     index_low <- which(r_wide[[z]] == "normal") + 1
     index_med <- which(r_wide[[z]] == "medium") + 1
     index_hig <- which(r_wide[[z]] == "high") + 1
@@ -166,7 +172,6 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   }
 
   tab[1, ] <- c(
-    "Syndrom",
     "Geografisk omr\u00E5de",
     "Alder",
     yrwks$yrwk,
@@ -176,37 +181,36 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
 
   tab <- huxtable::add_rows(tab, tab[1, ], after = 0)
 
-  huxtable::escape_contents(tab)[, 2] <- FALSE
+  huxtable::escape_contents(tab)[, 1] <- FALSE
 
   tab <- huxtable::merge_cells(tab, 1:2, 1)
   tab <- huxtable::merge_cells(tab, 1:2, 2)
-  tab <- huxtable::merge_cells(tab, 1:2, 3)
 
-  tab <- huxtable::merge_cells(tab, 1, 4:7)
-  tab[1, 4] <- "Meldte tilfeller"
+  tab <- huxtable::merge_cells(tab, 1, 3:6)
+  tab[1, 3] <- "Antall konsultasjoner"
 
-  tab <- huxtable::merge_cells(tab, 1, 8:11)
-  tab[1, 8] <- "Flere enn normalt<sup>1</sup>"
+  tab <- huxtable::merge_cells(tab, 1, 7:10)
+  tab[1, 7] <- "Flere enn normalt<sup>1</sup>"
 
-  tab <- huxtable::merge_cells(tab, 1, 12:15)
-  tab[1, 12] <- "Z-verdi<sup>3</sup>"
+  tab <- huxtable::merge_cells(tab, 1, 11:14)
+  tab[1, 11] <- "Z-verdi<sup>2</sup>"
 
-  huxtable::left_border(tab)[, c(4, 8, 12)] <- 5
-  huxtable::left_border_style(tab)[, c(4, 8, 12)] <- "double"
+  huxtable::left_border(tab)[, c(3, 7, 11)] <- 5
+  huxtable::left_border_style(tab)[, c(3, 7, 11)] <- "double"
 
   huxtable::align(tab) <- "center"
 
   nr0 <- nrow(tab) + 1
   tab <- huxtable::add_footnote(tab, glue::glue(
-    "<sup>1</sup>Differansen mellom antall registrete og {fhi::nb$oe}vre grense for normalt antall<sup>2</sup><br>",
-    "<sup>2</sup>95% prediksjonsintervall<br>",
-    "<sup>3</sup>Z-verdi: antall ganger standardaviket verdien er fra forventet antall konsultasjoner<br>",
-    "<sup>3</sup>Z-verdi mellom 2 og 4 og flere enn 2,5 meldte tilfeller indikerer at det er et h{fhi::nb$oe}yere antall meldte tilfeller enn normalt (vist som gul)<br>",
-    "<sup>3</sup>Z-verdi >= 4 og flere enn 3 meldte tilfeller indikerer at det er et betydlig h{fhi::nb$oe}yere antall meldte tilfeller enn normalt (vist som r{fhi::nb$oe}d)<br>",
+    "<sup>1</sup>Differansen mellom antall registrete og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
+    "<sup>2</sup>Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner<br>",
+    "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
+    "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
+    "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br>",
   ), border = 0)
   nr1 <- nrow(tab)
 
-  huxtable::escape_contents(tab)[1, c(8, 12)] <- F
+  huxtable::escape_contents(tab)[1, c(7, 11)] <- F
   huxtable::escape_contents(tab)[nr0:nr1, ] <- F
 
   huxtable::left_padding(tab) <-  5
@@ -216,7 +220,82 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   return(huxtable::to_html(tab))
 }
 
-ui_norsyss_kht_email_function_factory <- function(location_codes, x_tags, yrwk, n_status = c("medium", "high")){
+norsyss_kht_covid19_table <- function(data){
+  tab <- copy(data$covid19$norsyss)
+  setnames(tab, "n", "n_norsyss")
+  tab[
+    data$covid19$msis,
+    on=c("location_code","yrwk"),
+    n_msis := fhiplot::format_nor(n)
+  ]
+
+  tab[,pr100_norsyss := fhiplot::format_nor_perc_1(100*n_norsyss/consult_with_influenza)]
+  tab[consult_with_influenza==0, pr100_norsyss := "0,0%"]
+  tab[,n_norsyss:=fhiplot::format_nor(n_norsyss)]
+
+  tab[,week_id := 1:.N,by=.(location_code)]
+
+  tab_wide <- dcast.data.table(
+    tab,
+    location_code ~ week_id,
+    value.var = c("pr100_norsyss","n_norsyss","n_msis")
+  )
+  tab_wide <- rbind(tab_wide[location_code=="norge"],tab_wide[location_code!="norge"])
+  tab_wide[,location_name := get_location_name(location_code)]
+  tab_wide[, location_code := NULL]
+  setcolorder(tab_wide, "location_name")
+
+  yrwks <- unique(tab[, c("week_id", "yrwk")])
+  setorder(yrwks, week_id)
+
+  ht <- huxtable::as_hux(tab_wide) %>%
+    huxtable::add_colnames() %>%
+    fhiplot::huxtable_theme_fhi_basic()
+
+  ht[1, ] <- c(
+    "Geografisk omr\u00E5de",
+    yrwks$yrwk,
+    yrwks$yrwk,
+    yrwks$yrwk
+  )
+
+  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
+
+  huxtable::escape_contents(ht)[, 2] <- FALSE
+
+  ht <- huxtable::merge_cells(ht, 1:2, 1)
+
+  ht <- huxtable::merge_cells(ht, 1, 2:5)
+  ht[1, 2] <- "NorSySS<sup>12</sup> andel"
+
+  ht <- huxtable::merge_cells(ht, 1, 6:9)
+  ht[1, 6] <- "NorSySS<sup>2</sup> antall"
+
+  ht <- huxtable::merge_cells(ht, 1, 10:13)
+  ht[1, 10] <- "MSIS antall"
+
+  huxtable::left_border(ht)[, c(2, 6, 10)] <- 5
+  huxtable::left_border_style(ht)[, c(2, 6, 10)] <- "double"
+
+  huxtable::align(ht) <- "center"
+
+  nr0 <- nrow(ht) + 1
+  ht <- huxtable::add_footnote(ht, glue::glue(
+    "<sup>1</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
+    "<sup>2</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og her refererer til ICPC-2 koden R991: covid-19 (mistenkt eller bekreftet)<br>",
+  ), border = 0)
+  nr1 <- nrow(ht)
+
+  huxtable::escape_contents(ht)[1, ] <- F
+  huxtable::escape_contents(ht)[nr0:nr1, ] <- F
+
+  huxtable::left_padding(ht) <-  5
+  huxtable::right_padding(ht) <-  5
+
+  return(huxtable::to_html(ht))
+}
+
+ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, yrwk, n_status = c("medium", "high")){
   force(location_codes)
   force(x_tags)
   force(yrwk)
@@ -253,12 +332,40 @@ ui_norsyss_kht_email_function_factory <- function(location_codes, x_tags, yrwk, 
   }
 }
 
+ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
+  force(location_codes)
+  force(yrwk)
+  function(){
+    retval <- list()
+
+    retval$msis <- tbl("data_covid19_msis_by_time_location") %>%
+      dplyr::filter(granularity_time == "week") %>%
+      dplyr::filter(location_code %in% !!location_codes) %>%
+      dplyr::filter(yrwk %in% !!yrwk) %>%
+      dplyr::collect() %>%
+      latin1_to_utf8()
+
+    retval$norsyss <- tbl("data_norsyss") %>%
+      dplyr::filter(granularity_time=="day") %>%
+      dplyr::filter(location_code %in% !!location_codes) %>%
+      dplyr::filter(age=="total") %>%
+      dplyr::filter(yrwk %in% !!yrwk) %>%
+      dplyr::filter(tag_outcome %in% "covid19_vk_ote") %>%
+      dplyr::select(location_code, yrwk, n, consult_with_influenza) %>%
+      dplyr::group_by(location_code,yrwk) %>%
+      dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
+      dplyr::collect() %>%
+      latin1_to_utf8()
+
+    retval
+  }
+}
+
 ui_norsyss_kht_email_plans <- function(){
   x_tags <- c("respiratoryexternal_vk_ot", "gastro_vk_ot")
   yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-1)
 
   #yrwk <- fhi::isoyearweek(lubridate::today()-seq(48,70,7))
-
 
   val <- tbl("datar_norsyss_kht_email") %>%
     dplyr::collect()
@@ -284,13 +391,22 @@ ui_norsyss_kht_email_plans <- function(){
 
     list_plan[[length(list_plan)]]$add_data(
       name = "alert",
-      fn=ui_norsyss_kht_email_function_factory(
+      fn=ui_norsyss_kht_email_alert_function_factory(
         location_codes = val[email == em]$location_code,
         x_tags = x_tags,
         yrwk = yrwk,
         n_status = n_status
       )
     )
+
+    list_plan[[length(list_plan)]]$add_data(
+      name = "covid19",
+      fn=ui_norsyss_kht_email_covid19_function_factory(
+        location_codes = val[email == em]$location_code,
+        yrwk = yrwk
+      )
+    )
+
     list_plan[[length(list_plan)]]$add_analysis(
       fn = ui_norsyss_kht_email,
       email = em,

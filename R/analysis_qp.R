@@ -416,8 +416,8 @@ DetermineStatus <- function(data) {
 
   # create "normal", "medium", "high" categories
   data[, n_status := "normal"]
-  data[n > 1 & n > n_baseline_thresholdu0, n_status := "medium"]
-  data[n > 1 & n > n_baseline_thresholdu1, n_status := "high"]
+  data[n >= 3 & n > n_baseline_thresholdu0, n_status := "medium"]
+  data[n >= 4 & n > n_baseline_thresholdu1, n_status := "high"]
 }
 
 # clean_post_analysis

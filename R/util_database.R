@@ -12,6 +12,7 @@ use_db <- function(conn, db) {
       "USE {db};"
     }))
   }, error = function(e){
+
     a <- DBI::dbExecute(conn, glue::glue({
       "CREATE DATABASE {db};"
     }))
@@ -19,6 +20,14 @@ use_db <- function(conn, db) {
       "USE {db};"
     }))
   })
+}
+
+set_db_recovery_simple <- function(conn = get_db_connection(), db = config$db_config$db, i_am_sure_i_want_to_do_this = FALSE) {
+  stopifnot(i_am_sure_i_want_to_do_this==T)
+
+  a <- DBI::dbExecute(conn, glue::glue({
+    "ALTER DATABASE  {db} SET RECOVERY SIMPLE;"
+  }))
 }
 
 #' get_field_types
