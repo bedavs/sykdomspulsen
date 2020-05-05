@@ -4,7 +4,6 @@ set_config <- function() {
   ##    clear = FALSE
   ## ))
 
-  set_computer_name()
   set_computer_type()
   set_border()
   set_db()
