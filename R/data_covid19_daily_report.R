@@ -6,9 +6,12 @@
 #
 data_covid19_daily_report <- function(data, argset, schema){
   # tm_run_task("data_covid19_daily_report")
-  # data <- tm_get_data("data_covid19_daily_report")
-  # argset <- tm_get_argset("data_covid19_daily_report")
-  # schema <- tm_get_schema("data_covid19_daily_report")
+
+  if(plnr::is_run_directly()){
+    data <- tm_get_data("data_covid19_daily_report")
+    argset <- tm_get_argset("data_covid19_daily_report")
+    schema <- tm_get_schema("data_covid19_daily_report")
+  }
 
   file <- fs::dir_ls("/input/covid19/", regexp="dagsrapport_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].RDS")
   file <- file[!stringr::str_detect(file,"processed")]
@@ -21,13 +24,13 @@ data_covid19_daily_report <- function(data, argset, schema){
   master <- readRDS(file)
 
   date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
-  date_min_msis <- min(master$data_covid19_msis_by_time_location$date)
+  date_min_msis <- min(master$data_covid19_msis_by_time_location_nation$date)
 
   names(schema)
   names(master)
 
   # data_covid19_msis_by_time_location ----
-  master$data_covid19_msis_by_time_location
+  master$data_covid19_msis_by_time_location_municip
 
   skeleton <- expand.grid(
     location_code = fhidata::norway_locations_b2020$municip_code,
@@ -42,7 +45,7 @@ data_covid19_daily_report <- function(data, argset, schema){
 
   d_municip <- merge(
     skeleton,
-    master$data_covid19_msis_by_time_location,
+    master$data_covid19_msis_by_time_location_municip,
     by=c("location_code","date"),
     all.x = T
   )
@@ -50,34 +53,49 @@ data_covid19_daily_report <- function(data, argset, schema){
   d_municip[, granularity_geo := "municip"]
 
   # now generate county data
-  d_county <- copy(d_municip)
-  d_county[
-    fhidata::norway_locations_b2020,
-    on="location_code==municip_code",
-    county_code := county_code
-    ]
-  d_county <- d_county[,.(
-    n = sum(n)
-  ), keyby=.(
-    location_code = county_code,
-    date
-  )]
+  master$data_covid19_msis_by_time_location_county
+
+  skeleton <- expand.grid(
+    location_code = unique(fhidata::norway_locations_b2020$county_code),
+    date = seq.Date(
+      date_min_msis,
+      date_max,
+      by = 1
+    ),
+    stringsAsFactors = FALSE
+  )
+  setDT(skeleton)
+
+  d_county <- merge(
+    skeleton,
+    master$data_covid19_msis_by_time_location_county,
+    by=c("location_code","date"),
+    all.x = T
+  )
+  d_county[is.na(n), n:=0]
   d_county[, granularity_geo := "county"]
 
   # generate norge data
-  d_norge <- d_county[,.(
-    n=0
-  ), keyby=.(
-    date
-  )]
-  d_norge[,n:=NULL]
-  d_norge[
-    master$data_covid19_msis_by_time_location[,.(n=sum(n)),keyby="date"],
-    on="date",
-    n:=n
-    ]
-  d_norge[is.na(n),n:=0]
-  d_norge[, location_code := "norge"]
+  master$data_covid19_msis_by_time_location_county
+
+  skeleton <- expand.grid(
+    location_code = "norge",
+    date = seq.Date(
+      date_min_msis,
+      date_max,
+      by = 1
+    ),
+    stringsAsFactors = FALSE
+  )
+  setDT(skeleton)
+
+  d_norge <- merge(
+    skeleton,
+    master$data_covid19_msis_by_time_location_nation,
+    by=c("location_code","date"),
+    all.x = T
+  )
+  d_norge[is.na(n), n:=0]
   d_norge[, granularity_geo := "nation"]
 
   d <- rbind(d_municip, d_county, d_norge)
