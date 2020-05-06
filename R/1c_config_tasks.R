@@ -162,6 +162,8 @@ set_tasks <- function() {
             ),
 
             "covid19" = c("R991", "R992"),
+            "covid19_r991" = c("R991"),
+            "covid19_r992" = c("R992"),
             "engstelig_luftveissykdom_ika" = c("R27")
           )
         )
@@ -219,6 +221,18 @@ set_tasks <- function() {
             data.table(
               tag_input = "covid19",
               tag_output = "covid19_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
+            ),
+            data.table(
+              tag_input = "covid19_r991",
+              tag_output = "covid19_r991_vk_ote",
+              practice_type = list(c("legevakt", "legekontor")),
+              contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
+            ),
+            data.table(
+              tag_input = "covid19_r992",
+              tag_output = "covid19_r992_vk_ote",
               practice_type = list(c("legevakt", "legekontor")),
               contactType = list(c("oppmote", "telefonkontakt", "ekonsultasjon"))
             ),
@@ -696,6 +710,19 @@ set_tasks <- function() {
       permission = config$permissions$ui_norsyss_kht_email,
       update_plans_fn = ui_norsyss_kht_email_plans,
       schema = c("input" = config$schema$results_norsyss_standard)
+    )
+  )
+
+  # ui_covid19_areas_at_risk ----
+  config$tasks$add_task(
+    Task$new(
+      name = "ui_covid19_areas_at_risk",
+      type = "ui",
+      update_plans_fn = ui_covid19_areas_at_risk_plans,
+      schema = c(
+        "norsyss" = config$schema$data_norsyss,
+        "covid" = config$schema$results_norsyss_standard
+        )
     )
   )
 

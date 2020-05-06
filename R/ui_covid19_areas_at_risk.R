@@ -1,124 +1,31 @@
-ui_norsyss_kht_email <- function(data, argset, schema) {
+ui_covid19_areas_at_risk <- function(data, argset, schema) {
   if(FALSE){
-    tm_run_task("datar_norsyss_kht_email")
-    # tm_run_task("ui_norsyss_kht_email")
+    tm_run_task("ui_covid19_areas_at_risk")
   }
 
   if(plnr::is_run_directly()){
-    tm_update_plans("ui_norsyss_kht_email")
+    tm_update_plans("ui_covid19_areas_at_risk")
     length(config$tasks$list_task$ui_norsyss_kht_email$plans)
 
     index_plan <- 1
-    data <- tm_get_data("ui_norsyss_kht_email", index_plan=index_plan)
-    argset <- tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
-    schema <- tm_get_schema("ui_norsyss_kht_email")
-  } else {
-    # need this so that the email server doesn't die
-    Sys.sleep(30)
+    data <- tm_get_data("ui_covid19_areas_at_risk", index_plan=index_plan)
+    argset <- tm_get_argset("ui_covid19_areas_at_risk", index_plan=index_plan, index_argset = 1)
+    schema <- tm_get_schema("ui_covid19_areas_at_risk")
   }
 
-  email_subject <- glue::glue("OBS varsel fra Sykdomspulsen {lubridate::today()}")
+  file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.pdf")
+  folder <- fs::path("/output","covid19",lubridate::today())
+  fs::dir_create(folder)
 
-  email_text_top <- glue::glue(
-    "<b>Dette er et OBS varsel fra Sykdomspulsen for kommunehelsetjenesten</b><br><br>",
-
-    "Nytt fra Sykdomspulsen:<br>",
-    "- Vi har endret websiden som kommer etter p{fhi::nb$aa}loggingen p{fhi::nb$aa} ",
-    "<a href='https://spuls.fhi.no'>https://spuls.fhi.no</a> s{fhi::nb$aa} det skal v{fhi::nb$ae}re ",
-    "lettere {fhi::nb$aa} se hvor man skal trykke for {fhi::nb$aa} komme seg videre.<br>",
-    "- 04.05.2020 ble det opprettet en ny ICPC-2 kode for covid-19 ",
-    "(<a href='https://fastlegen.no/artikkel/diagnosekoder-ved-covid-19'>https://fastlegen.no/artikkel/diagnosekoder-ved-covid-19</a>). ",
-    "Denne uken vil vi fortsatt kun ha den gamle koden (R991: covid-19 (mistenkt eller bekreftet), ",
-    "men fra neste uke vil vi inkludere den nye koden i oversikten. <br>",
-    "-  Vi {fhi::nb$oe}nsker s{fhi::nb$aa}rt deltakere til et brukerpanel som kan gi innspill om websiden og OBS varselet, send mail til sykdomspulsen@fhi.no<br><br>",
-
-    "Mer informasjon om Sykdomspulsen og OBS varselet finner du under tabellene og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
-
-    "Dersom dere har problemer med p{fhi::nb$aa}loggingen eller andre sp\u00F8rsm\u00E5l, vennligst send en mail til sykdomspulsen@fhi.no<br><br><br>"
-  )
-
-  email_text_bottom <- glue::glue(
-    "Dette er et OBS varsel fra Sykdomspulsen.<br><br>",
-
-    "Dette OBS varslet er for det geografiske omr{fhi::nb$aa}det ",
-    "du valgte i websiden Sykdomspulsen for kommunehelsetjenesten.<br><br>",
-
-    "Tabellen med covid-19 viser antall konsultasjoner og andel konsultasjoner ",
-    "hos lege og legevakt (NorSySS) og antall bekreftede tilfeller registrert i MSIS.<br><br>",
-
-    "Tabellene med mage-tarminfeksjoner og luftveisinfeksjoner har kun NorSySS data og viser disse verdiene:<br>",
-    "Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
-    "g{fhi::nb$aa}r til legen flere ganger.<br>",
-    "Flere enn normalt: Differansen mellom antall registrerte og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
-    "Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner.<br>",
-    "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
-    "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
-    "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br><br>",
-
-    "Varselet er en informasjon om at det kan v{fhi::nb$ae}re noe som b{fhi::nb$oe}r f{fhi::nb$oe}lges opp i din kommune eller i et fylke. ",
-    "Det anbefales {fhi::nb$ae} g{fhi::nb$ae} inn i Sykdomspulsen websiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
-
-    "Sykdomspulsen kan i noen tilfeller generere et OBS varsel selv om det bare er en eller to konsultasjoner for et symptom/sykdom. ",
-    "Dette sees som oftest i sm{fhi::nb$aa} kommuner der det vanligvis ikke er mange konsultasjoner. For ikke {fhi::nb$aa} bli forstyrret ",
-    "av slike signaler har vi nå lagt inn en nedre grense for gult signal p{fhi::nb$aa} p{fhi::nb$aa} minst tre konsultasjoner og en nedre grense for ",
-    "r{fhi::nb$oe}dt signal p{fhi::nb$aa} minst fire konsultasjoner.<br><br>",
-
-    "Ta kontakt med oss om du har sp{fhi::nb$oe}rsm{fhi::nb$aa}l eller om det er noe som er uklart p{fhi::nb$aa} sykdomspulsen@fhi.no.<br><br>",
-
-    "Vi {fhi::nb$oe}nsker ogs{fhi::nb$aa} tilbakemelding p{fhi::nb$aa} om dette varselet er nyttig for dere eller ikke.<br><br>",
-
-    "Hilsen:<br><br>",
-
-    "Sykdomspulsen ved Folkehelseinstituttet<br>",
-    "v/Gry M Gr{fhi::nb$oe}neng (prosjektleder), Richard White (statistiker og webansvarlig) og Gunnar R{fhi::nb$oe} (statistiker og webansvarlig)<br><br>"
-  )
-
-  email_text <- email_text_top
-
-  email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>\n")
-
-  email_text <- paste0(
-    email_text,
-    "<h2>NorSySS+MSIS: covid-19 oversikt</h2>",
-    norsyss_kht_covid19_table(data = data)
-    )
-
-  email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>\n")
-
-  # include outbreaks
-  for(tag_outcome in argset$tag_outcome){
-    email_text <- paste0(
-      email_text,
-      "<h2>NorSySS: ",config$def$norsyss$long_names[[tag_outcome]]," varsler</h2>",
-      norsyss_kht_obs_table(
-        results = data$alert[[tag_outcome]],
-        tag_outcome = tag_outcome
-      )
-    )
-  }
-
-  email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>")
-
-  # add in bottom text
-  email_text <- paste0(email_text, email_text_bottom)
-
-  argset$email
-
-  bcc <- NULL
-  if(config$is_production) bcc <- "sykdomspulsen@fhi.no"
-  mailr(
-    subject = e_subject(
-      email_subject,
-      is_final = config$permissions$ui_norsyss_kht_email$is_final()
-      ),
-    html = email_text,
-    to = argset$email,
-    bcc = bcc,
-    is_final = config$permissions$ui_norsyss_kht_email$is_final()
+  rmarkdown::render(
+    input = system.file("rmd/ui_covid19_areas_at_risk.Rmd", package="sykdomspulsen"),
+    output_dir = folder,
+    output_file = file,
+    intermediates_dir = tempdir()
   )
 }
 
-norsyss_kht_obs_table <- function(results, tag_outcome) {
+xnorsyss_kht_obs_table <- function(results, tag_outcome) {
   r_long <- copy(results)
 
   tag_pretty <- config$def$norsyss$long_names[[tag_outcome]]
@@ -228,7 +135,7 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   return(huxtable::to_html(tab))
 }
 
-norsyss_kht_covid19_table <- function(data){
+xnorsyss_kht_covid19_table <- function(data){
   tab <- copy(data$covid19$norsyss)
   setnames(tab, "n", "n_norsyss")
   tab[
@@ -305,7 +212,7 @@ norsyss_kht_covid19_table <- function(data){
   return(huxtable::to_html(ht))
 }
 
-ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, yrwk, n_status = c("medium", "high")){
+xui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, yrwk, n_status = c("medium", "high")){
   force(location_codes)
   force(x_tags)
   force(yrwk)
@@ -342,22 +249,19 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
   }
 }
 
-ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
-  force(location_codes)
+ui_covid19_areas_at_risk_function_factory <- function(yrwk){
   force(yrwk)
   function(){
     retval <- list()
 
     retval$msis <- tbl("data_covid19_msis_by_time_location") %>%
       dplyr::filter(granularity_time == "week") %>%
-      dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
       latin1_to_utf8()
 
     retval$norsyss <- tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
-      dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(age=="total") %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::filter(tag_outcome %in% "covid19_vk_ote") %>%
@@ -367,64 +271,39 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::collect() %>%
       latin1_to_utf8()
 
+    retval$norsyss_norge <- tbl("data_norsyss") %>%
+      dplyr::filter(granularity_time=="day") %>%
+      dplyr::filter(age=="total") %>%
+      dplyr::filter(date >= "2020-03-09") %>%
+      dplyr::filter(tag_outcome %in% "covid19_vk_ote") %>%
+      dplyr::filter(location_code=="norge") %>%
+      dplyr::select(location_code, yrwk, date, n, consult_with_influenza) %>%
+      dplyr::group_by(location_code,yrwk, date) %>%
+      dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
+      dplyr::collect() %>%
+      latin1_to_utf8()
+
     retval
   }
 }
 
-ui_norsyss_kht_email_plans <- function(){
+ui_covid19_areas_at_risk_plans <- function(){
   x_tags <- c("respiratoryexternal_vk_ot", "gastro_vk_ot")
   yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-1)
 
-  #yrwk <- fhi::isoyearweek(lubridate::today()-seq(48,70,7))
-
-  val <- tbl("datar_norsyss_kht_email") %>%
-    dplyr::collect()
-  setDT(val)
-
-  # if it's not final, then restrict the email addresses
-  if(!config$permissions$ui_norsyss_kht_email$is_final()){
-    val <- val[
-      email %in% c(
-        "richardaubrey.white@fhi.no",
-        "sykdomspulsen@fhi.no"
-      )]
-  }
-
   list_plan <- list()
-  for(em in unique(val$email)){
-    n_status <- c("medium", "high")
-    if(em %in% c(
-      "utbrudd@fhi.no"
-    )) n_status <- c("high")
+  list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
 
-    list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
-
-    list_plan[[length(list_plan)]]$add_data(
-      name = "alert",
-      fn=ui_norsyss_kht_email_alert_function_factory(
-        location_codes = val[email == em]$location_code,
-        x_tags = x_tags,
-        yrwk = yrwk,
-        n_status = n_status
-      )
+  list_plan[[length(list_plan)]]$add_data(
+    name = "covid19",
+    fn=ui_covid19_areas_at_risk_function_factory(
+      yrwk = yrwk
     )
-
-    list_plan[[length(list_plan)]]$add_data(
-      name = "covid19",
-      fn=ui_norsyss_kht_email_covid19_function_factory(
-        location_codes = val[email == em]$location_code,
-        yrwk = yrwk
-      )
-    )
-
-    list_plan[[length(list_plan)]]$add_analysis(
-      fn = ui_norsyss_kht_email,
-      email = em,
-      tag_outcome = x_tags,
-      yrwk = yrwk,
-      n_status = n_status
-    )
-  }
+  )
+  list_plan[[length(list_plan)]]$add_analysis(
+    fn = ui_covid19_areas_at_risk,
+    yrwk = yrwk
+  )
 
   return(list_plan)
 }
