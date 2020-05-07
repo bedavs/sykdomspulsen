@@ -9,6 +9,6 @@ test_that("significantStatus", {
   )
   res <- DetermineStatus(res)
   significantByThreshold <- res[n > n_baseline_thresholdu0]
-  significantByConfidenceIntervals <- res[n_status != "Normal"]
+  significantByConfidenceIntervals <- res[n_status != "normal"]
   testthat::expect_equal(significantByThreshold, significantByConfidenceIntervals)
 })

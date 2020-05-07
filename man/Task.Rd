@@ -26,6 +26,7 @@ Task
 \if{html}{\out{<div class="r">}}\preformatted{Task$new(
   name,
   type,
+  permission = NULL,
   plans = NULL,
   update_plans_fn = NULL,
   schema,

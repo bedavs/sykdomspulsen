@@ -14,6 +14,7 @@ Permission
 \item \href{#method-new}{\code{Permission$new()}}
 \item \href{#method-has_permission}{\code{Permission$has_permission()}}
 \item \href{#method-revoke_permission}{\code{Permission$revoke_permission()}}
+\item \href{#method-grant_permission}{\code{Permission$grant_permission()}}
 \item \href{#method-is_final}{\code{Permission$is_final()}}
 \item \href{#method-current_value}{\code{Permission$current_value()}}
 }
@@ -42,6 +43,15 @@ Permission
 \subsection{Method \code{revoke_permission()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Permission$revoke_permission()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-grant_permission"></a>}}
+\if{latex}{\out{\hypertarget{method-grant_permission}{}}}
+\subsection{Method \code{grant_permission()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Permission$grant_permission()}\if{html}{\out{</div>}}
 }
 
 }
