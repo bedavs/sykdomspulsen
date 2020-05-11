@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-*.Rcheck
+**/.DS_Store
+*~
 nul

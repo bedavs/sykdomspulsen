@@ -1,0 +1,44 @@
+Package: sc
+Title: Sykdomspulsen Core - NIPH Infectious Disease Surveillance System
+Version: 2020.5.7
+Authors@R: c(
+  person("Richard", "White", email = "w@rwhite.no", role = c("aut", "cre")),
+  person("Gunnar", "R\u00F8", email = "GunnarOyvindIsaksson.Ro@fhi.no", role = c("aut")), 
+  person("B", "V", email = "beva@fhi.no", role = c("aut"))
+  )
+Description: Sykdomspulsen is a free and open-source health surveillance system designed and developed by the Norwegian Institute of Public Health.
+URL: https://sykdomspulsen-dokumentasjon.no
+BugReports: https://github.com/folkehelseinstituttet/fhi/sykdomspulsen/issues
+Depends:
+  R (>= 3.5.0)
+Imports:
+  doFuture,
+  data.table,
+  DBI,
+  devtools,
+  dplyr,
+  foreach,
+  fs,
+  future,
+  glue,
+  lubridate,
+  magrittr,
+  odbc,
+  plnr,
+  processx,
+  progress,
+  progressr,
+  R6,
+  RODBC,
+  rlang,
+  stringr,
+  tidyr,
+  uuid,
+Suggests: testthat,
+    knitr,
+    usethis
+License: GPL-3 + file LICENSE
+LazyData: true
+RoxygenNote: 7.1.0
+VignetteBuilder: knitr
+Encoding: UTF-8
