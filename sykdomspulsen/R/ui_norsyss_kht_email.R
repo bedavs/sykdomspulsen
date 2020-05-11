@@ -20,9 +20,13 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_subject <- glue::glue("OBS varsel fra Sykdomspulsen {lubridate::today()}")
 
   email_text_top <- glue::glue(
-    "<b>Dette er et OBS varsel fra Sykdomspulsen for kommunehelsetjenesten</b><br><br>",
+    "<b>Dette er et OBS varsel fra Sykdomspulsen for kommunehelsetjenesten</b><br>",
+    "Under ser du tabeller med de geografiske omr{fhi::nb$aa}dene du har valgt med informasjon ",
+    "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer). Den siste uken har kun data fra ",
+    "mandag og tirsdag<br><br>",
 
     "Nytt fra Sykdomspulsen:<br>",
+    "- Det er mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} å venstreklikke p{fhi::nb$aa} bildet og velge 'kopier'",
     "- Vi har endret websiden som kommer etter p{fhi::nb$aa}loggingen p{fhi::nb$aa} ",
     "<a href='https://spuls.fhi.no'>https://spuls.fhi.no</a> s{fhi::nb$aa} det skal v{fhi::nb$ae}re ",
     "lettere {fhi::nb$aa} se hvor man skal trykke for {fhi::nb$aa} komme seg videre.<br>",
@@ -81,7 +85,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     email_text,
     "<h2>NorSySS+MSIS: covid-19 oversikt</h2>",
     norsyss_kht_covid19_table(data = data)
-    )
+  )
 
   email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>\n")
 
@@ -110,7 +114,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     subject = e_subject(
       email_subject,
       is_final = config$permissions$ui_norsyss_kht_email$is_final()
-      ),
+    ),
     html = email_text,
     to = argset$email,
     bcc = bcc,
@@ -235,7 +239,7 @@ norsyss_kht_covid19_table <- function(data){
     data$covid19$msis,
     on=c("location_code","yrwk"),
     n_msis := fhiplot::format_nor(n)
-  ]
+    ]
 
   tab[,pr100_norsyss := fhiplot::format_nor_perc_1(100*n_norsyss/consult_with_influenza)]
   tab[consult_with_influenza==0, pr100_norsyss := "0,0%"]
