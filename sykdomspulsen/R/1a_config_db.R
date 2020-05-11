@@ -1,19 +1,10 @@
 set_db <- function(){
-  config$db_config <- list(
-    driver = Sys.getenv("DB_DRIVER", "MySQL"),
-    server = Sys.getenv("DB_SERVER", "db"),
-    port = as.integer(Sys.getenv("DB_PORT", 1433)),
-    user = Sys.getenv("DB_USER", "root"),
-    password = Sys.getenv("DB_PASSWORD", "example"),
-    db = Sys.getenv("DB_DB", "sykdomspuls"),
-    trusted_connection = Sys.getenv("DB_TRUSTED_CONNECTION")
-  )
 
-  # set schema ----
-  config$schema <- list(
-    # rundate ----
-    rundate = Schema$new(
-      db_config = config$db_config,
+  # rundate ----
+  sc::add_schema(
+    name = "rundate",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "rundate",
       db_field_types = c(
         "task" = "TEXT",
@@ -24,13 +15,16 @@ set_db <- function(){
       keys = c(
         "task"
       )
-    ),
+    )
+  )
 
-    # covid19 ----
-    # results_covid19_model ----
-    results_covid19_model = Schema$new(
+  # covid19 ----
+  # results_covid19_model ----
+  sc::add_schema(
+    name = "results_covid19_model",
+    schema = sc::Schema$new(
       db_table = "results_covid19_model",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -66,12 +60,15 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
+    )
+  )
 
-    # data_covid19_msis_by_time_location ----
-    data_covid19_msis_by_time_location = Schema$new(
+  # data_covid19_msis_by_time_location ----
+  sc::add_schema(
+    name = "data_covid19_msis_by_time_location",
+    schema = sc::Schema$new(
       db_table = "data_covid19_msis_by_time_location",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -94,12 +91,15 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
+    )
+  )
 
-    # data_covid19_msis_by_time_infected_abroad ----
-    data_covid19_msis_by_time_infected_abroad = Schema$new(
+  # data_covid19_msis_by_time_infected_abroad ----
+  sc::add_schema(
+    name = "data_covid19_msis_by_time_infected_abroad",
+    schema = sc::Schema$new(
       db_table = "data_covid19_msis_by_time_infected_abroad",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -124,12 +124,15 @@ set_db <- function(){
         "date",
         "tag_location_infected"
       )
-    ),
+    )
+  )
 
-    # data_covid19_msis_by_sex_age ----
-    data_covid19_msis_by_sex_age = Schema$new(
+  # data_covid19_msis_by_sex_age ----
+  sc::add_schema(
+    name = "data_covid19_msis_by_sex_age",
+    schema = sc::Schema$new(
       db_table = "data_covid19_msis_by_sex_age",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -154,12 +157,15 @@ set_db <- function(){
         "sex",
         "date"
       )
-    ),
+    )
+  )
 
-    # data_covid19_lab_by_time ----
-    data_covid19_lab_by_time = Schema$new(
+  # data_covid19_lab_by_time ----
+  sc::add_schema(
+    name = "data_covid19_lab_by_time",
+    schema = sc::Schema$new(
       db_table = "data_covid19_lab_by_time",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -184,12 +190,15 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
+    )
+  )
 
-    # data_covid19_nir_by_time ----
-    data_covid19_nir_by_time = Schema$new(
+  # data_covid19_nir_by_time ----
+  sc::add_schema(
+    name = "data_covid19_nir_by_time",
+    schema = sc::Schema$new(
       db_table = "data_covid19_nir_by_time",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -212,42 +221,15 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
+    )
+  )
 
-    # delete me soon data_covid19_msis ----
-    data_covid19_msis = Schema$new(
-      db_table = "data_covid19_msis",
-      db_config = config$db_config,
-      db_field_types =  c(
-        "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "border" = "INTEGER",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "date" = "DATE",
-        "yrwk" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "season" = "TEXT",
-        "x" = "DOUBLE",
-
-        "n" = "INTEGER"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "granularity_time",
-        "tag_outcome",
-        "location_code",
-        "date"
-      )
-    ),
-
-    # datar ----
-    # datar_weather ----
-    datar_weather = Schema$new(
-      db_config = config$db_config,
+  # datar ----
+  # datar_weather ----
+  sc::add_schema(
+    name = "datar_weather",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "datar_weather",
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -274,10 +256,14 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
-    # datar_normomo ----
-    datar_normomo = Schema$new(
-      db_config = config$db_config,
+    )
+  )
+
+  # datar_normomo ----
+  sc::add_schema(
+    name = "datar_normomo",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "datar_normomo",
       db_field_types =  c(
         "uuid" = "TEXT",
@@ -292,10 +278,14 @@ set_db <- function(){
       keys =  c(
         "uuid"
       )
-    ),
-    # datar_norsyss_kht_email ----
-    datar_norsyss_kht_email = Schema$new(
-      db_config = config$db_config,
+    )
+  )
+
+  # datar_norsyss_kht_email ----
+  sc::add_schema(
+    name = "datar_norsyss_kht_email",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "datar_norsyss_kht_email",
       db_field_types =  c(
         "location_code" = "TEXT",
@@ -306,12 +296,15 @@ set_db <- function(){
         "location_code",
         "email"
       )
-    ),
+    )
+  )
 
-    # data ----
-    # data_weather ----
-    data_weather = Schema$new(
-      db_config = config$db_config,
+  # data ----
+  # data_weather ----
+  sc::add_schema(
+    name = "data_weather",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "data_weather",
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -338,12 +331,15 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
+    )
+  )
 
-    # data_norsyss ----
-    data_norsyss = Schema$new(
+  # data_norsyss ----
+  sc::add_schema(
+    name = "data_norsyss",
+    schema = sc::Schema$new(
       db_table = "data_norsyss",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -373,11 +369,14 @@ set_db <- function(){
         "date",
         "age"
       )
-    ),
+    )
+  )
 
-    # data_msis ----
-    data_msis = Schema$new(
-      db_config = config$db_config,
+  # data_msis ----
+  sc::add_schema(
+    name = "data_msis",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "data_msis",
       db_field_types =  c(
         "tag_outcome" = "TEXT",
@@ -403,12 +402,15 @@ set_db <- function(){
         "year",
         "date"
       )
-    ),
+    )
+  )
 
-    # results ----
-    # results_normomo_standard ----
-    results_normomo_standard = Schema$new(
-      db_config = config$db_config,
+  # results ----
+  # results_normomo_standard ----
+  sc::add_schema(
+    name = "results_normomo_standard",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
       db_table = "results_normomo_standard",
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -451,11 +453,15 @@ set_db <- function(){
         "date"
       ),
       db_load_folder = tempdir()
-    ),
-    # results_norsyss_standard ----
-    results_norsyss_standard = Schema$new(
+    )
+  )
+
+  # results_norsyss_standard ----
+  sc::add_schema(
+    name = "results_norsyss_standard",
+    schema = sc::Schema$new(
       db_table = "results_norsyss_standard",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
@@ -493,11 +499,14 @@ set_db <- function(){
         "week",
         "date"
       )
-    ),
+    )
+  )
 
-    results_simple = Schema$new(
+  sc::add_schema(
+    name = "results_simple",
+    schema = sc::Schema$new(
       db_table = "results_simple",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "tag_outcome" = "TEXT",
         "source" = "TEXT",
@@ -525,10 +534,14 @@ set_db <- function(){
         "year",
         "date"
       )
-    ),
-    results_mem = Schema$new(
+    )
+  )
+
+  sc::add_schema(
+    name = "results_mem",
+    schema = sc::Schema$new(
       db_table = "results_mem",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "tag_outcome" = "TEXT",
         "source" = "TEXT",
@@ -560,10 +573,14 @@ set_db <- function(){
         "date",
         "age"
       )
-    ),
-    results_mem_limits = Schema$new(
+    )
+  )
+
+  sc::add_schema(
+    name = "results_mem_limits",
+    schema = sc::Schema$new(
       db_table = "results_mem_limits",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types = list(
         "season" = "TEXT",
         "tag_outcome" = "TEXT",

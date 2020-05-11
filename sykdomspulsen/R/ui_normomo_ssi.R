@@ -5,7 +5,7 @@ ui_normomo_ssi <- function(data, argset, schema) {
   # schema <- tm_get_schema("ui_normomo_ssi")
 
 
-  folder <- fs::dir_ls(path("output", "normomo"))
+  folder <- fs::dir_ls(sc::path("output", "normomo"))
   folder <- max(folder)
   folder <- fs::dir_ls(fs::path(folder, "ssi"), regexp="norway")
   yrwk <- stringr::str_extract(folder, "[0-9][0-9][0-9][0-9]-[0-9][0-9]$")

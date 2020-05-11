@@ -33,7 +33,11 @@ tm_update_plans <- function(task_name, index_plan = NULL, index_argset = NULL) {
 #' @param index_argset Not used
 #' @export
 tm_run_task <- function(task_name, index_plan = NULL, index_argset = NULL) {
-  message(glue::glue("spulscore {utils::packageVersion('spulscore')}"))
+  if("sykdomspulsen" %in% utils::installed.packages()[,"Package"]){
+    message(glue::glue("sykdomspulsen {utils::packageVersion('sykdomspulsen')} / spulscore {utils::packageVersion('sc')}"))
+  } else {
+    message(glue::glue("spulscore {utils::packageVersion('sc')}"))
+  }
   task <- tm_get_task(
     task_name = task_name,
     index_plan = index_plan,

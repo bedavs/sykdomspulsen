@@ -19,11 +19,11 @@ ui_normomo_email_internal <- function(data, argset, schema) {
   fig2 <- glue::glue(argset$fig2)
   fig3 <- glue::glue(argset$fig3)
 
-  tab1_filepath <- path("output",glue::glue(argset$tab1_filepath))
-  tab2_filepath <- path("output",glue::glue(argset$tab2_filepath))
-  fig1_filepath <- path("output",glue::glue(argset$fig1_filepath))
-  fig2_filepath <- path("output",glue::glue(argset$fig2_filepath))
-  fig3_filepath <- path("output",glue::glue(argset$fig3_filepath))
+  tab1_filepath <- sc::path("output", argset$tab1_filepath)
+  tab2_filepath <- sc::path("output", argset$tab2_filepath)
+  fig1_filepath <- sc::path("output", argset$fig1_filepath)
+  fig2_filepath <- sc::path("output", argset$fig2_filepath)
+  fig3_filepath <- sc::path("output", argset$fig3_filepath)
 
 
   html <- glue::glue(

@@ -3,14 +3,14 @@
 \docType{data}
 \name{config}
 \alias{config}
-\title{Flags/values to be used in the 'dashboards' scene}
+\title{Flags/values to be used}
 \format{
-An object of class \code{environment} of length 10.
+An object of class \code{environment} of length 5.
 }
 \usage{
 config
 }
 \description{
-Flags/values to be used in the 'dashboards' scene
+Flags/values to be used
 }
 \keyword{datasets}

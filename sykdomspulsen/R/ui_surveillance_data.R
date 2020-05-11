@@ -4,7 +4,7 @@ ui_surveillance_data <- function(data, argset, schema) {
   # argset <- tm_get_argset("ui_surveillance_data", index_plan=1, index_argset = 1)
   # schema <- tm_get_schema("ui_surveillance_data")
 
-  folder <- path("output", "surveillance_data")
+  folder <- sc::path("output", "surveillance_data")
   if(!fs::dir_exists(folder)){
     system("cd /output; sudo git clone https://github.com/folkehelseinstituttet/surveillance_data.git")
   }

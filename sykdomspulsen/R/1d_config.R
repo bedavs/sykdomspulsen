@@ -1,10 +1,5 @@
 set_config <- function() {
-  ## progressr::handlers(progressr::progress_handler(
-  ##    format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
-  ##    clear = FALSE
-  ## ))
 
-  set_computer_type()
   set_border()
   set_db()
   set_progressr()
@@ -47,26 +42,12 @@ set_config <- function() {
   )
   set_permissions()
   set_tasks()
-  # if(!foreach::getDoParRegistered()){
-  #   future::plan(future::sequential)
-  #   foreach::registerDoSEQ()
-  # }
+
 }
 
-set_computer_type <- function() {
-  if (Sys.getenv("SYKDOMSPULSEN_PRODUCTION") == "1") {
-    config$is_production <- TRUE
-  }
-}
-
-set_dev_options <- function(){
-  # if(config$computer_name == "gunr"){
-  #   options(error = function() traceback())
-  # }
-}
 
 set_border <- function() {
-  if (config$is_production) {
+  if (sc::config$is_production) {
     config$border <- 2020
   } else {
     config$border <- 2020
@@ -107,7 +88,7 @@ set_email <- function(){
 
 set_git_cred <- function(){
   config$git_cred <- git2r::cred_token()
- }
+}
 
 
 

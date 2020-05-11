@@ -1,53 +1,51 @@
 set_tasks <- function() {
-  config$tasks <- TaskManager$new()
-
   # covid19 ----
   # data_covid19_model ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_covid19_model",
         type = "data",
         action = "data_covid19_model",
-        schema = list(output = config$schema$results_covid19_model)
+        schema = list(output = sc::config$schemas$results_covid19_model)
       )
     )
   )
 
   # data_covid19_daily_report ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_covid19_daily_report",
         type = "data",
         action = "data_covid19_daily_report",
         schema = list(
-          data_covid19_msis_by_time_location = config$schema$data_covid19_msis_by_time_location,
-          data_covid19_msis_by_time_infected_abroad = config$schema$data_covid19_msis_by_time_infected_abroad,
-          data_covid19_msis_by_sex_age = config$schema$data_covid19_msis_by_sex_age,
-          data_covid19_lab_by_time = config$schema$data_covid19_lab_by_time,
-          data_covid19_nir_by_time = config$schema$data_covid19_nir_by_time
+          data_covid19_msis_by_time_location = sc::config$schemas$data_covid19_msis_by_time_location,
+          data_covid19_msis_by_time_infected_abroad = sc::config$schemas$data_covid19_msis_by_time_infected_abroad,
+          data_covid19_msis_by_sex_age = sc::config$schemas$data_covid19_msis_by_sex_age,
+          data_covid19_lab_by_time = sc::config$schemas$data_covid19_lab_by_time,
+          data_covid19_nir_by_time = sc::config$schemas$data_covid19_nir_by_time
         )
       )
     )
   )
 
   # data_covid19_msis ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_covid19_msis",
         type = "data",
         action = "data_covid19_msis",
-        schema = list(output = config$schema$data_covid19_msis)
+        schema = list(output = sc::config$schemas$data_covid19_msis)
       )
     )
   )
 
   # data ----
   # data_pre_normomo ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_pre_normomo",
         type = "data",
@@ -56,54 +54,54 @@ set_tasks <- function() {
     )
   )
   # datar_normomo ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "datar_normomo",
         type = "data",
         action = "datar_normomo",
-        schema = list(output = config$schema$datar_normomo)
+        schema = list(output = sc::config$schemas$datar_normomo)
       )
     )
   )
   # datar_normomo_drop ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "datar_normomo_drop",
         type = "data",
         action = "datar_normomo_drop",
-        schema = list(output = config$schema$datar_normomo)
+        schema = list(output = sc::config$schemas$datar_normomo)
       )
     )
   )
 
   # datar_norsyss_registration ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "datar_norsyss_kht_email",
         type = "data",
         action = "datar_norsyss_kht_email",
-        schema = list(output = config$schema$datar_norsyss_kht_email)
+        schema = list(output = sc::config$schemas$datar_norsyss_kht_email)
       )
     )
   )
   # datar_norsyss_kht_email_drop ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "datar_norsyss_kht_email_drop",
         type = "data",
         action = "datar_norsyss_kht_email_drop",
-        schema = list(output = config$schema$datar_norsyss_kht_email)
+        schema = list(output = sc::config$schemas$datar_norsyss_kht_email)
       )
     )
   )
 
   # data_pre_norsyss ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_pre_norsyss",
         type = "data",
@@ -172,13 +170,13 @@ set_tasks <- function() {
   )
 
   # data_norsyss ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_norsyss",
         type = "data",
         action = "data_norsyss",
-        schema = list(output = config$schema$data_norsyss),
+        schema = list(output = sc::config$schemas$data_norsyss),
         args = list(
           # v = (lege)vakt
           # k = (lege)kontor
@@ -306,38 +304,38 @@ set_tasks <- function() {
   )
 
   # datar_weather ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "datar_weather",
         type = "data",
         action = "datar_weather",
-        schema = list(output = config$schema$datar_weather)
+        schema = list(output = sc::config$schemas$datar_weather)
       )
     )
   )
   # data_weather ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_weather",
         type = "data",
         action = "data_weather",
         schema = list(
-          input = config$schema$datar_weather,
-          output = config$schema$data_weather
+          input = sc::config$schemas$datar_weather,
+          output = sc::config$schemas$data_weather
         )
       )
     )
   )
   # data_msis ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "data_msis",
         type = "data",
         action = "data_msis",
-        schema = list(output = config$schema$data_msis),
+        schema = list(output = sc::config$schemas$data_msis),
         args = list(
           start_year = 2008,
           end_year = 2019,
@@ -349,20 +347,20 @@ set_tasks <- function() {
 
   # analysis ----
   # analysis_normomo ----
-  config$tasks$add_task(
-    Task$new(
+  sc::add_task(
+    sc::Task$new(
       name = "analysis_normomo",
       type = "analysis",
       update_plans_fn = analysis_normomo_plans,
-      schema = c("output" = config$schema$results_normomo_standard),
+      schema = c("output" = sc::config$schemas$results_normomo_standard),
       cores = min(6, parallel::detectCores()),
       chunk_size = 1
     )
   )
 
   # analysis_norsyss_qp_weekly ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       conf = list(
         name = "analysis_norsyss_qp_weekly",
         db_table = "data_norsyss",
@@ -381,7 +379,7 @@ set_tasks <- function() {
         ),
         for_each_argset = list("location_code" = "all"),
         schema = list(
-          output = config$schema$results_norsyss_standard
+          output = sc::config$schemas$results_norsyss_standard
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
@@ -396,8 +394,8 @@ set_tasks <- function() {
   )
 
   # analysis_norsyss_qp_daily ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       conf = list(
         name = "analysis_norsyss_qp_daily",
         db_table = "data_norsyss",
@@ -417,7 +415,7 @@ set_tasks <- function() {
         ),
         for_each_argset = list("location_code" = "all"),
         schema = list(
-          output = config$schema$results_norsyss_standard
+          output = sc::config$schemas$results_norsyss_standard
         ),
         upsert_at_end_of_each_plan = TRUE,
         args = list(
@@ -432,8 +430,8 @@ set_tasks <- function() {
   )
 
   # analysis_norsyss_mem_influensa ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "analysis_norsyss_mem_influensa",
         db_table = "data_norsyss",
@@ -443,8 +441,8 @@ set_tasks <- function() {
         filter = "(granularity_geo=='county' | granularity_geo=='nation') & tag_outcome=='influensa_vk_o'",
         for_each_plan = list("location_code" = "all"),
         schema = list(
-          output = config$schema$results_mem,
-          output_limits = config$schema$results_mem_limits
+          output = sc::config$schemas$results_mem,
+          output_limits = sc::config$schemas$results_mem_limits
         ),
         args = list(
           age = jsonlite::toJSON(list("total" = c("total"))),
@@ -457,8 +455,8 @@ set_tasks <- function() {
     )
   )
 
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "analysis_norsyss_mem_influensa_all",
         db_table = "data_norsyss",
@@ -468,8 +466,8 @@ set_tasks <- function() {
         filter = "(granularity_geo=='county' | granularity_geo=='norge') & tag_outcome=='influensa_vk_ote'",
         for_each_plan = list("location_code" = "all"),
         schema = list(
-          output = config$schema$results_mem,
-          output_limits = config$schema$results_mem_limits
+          output = sc::config$schemas$results_mem,
+          output_limits = sc::config$schemas$results_mem_limits
         ),
         args = list(
           age = jsonlite::toJSON(list(
@@ -485,15 +483,15 @@ set_tasks <- function() {
     )
   )
 
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "analysis_simple_msis",
         type = "analysis",
         db_table = "data_msis",
         action = "analysis_simple",
         dependencies = c("data_msis"),
-        schema = list(output = config$schema$results_simple),
+        schema = list(output = sc::config$schemas$results_simple),
         for_each_plan = list("location_code" = "all", "tag_outcome" = c("Kikoste", "Campylobacteriose")),
         args = list(
           group_by = "month",
@@ -506,41 +504,41 @@ set_tasks <- function() {
   ############
   # ui ----
   # ui_surveillance_data ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_surveillance_data",
         type = "single",
         action = "ui_surveillance_data",
         schema = list(
-          data_covid19_msis_by_time_location=config$schema$data_covid19_msis_by_time_location
+          data_covid19_msis_by_time_location=sc::config$schemas$data_covid19_msis_by_time_location
         )
       )
     )
   )
 
   # ui_normomo_ssi ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_normomo_ssi",
         type = "single",
         action = "ui_normomo_ssi",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         dependencies = c("results_normomo_standard")
       )
     )
   )
 
   # ui_normomo_thresholds_1yr_5yr ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_normomo_thresholds_1yr_5yr",
         type = "ui",
         action = "ui_normomo_thresholds_1yr_5yr",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("location_code" = "all", "age" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
@@ -552,14 +550,14 @@ set_tasks <- function() {
   )
 
   # ui_normomo_overview_by_location ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_normomo_overview_by_location",
         type = "ui",
         action = "ui_normomo_overview",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("age" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
@@ -572,14 +570,14 @@ set_tasks <- function() {
   )
 
   # ui_normomo_overview_by_age ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_normomo_overview_by_age",
         type = "ui",
         action = "ui_normomo_overview",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("location_code" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
@@ -592,14 +590,14 @@ set_tasks <- function() {
   )
 
   # ui_normomo_table_overview ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       conf = list(
         name = "ui_normomo_table_overview",
         type = "ui",
         action = "ui_normomo_table_overview",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("location_code" = c("all")),
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
@@ -612,14 +610,14 @@ set_tasks <- function() {
   )
 
   # ui_normomo_table_excess_only_sort_location ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       conf = list(
         name = "ui_normomo_table_excess_only_sort_location",
         type = "ui",
         action = "ui_normomo_table_excess_only",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("border" = 2020),
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
@@ -633,14 +631,14 @@ set_tasks <- function() {
   )
 
   # ui_normomo_table_excess_only_sort_age ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       conf = list(
         name = "ui_normomo_table_excess_only_sort_age",
         type = "ui",
         action = "ui_normomo_table_excess_only",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("border" = 2020),
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
@@ -654,14 +652,14 @@ set_tasks <- function() {
   )
 
   # ui_normomo_data_files ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       conf = list(
         name = "ui_normomo_data_files",
         type = "ui",
         action = "ui_normomo_data_files",
         db_table = "results_normomo_standard",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         for_each_plan = list("border" = config$border),
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
@@ -674,13 +672,13 @@ set_tasks <- function() {
   )
 
   # ui_normomo_email_internal ----
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_normomo_email_internal",
         type = "single",
         action = "ui_normomo_email_internal",
-        schema = list(input=config$schema$results_normomo_standard),
+        schema = list(input=sc::config$schemas$results_normomo_standard),
         dependencies = c("results_normomo_standard"),
         args = list(
           tab1 = "overview_norge_{argset$today}.png",
@@ -703,31 +701,31 @@ set_tasks <- function() {
   )
 
   # ui_norsyss_kht_email ----
-  config$tasks$add_task(
-    Task$new(
+  sc::add_task(
+    sc::Task$new(
       name = "ui_norsyss_kht_email",
       type = "ui",
       permission = config$permissions$ui_norsyss_kht_email,
       update_plans_fn = ui_norsyss_kht_email_plans,
-      schema = c("input" = config$schema$results_norsyss_standard)
+      schema = c("input" = sc::config$schemas$results_norsyss_standard)
     )
   )
 
   # ui_covid19_areas_at_risk ----
-  config$tasks$add_task(
-    Task$new(
+  sc::add_task(
+    sc::Task$new(
       name = "ui_covid19_areas_at_risk",
       type = "ui",
       update_plans_fn = ui_covid19_areas_at_risk_plans,
       schema = c(
-        "norsyss" = config$schema$data_norsyss,
-        "covid" = config$schema$results_norsyss_standard
+        "norsyss" = sc::config$schemas$data_norsyss,
+        "covid" = sc::config$schemas$results_norsyss_standard
         )
     )
   )
 
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_threshold_plot_msis",
         type = "ui",
@@ -745,8 +743,8 @@ set_tasks <- function() {
     )
   )
 
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_norsyss_mem_influensa",
         type = "ui",
@@ -767,8 +765,8 @@ set_tasks <- function() {
     )
   )
 
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_norsyss_mem_influensa_all",
         type = "ui",
@@ -789,12 +787,12 @@ set_tasks <- function() {
     )
   )
 
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_external_api",
         type = "data",
-        schema=list(input=config$schema$results_norsyss_standard),
+        schema=list(input=sc::config$schemas$results_norsyss_standard),
         action="ui_external_api",
         args = list(
           tags = c("gastro"),
@@ -805,12 +803,12 @@ set_tasks <- function() {
       )
     )
   )
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_alert_pdf",
         type = "data",
-        schema=list(input=config$schema$results_norsyss_standard),
+        schema=list(input=sc::config$schemas$results_norsyss_standard),
         action="ui_alert_pdf",
         args = list(
           tags = c("gastro"),
@@ -820,12 +818,12 @@ set_tasks <- function() {
       )
     )
   )
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_norsyss_pdf",
         type = "data",
-        schema=list(input=config$schema$results_norsyss_standard),
+        schema=list(input=sc::config$schemas$results_norsyss_standard),
         action="ui_norsyss_pdf",
         args = list(
           tags = c("gastro"),
@@ -835,12 +833,12 @@ set_tasks <- function() {
       )
     )
   )
-  config$tasks$add_task(
-    task_from_config(
+  sc::add_task(
+    sc::task_from_config(
       list(
         name = "ui_archive_results_norsyss_standard",
         type = "data",
-        schema=list(input=config$schema$results_norsyss_standard),
+        schema=list(input=sc::config$schemas$results_norsyss_standard),
         action="ui_archive_results",
         args = list(
           folder = "norsyss_qp",
@@ -857,23 +855,23 @@ set_tasks <- function() {
  for(i in 1:30){
    p$add_analysis(fn = function(data, argset, schema){Sys.sleep(1)})
  }
- config$tasks$add_task(
-   Task$new(
+ sc::add_task(
+   sc::Task$new(
      name = "test_parallel_1",
      type = "analysis",
      plans = list(p),
-     schema = c("output" = config$schema$results_normomo_standard),
+     schema = c("output" = sc::config$schemas$results_normomo_standard),
      cores = min(6, parallel::detectCores()),
      chunk_size = 1
    )
  )
 
- config$tasks$add_task(
-   Task$new(
+ sc::add_task(
+   sc::Task$new(
      name = "test_parallel_2",
      type = "analysis",
      plans = list(p,p),
-     schema = c("output" = config$schema$results_normomo_standard),
+     schema = c("output" = sc::config$schemas$results_normomo_standard),
      cores = min(6, parallel::detectCores()),
      chunk_size = 1
    )

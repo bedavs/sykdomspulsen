@@ -3,13 +3,13 @@
 # Get and clean MSIS data from msis.no
 #
 analysis_normomo <-  function(data, argset, schema, ...){
-  if(FALSE){
-    tm_run_task("analysis_normomo")
+  if(plnr::is_run_directly()){
+    # sc::tm_run_task("analysis_normomo")
 
-    tm_update_plans("analysis_normomo")
-    data <- tm_get_data("analysis_normomo", index_plan=4)
-    argset <- tm_get_argset("analysis_normomo", index_plan=2, index_argset = 1)
-    schema <- tm_get_schema("analysis_normomo")
+    sc::tm_update_plans("analysis_normomo")
+    data <- sc::tm_get_data("analysis_normomo", index_plan=4)
+    argset <- sc::tm_get_argset("analysis_normomo", index_plan=2, index_argset = 1)
+    schema <- sc::tm_get_schema("analysis_normomo")
   }
 
   fs::dir_create(argset$wdir)
@@ -69,15 +69,15 @@ analysis_normomo_hfile <- function() {
 analysis_normomo_function_factory <- function(location_code) {
   force(location_code)
   function(){
-    tbl("datar_normomo") %>%
+    sc::tbl("datar_normomo") %>%
       dplyr::filter(location_code==!!location_code) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
   }
 }
 
 analysis_normomo_plans <- function(){
-  val <- tbl("datar_normomo") %>%
+  val <- sc::tbl("datar_normomo") %>%
     dplyr::summarize(date_extracted=max(date_extracted,na.rm=T)) %>%
     dplyr::collect()
   date_extracted <- val$date_extracted
@@ -86,16 +86,16 @@ analysis_normomo_plans <- function(){
   # For SSI ----
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
   list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
-    tbl("datar_normomo") %>%
+    sc::tbl("datar_normomo") %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
   })
   list_plan[[length(list_plan)]]$add_analysis(
     fn = analysis_normomo,
     location_code = "norway",
     year_end = fhi::isoyear_n(date_extracted),
     date_extracted = date_extracted,
-    wdir = path("output","normomo",lubridate::today(),"ssi"),
+    wdir = sc::path("output","normomo",lubridate::today(),"ssi"),
     upload = FALSE,
     momo_groups = list(
       "0to4" =  "age >= 0 & age <=4",
@@ -124,9 +124,9 @@ analysis_normomo_plans <- function(){
   # For FHI ----
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
   list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
-    tbl("datar_normomo") %>%
+    sc::tbl("datar_normomo") %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
   })
 
   # FHI - Norway ----

@@ -12,6 +12,7 @@ BugReports: https://github.com/folkehelseinstituttet/fhi/sykdomspulsen/issues
 Depends:
   R (>= 3.5.0)
 Imports:
+  sc,
   broom,
   car,
   cowplot,

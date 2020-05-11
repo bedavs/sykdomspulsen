@@ -10,7 +10,7 @@ ui_obsmail<- function(data, argset, schema) {
     dplyr::filter(yrwk %in% !!yrwks) %>%
     dplyr::filter(tag_outcome %in% tag_relevant) %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
   results[, tag :=tag_outcome]
   results[, to_keep := FALSE]
   results[n_status != "Normal", to_keep := TRUE]

@@ -8,10 +8,10 @@ data_pre_norsyss <- function(data, argset, schema){
   norsyss_fetch_raw_data_and_aggregate(
     date_from = argset$date_from,
     date_to = format(Sys.time(), "%Y-%m-%d"),
-    folder = path("input", "norsyss"),
+    folder = sc::path("input", "norsyss"),
     diags = argset$diags
   )
-  get_n_doctors(path("input", "norsyss"))
+  get_n_doctors(sc::path("input", "norsyss"))
   return(TRUE)
 }
 

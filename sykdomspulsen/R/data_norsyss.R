@@ -289,7 +289,7 @@ CleanData <- function(d,
 # @param clean Folder containing clean data
 # @import data.table
 IdentifyDatasets <-
-  function(raw = list.files(path("input", "norsyss"), "^partially_formatted_"))
+  function(raw = list.files(sc::path("input", "norsyss"), "^partially_formatted_"))
   {
     print(raw)
     ## res <- IdentifyAllDatasets(raw = raw, clean = clean)
@@ -340,7 +340,7 @@ data_norsyss <- function(data, argset, schema){
     dplyr::group_by(tag_outcome) %>%
     dplyr::summarise(date = max(date, na.rm=T)) %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
 
   if(nrow(max_date)==0){
     max_year_in_db <- 2006
@@ -358,7 +358,7 @@ data_norsyss <- function(data, argset, schema){
     syndromes_in_db <- schema$output$dplyr_tbl() %>%
       dplyr::distinct(year, tag_outcome) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     delete_all_data <- FALSE
     for(y in unique(syndromes_in_db$year)){

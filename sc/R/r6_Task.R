@@ -1,6 +1,7 @@
 #' add task
 #' @param task a Task R6 class
-add_permission <- function(task){
+#' @export
+add_task <- function(task){
   config$tasks$add_task(task)
 }
 
@@ -17,7 +18,7 @@ task_from_config <- function(conf) {
   if (conf$type %in% c("data", "single")) {
     plan <- plnr::Plan$new()
     arguments <- list(
-      fn = get(conf$action),
+      fn_name = conf$action,
       name = name,
       today = Sys.Date()
     )
@@ -70,7 +71,7 @@ task_from_config <- function(conf) {
         current_plan <- plnr::Plan$new()
         fs <- c()
         arguments <- list(
-          fn = get(conf$action), name = glue::glue("{name}_{i}"),
+          fn_name = conf$action, name = glue::glue("{name}_{i}"),
           source_table = table_name,
           today = Sys.Date()
         )

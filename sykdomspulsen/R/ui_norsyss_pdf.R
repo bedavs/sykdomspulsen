@@ -107,7 +107,7 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
     dplyr::filter(tag_outcome == !!x_tag) %>%
     dplyr::filter(age == "total") %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
   # remove last 3 weeks
   yrwks <- rev(sort(unique(data_long$yrwk)))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]
@@ -154,9 +154,9 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
 
 sykdomspulspdf_folder <- function(folder, date, further = NULL) {
   if (is.null(further)) {
-    retval <- path("output", "norsyss_pdfs", date, folder)
+    retval <- sc::path("output", "norsyss_pdfs", date, folder)
   } else {
-    retval <- path("output", "norsyss_pdfs", date, folder, further)
+    retval <- sc::path("output", "norsyss_pdfs", date, folder, further)
   }
   return(retval)
 }
@@ -168,7 +168,7 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
     dplyr::filter(tag_outcome == !!x_tag) %>%
     dplyr::filter(age != "total") %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
   # remove last 3 weeks
   yrwks <- rev(unique(data_long$yrwk))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]

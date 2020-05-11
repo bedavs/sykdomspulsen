@@ -1,5 +1,5 @@
 data_pre_normomo <- function(){
-  if(config$is_production){
+  if(sc::config$is_production){
     data_grab <- glue::glue(
       'get -r "ut" /input/normomo/\n',
       'rm ut/*'
@@ -28,10 +28,12 @@ data_pre_normomo <- function(){
 #  @import data.table
 #
 datar_normomo <- function(data, argset, schema){
-  # tm_run_task("datar_normomo")
-  # data <- tm_get_data("data_normomo")
-  # argset <- tm_get_argset("data_normomo")
-  # schema <- tm_get_schema("data_normomo")
+  if(plnr::is_run_directly()){
+    # sc::tm_run_task("datar_normomo")
+    data <- tm_get_data("data_normomo")
+    argset <- tm_get_argset("data_normomo")
+    schema <- tm_get_schema("data_normomo")
+  }
 
   d <- datar_normomo_internal()
   schema$output$db_drop_table()
@@ -52,7 +54,7 @@ datar_normomo_drop <- function(data, argset, schema){
 
 
 datar_normomo_internal <- function(){
-  files <- fs::dir_ls(path("input", "normomo"), regexp="FHIDOD2_[0-9]+.txt$")
+  files <- fs::dir_ls(sc::path("input", "normomo"), regexp="FHIDOD2_[0-9]+.txt$")
   file <- max(files)
   date_extracted <- stringr::str_extract(file, "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
   date_extracted <- glue::glue(

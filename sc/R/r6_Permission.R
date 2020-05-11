@@ -1,6 +1,7 @@
 #' add permission
 #' @param name the name of the permission
 #' @param permission a Permission R6 class
+#' @export
 add_permission <- function(name, permission){
   config$permissions[[name]] <- permission
 }

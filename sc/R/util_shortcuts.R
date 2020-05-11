@@ -51,11 +51,4 @@ tm_shortcut_schema <- function(task_name, index_plan = NULL, index_argset = NULL
   )$schema
 }
 
-get_list <- function(l, key, default=NULL){
-  if(key %in% names(l)){
-    return(l[[key]])
-  }else{
-    return(default)
-  }
-}
 

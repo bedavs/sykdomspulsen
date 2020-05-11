@@ -235,7 +235,7 @@ datar_weather <- function(data, argset, schema) {
     dplyr::filter(forecast == 0) %>%
     dplyr::summarize(last_date = max(date, na.rm = T)) %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
 
   download_dates <- NULL
   download_years <- NULL
@@ -282,7 +282,7 @@ datar_weather <- function(data, argset, schema) {
   val <- schema$output$dplyr_tbl() %>%
     dplyr::summarize(last_date = max(date, na.rm = T)) %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
 }
 
 # data_weather
@@ -296,7 +296,7 @@ data_weather <- function(data, argset, schema) {
 
   temp <- schema$input$dplyr_tbl() %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
 
   fit <- lme4::lmer(tx ~ tg + (1 | location_code), data = temp)
   temp[, tx_pred := stats::predict(fit, newdata = temp)]

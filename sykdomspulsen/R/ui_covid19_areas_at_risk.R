@@ -228,7 +228,7 @@ xui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags,
         dplyr::filter(n_status %in% !!n_status) %>%
         dplyr::distinct(location_code) %>%
         dplyr::collect() %>%
-        latin1_to_utf8()
+        sc::latin1_to_utf8()
 
       x_location_codes <- x_location_codes$location_code
 
@@ -241,7 +241,7 @@ xui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags,
           dplyr::filter(tag_outcome %in% !!tag) %>%
           dplyr::filter(yrwk %in% !!yrwk) %>%
           dplyr::collect() %>%
-          latin1_to_utf8()
+          sc::latin1_to_utf8()
       }
     }
 
@@ -258,7 +258,7 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
       dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval$norsyss <- tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
@@ -269,7 +269,7 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
       dplyr::group_by(location_code,yrwk) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval$norsyss_norge <- tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
@@ -281,7 +281,7 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
       dplyr::group_by(location_code,yrwk, date) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval
   }

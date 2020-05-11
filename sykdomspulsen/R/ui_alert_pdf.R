@@ -12,7 +12,7 @@ ui_alert_pdf <- function(data, argset, schema) {
     dplyr::filter(n_status == "High") %>%
     dplyr::filter(tag_outcome %in% tags) %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
   if (nrow(d) == 0) {
     return()
   }
@@ -26,8 +26,8 @@ ui_alert_pdf <- function(data, argset, schema) {
     location_name = location_name
   )]
 
-  fs::dir_create(path("output","norsyss", argset$today))
-  d[, output_dir := path("output","norsyss",argset$today)]
+  fs::dir_create(sc::path("output","norsyss", argset$today))
+  d[, output_dir := sc::path("output","norsyss",argset$today)]
   d[, attachment := fs::path(output_dir, output_file)]
   for (i in 1:nrow(d)) {
     Sys.sleep(1)

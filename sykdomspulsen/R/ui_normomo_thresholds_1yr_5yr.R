@@ -21,7 +21,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
     argset$folder,
     today = argset$today
   )
-  fs::dir_create(path("output",folder))
+  fs::dir_create(sc::path("output",folder))
 
   # caption
   caption <- glue::glue('Sist oppdatert: {strftime(argset$today, format = "%d/%m/%Y")}')
@@ -40,7 +40,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
   )
   fhiplot::save_a4(
     q,
-    filename = path("output", folder, filename)
+    filename = sc::path("output", folder, filename)
   )
 
   # graph2
@@ -57,7 +57,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
   )
   fhiplot::save_a4(
     q,
-    filename = path("output", folder, filename)
+    filename = sc::path("output", folder, filename)
   )
 
 }

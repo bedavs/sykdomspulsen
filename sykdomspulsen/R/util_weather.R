@@ -6,7 +6,7 @@ get_weather <- function(impute_missing = FALSE) {
 
   temp <- tbl("data_weather") %>%
     dplyr::collect() %>%
-    latin1_to_utf8()
+    sc::latin1_to_utf8()
 
   if (impute_missing) {
     fit <- lme4::lmer(tx ~ tg + (1 | location_code), data = temp)

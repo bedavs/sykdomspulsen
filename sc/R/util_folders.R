@@ -1,16 +1,16 @@
 #' This function gets the right folder for results
-#' @param type input, output, or archive
-#' @param tag Name of the second level file/folder
-#' @param ... Third level and beyond
+#' @param type input, output
+#' @param ... Second level and beyond
 #' @export
-path <- function(type="output", tag, ...) {
-  stopifnot(type %in% c("input","output","archive"))
+path <- function(type="output", ...) {
+  stopifnot(type %in% c("input","output"))
 
-  fs::path("/",
-    type,
-    tag,
-    ...
+  start_location <- dplyr::case_when(
+    type == "input" ~ config$path_input,
+    type == "output" ~ config$path_output
   )
+
+  paste0(start_location,"/",glue::glue(fs::path(...)))
 }
 
 

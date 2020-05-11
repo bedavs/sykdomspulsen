@@ -32,7 +32,7 @@ datar_norsyss_kht_email <- function(data, argset, schema){
   )]
   d <- unique(d)
 
-  if(!config$is_production){
+  if(!sc::config$is_production){
     d <- d[
       email %in% c(
         "richardaubrey.white@fhi.no"

@@ -8,6 +8,6 @@ ui_archive_results <- function(data, argset, schema){
                   dplyr::filter(year > lower) %>%
                   dplyr::collect()
   setDT(data)
-  fs::dir_create(path("archive", argset$folder, argset$today))
-  saveRDS(data, file = path("archive", argset$folder, argset$today, "latest_data.RDS"))
+  fs::dir_create(sc::path("archive", argset$folder, argset$today))
+  saveRDS(data, file = sc::path("archive", argset$folder, argset$today, "latest_data.RDS"))
 }

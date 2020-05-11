@@ -1,6 +1,7 @@
 #' add schema
 #' @param name the name of the schema
 #' @param schema a Schema R6 class
+#' @export
 add_schema <- function(name, schema){
   config$schemas[[name]] <- schema
 }
