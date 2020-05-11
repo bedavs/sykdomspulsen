@@ -1,0 +1,38 @@
+
+R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(testthat)
+> library(sykdomspulsen)
+[34mSYKDOMSPULSEN_DB_DRIVER='ODBC Driver 17 for SQL Server'[39m
+[34mSYKDOMSPULSEN_DB_SERVER='dm-test'[39m
+[34mSYKDOMSPULSEN_DB_PORT='1433'[39m
+[34mSYKDOMSPULSEN_DB_USER='xxx'[39m
+[34mSYKDOMSPULSEN_DB_PASSWORD='xxx'[39m
+[34mSYKDOMSPULSEN_DB_DB='Sykdomspulsen_surv'[39m
+[34mSYKDOMSPULSEN_DB_TRUSTED_CONNECTION='yes'[39m
+[34mSYKDOMSPULSEN_PRODUCTION='0'[39m
+[34mSYKDOMSPULSEN_PATH_INPUT='/input'[39m
+[34mSYKDOMSPULSEN_PATH_OUTPUT='/output'[39m
+sykdomspulsen 2020.5.7
+> 
+> test_check("sykdomspulsen")
+══ testthat results  ═════════
+[ OK: 1 | SKIPPED: 0 | WARNINGS: 1 | FAILED: 0 ]
+> 
+> proc.time()
+   user  system elapsed 
+  8.391   1.070   7.545 

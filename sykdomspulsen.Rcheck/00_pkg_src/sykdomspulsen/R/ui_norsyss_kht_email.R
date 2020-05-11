@@ -26,7 +26,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "mandag og tirsdag<br><br>",
 
     "Nytt fra Sykdomspulsen:<br>",
-    "- Det er mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} venstreklikke p{fhi::nb$aa} bildet og velge 'kopier'",
+    "- Det er mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} å venstreklikke p{fhi::nb$aa} bildet og velge 'kopier'",
     "- Vi har endret websiden som kommer etter p{fhi::nb$aa}loggingen p{fhi::nb$aa} ",
     "<a href='https://spuls.fhi.no'>https://spuls.fhi.no</a> s{fhi::nb$aa} det skal v{fhi::nb$ae}re ",
     "lettere {fhi::nb$aa} se hvor man skal trykke for {fhi::nb$aa} komme seg videre.<br>",
@@ -85,7 +85,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     email_text,
     "<h2>NorSySS+MSIS: covid-19 oversikt</h2>",
     norsyss_kht_covid19_table(data = data)
-    )
+  )
 
   email_text <- paste0(email_text, "<hr width='60%' size='5px' noshade><br>\n")
 
@@ -109,12 +109,12 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   argset$email
 
   bcc <- NULL
-  if(config$is_production) bcc <- "sykdomspulsen@fhi.no"
+  if(sc::config$is_production) bcc <- "sykdomspulsen@fhi.no"
   mailr(
     subject = e_subject(
       email_subject,
       is_final = config$permissions$ui_norsyss_kht_email$is_final()
-      ),
+    ),
     html = email_text,
     to = argset$email,
     bcc = bcc,
@@ -239,7 +239,7 @@ norsyss_kht_covid19_table <- function(data){
     data$covid19$msis,
     on=c("location_code","yrwk"),
     n_msis := fhiplot::format_nor(n)
-  ]
+    ]
 
   tab[,pr100_norsyss := fhiplot::format_nor_perc_1(100*n_norsyss/consult_with_influenza)]
   tab[consult_with_influenza==0, pr100_norsyss := "0,0%"]
@@ -325,7 +325,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
         dplyr::filter(n_status %in% !!n_status) %>%
         dplyr::distinct(location_code) %>%
         dplyr::collect() %>%
-        latin1_to_utf8()
+        sc::latin1_to_utf8()
 
       x_location_codes <- x_location_codes$location_code
 
@@ -338,7 +338,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
           dplyr::filter(tag_outcome %in% !!tag) %>%
           dplyr::filter(yrwk %in% !!yrwk) %>%
           dplyr::collect() %>%
-          latin1_to_utf8()
+          sc::latin1_to_utf8()
       }
     }
 
@@ -357,7 +357,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval$norsyss <- tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
@@ -369,7 +369,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::group_by(location_code,yrwk) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval
   }
