@@ -26,7 +26,8 @@ set_tasks <- function() {
           data_covid19_msis_by_time_infected_abroad = config$schema$data_covid19_msis_by_time_infected_abroad,
           data_covid19_msis_by_sex_age = config$schema$data_covid19_msis_by_sex_age,
           data_covid19_lab_by_time = config$schema$data_covid19_lab_by_time,
-          data_covid19_nir_by_time = config$schema$data_covid19_nir_by_time
+          data_covid19_hospital_by_time = config$schema$data_covid19_hospital_by_time,
+          data_covid19_deaths = config$schema$data_covid19_deaths
         )
       )
     )
