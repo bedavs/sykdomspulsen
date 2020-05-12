@@ -189,7 +189,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   # data_covid19_lab_by_time ----
   master$data_covid19_lab_by_time
 
-  retval <- master$data_covid19_lab_by_time
+  retval <- data.table(master$data_covid19_lab_by_time)
   retval[, granularity_time := "day"]
   retval[,location_code:="norge"]
 
