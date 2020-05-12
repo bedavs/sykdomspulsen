@@ -1,7 +1,8 @@
-# analyse_simple
-#
-# Running QP analsys
-#
+#' analysis_qp
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 analysis_qp <- function(data, argset, schema){
   # tm_update_plans("analysis_norsyss_qp_weekly")
   # data <- tm_get_data("analysis_norsyss_qp_weekly", index_plan = 1)

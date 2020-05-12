@@ -126,10 +126,11 @@ run_mem_model <- function(data, conf) {
 
 
 
-# analysis_mem
-#
-# Run mem analysis
-#
+#' analysis_mem
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 analysis_mem <-  function(data, argset, schema){
   # arguments start
   conf <- argset

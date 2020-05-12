@@ -1,10 +1,12 @@
 
-# data_covid19_model
-#
-# Get and clean model data
-#
-#  @import data.table
-#
+#' data_covid19_model
+#'
+#' Get and clean model data
+#'
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 data_covid19_model <- function(data, argset, schema){
   # tm_run_task("data_covid19_model")
   # data <- tm_get_data("data_covid19_model")

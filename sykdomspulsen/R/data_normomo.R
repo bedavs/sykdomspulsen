@@ -1,3 +1,5 @@
+#' data_pre_normomo
+#' @export
 data_pre_normomo <- function(){
   if(sc::config$is_production){
     data_grab <- glue::glue(
@@ -21,12 +23,11 @@ data_pre_normomo <- function(){
 }
 
 
-# DataNormomo
-#
-# Get and clean NorMOMO data
-#
-#  @import data.table
-#
+#' datar_normomo
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 datar_normomo <- function(data, argset, schema){
   if(plnr::is_run_directly()){
     # sc::tm_run_task("datar_normomo")
@@ -43,6 +44,11 @@ datar_normomo <- function(data, argset, schema){
   schema$output$db_add_constraint()
 }
 
+#' datar_normomo_drop
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 datar_normomo_drop <- function(data, argset, schema){
   # tm_run_task("datar_normomo_drop")
   # data <- tm_get_data("datar_normomo_drop")

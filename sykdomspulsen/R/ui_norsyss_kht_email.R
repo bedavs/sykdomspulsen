@@ -1,3 +1,8 @@
+#' ui_norsyss_kht_email
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_norsyss_kht_email <- function(data, argset, schema) {
   if(FALSE){
     tm_run_task("datar_norsyss_kht_email")

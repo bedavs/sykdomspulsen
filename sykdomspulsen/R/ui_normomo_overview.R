@@ -1,4 +1,8 @@
-
+#' ui_normomo_overview
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_overview <- function(data, argset, schema) {
   if(FALSE){
     tm_run_task("ui_normomo_overview_by_location")

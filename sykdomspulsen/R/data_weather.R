@@ -222,8 +222,11 @@ add_info_for_weather <- function(da){
 }
 
 
-# data_weather
-# Updates the weather db tables
+#' datar_weather
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 datar_weather <- function(data, argset, schema) {
   # tm_run_task("datar_weather")
 
@@ -257,7 +260,7 @@ datar_weather <- function(data, argset, schema) {
 
   if (!is.null(download_dates)) {
     for (i in download_dates) {
-      msg(glue::glue("Downloading weather for {i}"))
+      message(glue::glue("Downloading weather for {i}"))
       d <- thredds_get_data(date = i)
       d <- add_info_for_weather(d)
       schema$output$db_upsert_load_data_infile(d)
@@ -266,7 +269,7 @@ datar_weather <- function(data, argset, schema) {
 
   if (!is.null(download_years)) {
     for (i in download_years) {
-      msg(glue::glue("Downloading weather for {i}"))
+      message(glue::glue("Downloading weather for {i}"))
       d <- thredds_get_data(year = i)
       d <- add_info_for_weather(d)
       schema$output$db_upsert_load_data_infile(d)
@@ -285,8 +288,11 @@ datar_weather <- function(data, argset, schema) {
     sc::latin1_to_utf8()
 }
 
-# data_weather
-# Updates the weather db tables
+#' data_weather
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 data_weather <- function(data, argset, schema) {
   # tm_run_task("data_weather")
 

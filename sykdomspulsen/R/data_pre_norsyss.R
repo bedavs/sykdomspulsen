@@ -1,6 +1,8 @@
-# get_NorSySS_data
-#
-# Get and clean from file
+#' data_pre_norsyss
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 data_pre_norsyss <- function(data, argset, schema){
   # tm_run_task("data_pre_norsyss")
   # argset = tm_get_argset("data_pre_norsyss")
@@ -94,7 +96,7 @@ norsyss_fetch_raw_data_and_aggregate <- function(
       max_date <- as.Date(max(x$date, na.rm = T))
       # as long as last date in the file is within 2 days of the requested date
       if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
-        msg("file already exists! exiting...", slack = T)
+        message("file already exists! exiting...")
         return()
       }
     }

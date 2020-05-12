@@ -1,3 +1,8 @@
+#' ui_normomo_email_internal
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_email_internal <- function(data, argset, schema) {
   if(FALSE){
     tm_run_task("ui_normomo_thresholds_1yr_5yr")

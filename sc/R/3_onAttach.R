@@ -1,3 +1,3 @@
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage(glue::glue("\n\nspulscore: {utils::packageVersion('sykdomspulsen')}"))
+  packageStartupMessage(glue::glue("\n\nspulscore: {utils::packageVersion('sc')}"))
 }

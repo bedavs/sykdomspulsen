@@ -128,13 +128,14 @@ clean_data <- function(data){
     return(data)
 }
 
-# data_msis
-#
-# Get and clean MSIS data from msis.no
-#
+#' data_msis
 #' @import httr
 #' @import data.table
 #' @import rvest
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 data_msis <- function(data, argset, schema){
   # arguments start
   start_year <- argset$start_year

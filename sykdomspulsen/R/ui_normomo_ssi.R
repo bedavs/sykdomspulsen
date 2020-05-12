@@ -1,3 +1,8 @@
+#' ui_normomo_ssi
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_ssi <- function(data, argset, schema) {
   # tm_run_task("ui_normomo_ssi")
   # data <- tm_get_data("ui_normomo_ssi", index_plan=1)

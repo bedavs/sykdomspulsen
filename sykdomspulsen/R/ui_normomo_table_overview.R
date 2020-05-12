@@ -1,4 +1,9 @@
 
+#' ui_normomo_table_overview
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_table_overview <- function(data, argset, schema) {
   if(FALSE){
     tm_update_plans("ui_normomo_table_overview")

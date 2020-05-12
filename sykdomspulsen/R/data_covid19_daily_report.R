@@ -1,9 +1,8 @@
-# data_covid19_daily_report
-#
-# Get and clean NorMOMO data
-#
-#  @import data.table
-#
+#' data_covid19_daily_report
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 data_covid19_daily_report <- function(data, argset, schema){
   # tm_run_task("data_covid19_daily_report")
 

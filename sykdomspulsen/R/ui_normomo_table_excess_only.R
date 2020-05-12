@@ -1,4 +1,8 @@
-
+#' ui_normomo_table_excess_only
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_table_excess_only <- function(data, argset, schema) {
   if(FALSE){
     tm_update_plans("ui_normomo_table_excess_only_sort_location")

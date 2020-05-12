@@ -1,8 +1,9 @@
-# analysis_normomo
-#
-# Get and clean MSIS data from msis.no
-#
-analysis_normomo <-  function(data, argset, schema, ...){
+#' analysis_normomo
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
+analysis_normomo <-  function(data, argset, schema){
   if(plnr::is_run_directly()){
     # sc::tm_run_task("analysis_normomo")
 

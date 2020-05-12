@@ -1,3 +1,8 @@
+#' datar_norsyss_kht_email
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 datar_norsyss_kht_email <- function(data, argset, schema){
   if(FALSE){
     tm_run_task("datar_norsyss_kht_email")
@@ -59,7 +64,11 @@ datar_norsyss_kht_email <- function(data, argset, schema){
   schema$output$db_add_constraint()
 }
 
-
+#' datar_norsyss_kht_email_drop
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 datar_norsyss_kht_email_drop <- function(data, argset, schema){
   if(FALSE){
     tm_run_task("datar_norsyss_kht_email_drop")

@@ -1,4 +1,8 @@
-
+#' ui_normomo_thresholds_1yr_5yr
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
   # tm_update_plans("ui_normomo_thresholds_1yr_5yr")
   # data <- tm_get_data("ui_normomo_thresholds_1yr_5yr", index_plan=2)

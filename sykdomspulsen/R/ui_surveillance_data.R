@@ -1,3 +1,8 @@
+#' ui_surveillance_data
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_surveillance_data <- function(data, argset, schema) {
   # tm_run_task("ui_surveillance_data")
   # data <- tm_get_data("ui_surveillance_data", index_plan=1)

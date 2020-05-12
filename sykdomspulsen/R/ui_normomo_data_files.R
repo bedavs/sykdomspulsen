@@ -1,4 +1,8 @@
-
+#' ui_normomo_data_files
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_normomo_data_files <- function(data, argset, schema) {
   if(plnr::is_run_directly()){
     sc::tm_update_plans("ui_normomo_data_files")

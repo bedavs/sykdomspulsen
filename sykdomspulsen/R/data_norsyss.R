@@ -164,7 +164,7 @@ CleanData <- function(d,
   n2 <- nrow(data)
 
   if (n1 != n2) {
-    msg("Population file not merging correctly", type = "err", slack = T)
+    stop("Population file not merging correctly")
   }
 
   # merging in municipalitiy-fylke names
@@ -181,7 +181,7 @@ CleanData <- function(d,
   hellidager[, date := data.table::as.IDate(date)]
   if (testIfHelligdagIndikatorFileIsOutdated &
     lubridate::today() > max(hellidager$date)) {
-    msg("HELLIGDAGER NEEDS UPDATING", type = "err", slack = T)
+    stop("HELLIGDAGER NEEDS UPDATING")
   }
   data[hellidager, on = "date", HelligdagIndikator := HelligdagIndikator]
   data[is.na(HelligdagIndikator), HelligdagIndikator := FALSE]
@@ -302,12 +302,11 @@ IdentifyDatasets <-
   }
 
 
-# get_NorSySS_data
-#
-# Get and clean from file
-#
-#
-# @import data.table
+#' data_norsyss
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 data_norsyss <- function(data, argset, schema){
   # tm_run_task("data_norsyss")
   # argset <- tm_get_argset("data_norsyss")
@@ -317,7 +316,7 @@ data_norsyss <- function(data, argset, schema){
   file <- fs::dir_ls("/input/norsyss/", regexp="norsyss_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt")
   file <- max(file)
 
-  msg(sprintf("Cleaning file %s", file))
+  message(sprintf("Cleaning file %s", file))
   #EmailNotificationOfNewData(files$id)
 
   d <- fread(file)
@@ -375,7 +374,7 @@ data_norsyss <- function(data, argset, schema){
 
   for (i in 1:nrow(syndromes)) {
     conf <- syndromes[i]
-    msg(sprintf("Processing %s/%s: %s -> %s", i, nrow(syndromes), conf$tag_input, conf$tag_output))
+    message(sprintf("Processing %s/%s: %s -> %s", i, nrow(syndromes), conf$tag_input, conf$tag_output))
 
     res <- CleanData(
       d = copy(d[
@@ -395,6 +394,6 @@ data_norsyss <- function(data, argset, schema){
     schema$output$db_load_data_infile(res)
   }
   #schema$output$db_add_constraint()
-  msg("New data is now formatted and ready")
+  message("New data is now formatted and ready")
   return(TRUE)
 }
