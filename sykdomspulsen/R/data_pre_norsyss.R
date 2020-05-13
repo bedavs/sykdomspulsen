@@ -13,7 +13,7 @@ data_pre_norsyss <- function(data, argset, schema){
     folder = sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE),
     diags = argset$diags
   )
-  get_n_doctors(sc::path("input", "norsyss"))
+  get_n_doctors(sc::path("input", "sykdomspulsen_norsyss_input"))
   return(TRUE)
 }
 
