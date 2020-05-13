@@ -32,6 +32,7 @@ check_env_vars <- function(){
     if(getval==""){
       packageStartupMessage(crayon::red(glue::glue("{i}=''")))
     } else {
+      if(stringr::str_detect(i,"PASSWORD")) getval <- "*****"
       packageStartupMessage(crayon::blue(glue::glue("{i}='{getval}'")))
     }
   }
