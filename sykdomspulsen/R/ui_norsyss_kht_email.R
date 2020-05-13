@@ -22,26 +22,42 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     Sys.sleep(30)
   }
 
-  email_subject <- glue::glue("OBS varsel fra Sykdomspulsen {lubridate::today()}")
+  email_subject <- glue::glue("RETTET OBS varsel fra Sykdomspulsen {lubridate::today()}")
 
   email_text_top <- glue::glue(
-    "<b>Dette er et OBS varsel fra Sykdomspulsen for kommunehelsetjenesten</b><br>",
+    "<b>Dette er et RETTET OBS varsel fra Sykdomspulsen for kommunehelsetjenesten</b><br>",
     "Under ser du tabeller med de geografiske omr{fhi::nb$aa}dene du har valgt med informasjon ",
-    "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer). Den siste uken har kun data fra ",
-    "mandag og tirsdag<br><br>",
+    "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer). Du kan endre geografike ",
+    "omr{fhi::nb$aa}de i websiden. Den siste uken er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken ",
+    "og har derfor kun data fra mandag og tirsdag.<br><br>",
 
-    "Nytt fra Sykdomspulsen:<br>",
-    "- Det er mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} venstreklikke p{fhi::nb$aa} bildet og velge 'kopier'",
+    "<u>Nytt fra Sykdomspulsen:</u><br>",
+    "- Det er mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier', ",
+    "vi jobber med at dere ogs{fhi::nb$aa} skal kunne laste ned tallmaterialet bak grafene.<br>",
+
     "- Vi har endret websiden som kommer etter p{fhi::nb$aa}loggingen p{fhi::nb$aa} ",
     "<a href='https://spuls.fhi.no'>https://spuls.fhi.no</a> s{fhi::nb$aa} det skal v{fhi::nb$ae}re ",
     "lettere {fhi::nb$aa} se hvor man skal trykke for {fhi::nb$aa} komme seg videre.<br>",
-    "- 04.05.2020 ble det opprettet en ny ICPC-2 kode for covid-19 ",
-    "(<a href='https://fastlegen.no/artikkel/diagnosekoder-ved-covid-19'>https://fastlegen.no/artikkel/diagnosekoder-ved-covid-19</a>). ",
-    "Denne uken vil vi fortsatt kun ha den gamle koden (R991: covid-19 (mistenkt eller bekreftet), ",
-    "men fra neste uke vil vi inkludere den nye koden i oversikten. <br>",
-    "-  Vi {fhi::nb$oe}nsker s{fhi::nb$aa}rt deltakere til et brukerpanel som kan gi innspill om websiden og OBS varselet, send mail til sykdomspulsen@fhi.no<br><br>",
 
-    "Mer informasjon om Sykdomspulsen og OBS varselet finner du under tabellene og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
+    "- Fra 06.03.2020 til 03.05.2020 ble diagnosekoden R991: covid-19 (mistenkt eller bekreftet) brukt. ",
+    "04.05.2020 ble det en endring i covid-19 ICPC-2 diagnosekodene til R991: covid-19 (mistenkt/sannsynlig) ",
+    "og R991: covid-19 (bekreftet). For {fhi::nb$aa} f{fhi::nb$aa} mest mulig enhetlig data for hele tidsperioden ",
+    "er R991 og R992 samlet for tiden etter 04.05.2020. Vi vurderer {fhi::nb$aa} endre dette etterhvert.<br>",
+
+    "- Vi vet at det er mange som ikke liker v{fhi::nb$aa}r p{fhi::nb$aa}loggingsl{fhi::nb$oe}sning med egen ",
+    "kommune(over)lege(n) e-postadresse. Vi synes dette er synd, men ser ingen annen utvei s{fhi::nb$aa} lenge ",
+    "det ikke finnes et nasjonalt autorisert register over kommuneleger/kommuneoverleger som fortl{fhi::nb$oe}pende ",
+    "blir oppdatert med endringer i kommunene. Folkehelseinstituttet har ikke kapasitet til {fhi::nb$aa} forvalte ",
+    "et slikt register p{fhi::nb$aa} vegne av kommunene, men samarbeider gjerne med kommunene og KS for {fhi::nb$aa} ",
+    "f{fhi::nb$aa} til et slikt register som vil v{fhi::nb$ae}re viktig i fremtidig beredskapsarbeid med ",
+    "{fhi::nb$oe}kt digitalisering. Dette er bakgrunnen for at vi er blitt n{fhi::nb$oe}dt til {fhi::nb$aa} ",
+    "foresl{fhi::nb$aa} denne l{fhi::nb$oe}sningen med rollebaserte mailkontoer i den enkelte kommune. Dermed er ",
+    "det kommunene selv som m{fhi::nb$aa} p{fhi::nb$aa}se at den som enhver tid innehar rollen ogs{fhi::nb$aa} har ",
+    "tilgang  til denne e-postadressen.<br>",
+
+    "- Vi {fhi::nb$oe}nsker s{fhi::nb$aa}rt deltakere til et brukerpanel som kan gi innspill om websiden og OBS varselet, send mail til sykdomspulsen@fhi.no<br><br>",
+
+    "Mer informasjon om Sykdomspulsen og OBS varslet finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
 
     "Dersom dere har problemer med p{fhi::nb$aa}loggingen eller andre sp\u00F8rsm\u00E5l, vennligst send en mail til sykdomspulsen@fhi.no<br><br><br>"
   )
@@ -52,10 +68,16 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Dette OBS varslet er for det geografiske omr{fhi::nb$aa}det ",
     "du valgte i websiden Sykdomspulsen for kommunehelsetjenesten.<br><br>",
 
-    "Tabellen med covid-19 viser antall konsultasjoner og andel konsultasjoner ",
-    "hos lege og legevakt (NorSySS) og antall bekreftede tilfeller registrert i MSIS.<br><br>",
+    "<u>Tabellen med covid-19 viser</u> antall konsultasjoner hos lege og legevakt (NorSySS) ",
+    "og antall bekreftede tilfeller registrert i MSIS.<br><br>",
 
-    "Tabellene med mage-tarminfeksjoner og luftveisinfeksjoner har kun NorSySS data og viser disse verdiene:<br>",
+    "For NorSySS data ble diagnosekoden R991: covid-19 (mistenkt eller bekreftet) ",
+    "brukt mellom 06.03.2020 til 03.05.2020. Det ble en endring i covid-19 ICPC-2 diagnosekodene ",
+    "04.05.2020 til R991: covid-19 (mistenkt/sannsynlig) og R992: covid-19 (bekreftet). ",
+    "For {fhi::nb$aa} f{fhi::nb$aa} mest mulig enhetlig data for hele tidsperioden viser vi R991 og R992 samlet for ",
+    "tiden etter 04.05.2020. Vi vurderer {fhi::nb$aa} endre dette etterhvert.<br><br>",
+
+    "<u>Tabellene med mage-tarminfeksjoner og luftveisinfeksjoner har kun NorSySS data og viser disse verdiene:</u><br>",
     "Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
     "g{fhi::nb$aa}r til legen flere ganger.<br>",
     "Flere enn normalt: Differansen mellom antall registrerte og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
@@ -65,7 +87,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br><br>",
 
     "Varselet er en informasjon om at det kan v{fhi::nb$ae}re noe som b{fhi::nb$oe}r f{fhi::nb$oe}lges opp i din kommune eller i et fylke. ",
-    "Det anbefales {fhi::nb$ae} g{fhi::nb$ae} inn i Sykdomspulsen websiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
+    "Det anbefales {fhi::nb$aa} g{fhi::nb$aa} inn i Sykdomspulsen websiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
 
     "Sykdomspulsen kan i noen tilfeller generere et OBS varsel selv om det bare er en eller to konsultasjoner for et symptom/sykdom. ",
     "Dette sees som oftest i sm{fhi::nb$aa} kommuner der det vanligvis ikke er mange konsultasjoner. For ikke {fhi::nb$aa} bli forstyrret ",
@@ -98,7 +120,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   for(tag_outcome in argset$tag_outcome){
     email_text <- paste0(
       email_text,
-      "<h2>NorSySS: ",config$def$norsyss$long_names[[tag_outcome]]," varsler</h2>",
+      "<h2>NorSySS: Varsler om ",stringr::str_to_lower(config$def$norsyss$long_names[[tag_outcome]]),"</h2>",
       norsyss_kht_obs_table(
         results = data$alert[[tag_outcome]],
         tag_outcome = tag_outcome
@@ -114,7 +136,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   argset$email
 
   bcc <- NULL
-  if(sc::config$is_production) bcc <- "sykdomspulsen@fhi.no"
+  if(config$is_production) bcc <- "sykdomspulsen@fhi.no"
   mailr(
     subject = e_subject(
       email_subject,
@@ -301,7 +323,7 @@ norsyss_kht_covid19_table <- function(data){
   nr0 <- nrow(ht) + 1
   ht <- huxtable::add_footnote(ht, glue::glue(
     "<sup>1</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
-    "<sup>2</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og her refererer til ICPC-2 koden R991: covid-19 (mistenkt eller bekreftet)<br>",
+    "<sup>2</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og her refererer til ICPC-2 kodene R991 og R992 samlet (covid-19, mistenkt. sannsynlig og bekreftet)<br>",
   ), border = 0)
   nr1 <- nrow(ht)
 
@@ -330,7 +352,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
         dplyr::filter(n_status %in% !!n_status) %>%
         dplyr::distinct(location_code) %>%
         dplyr::collect() %>%
-        sc::latin1_to_utf8()
+        latin1_to_utf8()
 
       x_location_codes <- x_location_codes$location_code
 
@@ -343,7 +365,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
           dplyr::filter(tag_outcome %in% !!tag) %>%
           dplyr::filter(yrwk %in% !!yrwk) %>%
           dplyr::collect() %>%
-          sc::latin1_to_utf8()
+          latin1_to_utf8()
       }
     }
 
@@ -362,7 +384,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
-      sc::latin1_to_utf8()
+      latin1_to_utf8()
 
     retval$norsyss <- tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
@@ -374,7 +396,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::group_by(location_code,yrwk) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
       dplyr::collect() %>%
-      sc::latin1_to_utf8()
+      latin1_to_utf8()
 
     retval
   }
