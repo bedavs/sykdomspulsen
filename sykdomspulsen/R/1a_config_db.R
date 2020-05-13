@@ -224,10 +224,13 @@ set_db <- function(){
         "location_code",
         "date"
       )
-    ),
+    )
+  )
 
-    # data_covid19_deaths ----
-    data_covid19_deaths = Schema$new(
+  # data_covid19_deaths ----
+  sc::add_schema(
+    name = "data_covid19_deaths",
+    schema = sc::Schema$new(
       db_table = "data_covid19_deaths",
       db_config = config$db_config,
       db_field_types =  c(
