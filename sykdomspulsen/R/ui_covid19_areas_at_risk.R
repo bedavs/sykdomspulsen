@@ -1,251 +1,224 @@
+#' ui_covid19_areas_at_risk
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_covid19_areas_at_risk <- function(data, argset, schema) {
   if(FALSE){
     tm_run_task("ui_covid19_areas_at_risk")
   }
 
   if(plnr::is_run_directly()){
-    tm_update_plans("ui_covid19_areas_at_risk")
+    sc::tm_update_plans("ui_covid19_areas_at_risk")
     length(config$tasks$list_task$ui_norsyss_kht_email$plans)
 
     index_plan <- 1
-    data <- tm_get_data("ui_covid19_areas_at_risk", index_plan=index_plan)
-    argset <- tm_get_argset("ui_covid19_areas_at_risk", index_plan=index_plan, index_argset = 1)
-    schema <- tm_get_schema("ui_covid19_areas_at_risk")
+    data <- sc::tm_get_data("ui_covid19_areas_at_risk", index_plan=index_plan)
+    argset <- sc::tm_get_argset("ui_covid19_areas_at_risk", index_plan=index_plan, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_covid19_areas_at_risk")
   }
+
+  d <- copy(data$covid19$norsyss)
+  setorder(d,location_code,yrwk)
+  d[,pr100:=100*n/consult_with_influenza]
+  d[is.nan(pr100), pr100:=0]
+  d[,yrwk_id := paste0("yrwk",1:.N), by=.(location_code)]
+
+  yrwks <- unique(d$yrwk)
+
+  d_wide <- dcast.data.table(d, location_code ~ yrwk_id, value.var = c("n","consult_with_influenza","pr100"))
+
+  d_wide[,baseline := pmax(0.01,100*(n_yrwk1+n_yrwk2)/(consult_with_influenza_yrwk1+consult_with_influenza_yrwk2))]
+
+  d_wide[,threshold_yrwk_1 := 0]
+  d_wide[,threshold_yrwk_2 := 0]
+
+  d_wide[,threshold_yrwk_3 := 100*qpois(0.975, lambda=baseline*consult_with_influenza_yrwk3/100)/consult_with_influenza_yrwk3]
+  d_wide[is.nan(threshold_yrwk_3),threshold_yrwk_3:=0]
+
+  d_wide[,threshold_yrwk_4 := 100*qpois(0.975, lambda=baseline*consult_with_influenza_yrwk4/100)/consult_with_influenza_yrwk4]
+  d_wide[is.nan(threshold_yrwk_4),threshold_yrwk_4:=0]
+
+  d_wide_norsyss <- d_wide
+
+  location_code_norsyss <- d_wide_norsyss[pr100_yrwk3 > threshold_yrwk_3 | pr100_yrwk4 > threshold_yrwk_4]$location_code
+
+  d <- copy(data$covid19$msis)
+  setorder(d,location_code,yrwk)
+  d[,yrwk_id := paste0("yrwk",1:.N), by=.(location_code)]
+
+  d_wide <- dcast.data.table(d, location_code ~ yrwk_id, value.var = "n")
+  d_wide[,baseline := pmax(1,round((yrwk1+yrwk2)/2))]
+  d_wide[,threshold := qpois(0.975, lambda = baseline)]
+
+  d_wide_msis <- d_wide
+  location_code_msis <- d_wide_msis[yrwk3 > threshold | yrwk4 > threshold]$location_code
+
+  location_codes <- unique(c(location_code_norsyss, location_code_msis))
+
+  tab_norsyss <- melt.data.table(
+    d_wide_norsyss[location_code %in% location_codes],
+    id="location_code",
+    measure = patterns("^n_", "^pr100_","^threshold_"),
+    value.name = c("norsyss_n","norsyss_pr100","norsyss_pr100_threshold")
+  )
+
+  tab_norsyss
+
+  tab_msis <- melt.data.table(
+    d_wide_msis[location_code %in% location_codes],
+    id.vars =c("location_code","threshold"),
+    measure.vars = c("yrwk1","yrwk2","yrwk3","yrwk4")
+  )
+  levels(tab_msis$variable) <- 1:4
+
+  tab <- merge(
+    tab_msis,
+    tab_norsyss,
+    by=c("location_code","variable")
+  )
+
+  setnames(tab,c("threshold","value"),c("msis_threshold","msis_n"))
+
+  tab[, pretty_msis_threshold:=fhiplot::format_nor(msis_threshold)]
+  tab[, pretty_msis_n:=fhiplot::format_nor(msis_n)]
+  tab[, pretty_norsyss_n:=fhiplot::format_nor(norsyss_n)]
+  tab[, pretty_norsyss_pr100:=fhiplot::format_nor_perc_1(norsyss_pr100)]
+  tab[, pretty_norsyss_pr100_threshold:=fhiplot::format_nor_perc_1(norsyss_pr100_threshold)]
+
+  tab[variable %in% 1:2, pretty_msis_threshold:=""]
+  tab[variable %in% 1:2, pretty_norsyss_pr100_threshold:=""]
+
+  tab[,location_name := get_location_name(location_code)]
+  tab[location_name=="Bergen"]
+
+  tab[variable %in% 3:4,msis_difference := msis_n-msis_threshold]
+  tab[variable %in% 3:4,norsyss_difference := norsyss_pr100-norsyss_pr100_threshold]
+
+  # render it
 
   file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.pdf")
   folder <- sc::path("output","sykdomspulsen_norsyss_restricted_output",lubridate::today(), create_dir = T)
+  tempdir <- tempdir()
 
   rmarkdown::render(
     input = system.file("rmd/ui_covid19_areas_at_risk.Rmd", package="sykdomspulsen"),
-    output_dir = folder,
+    output_dir = tempdir,
     output_file = file,
-    intermediates_dir = tempdir()
+    intermediates_dir = tempdir
+  )
+
+  sc::mv(
+    fs::path(tempdir, file),
+    fs::path(folder, file)
   )
 }
 
-xnorsyss_kht_obs_table <- function(results, tag_outcome) {
-  r_long <- copy(results)
+areas_at_risk_ht <- function(tab, yrwks){
+  msis_index_hig <- which(tab$msis_n > tab$msis_threshold & tab$variable %in% 3:4)
+  norsyss_index_hig <- which(tab$norsyss_pr100 > tab$norsyss_pr100_threshold & tab$variable %in% 3:4)
 
-  tag_pretty <- config$def$norsyss$long_names[[tag_outcome]]
+  levels(tab$variable) <- yrwks
 
-  if (nrow(r_long) == 0) {
-    return(sprintf("<b>%s:</b> <span style='color:red;text-decoration:underline;'>Ingen varsler registrert</span><br><br><br>", tag_pretty))
-  }
-
-  setorder(r_long, tag_outcome, yrwk)
-  r_long[age=="total",age:="Totalt"]
-  r_long[, week_id := 1:.N,by=.(location_code,age,sex)]
-  r_long[, tag_pretty := tag_pretty]
-  r_long[, excessp := fhiplot::format_nor(ceiling(pmax(0, n - n_baseline_thresholdu0)),0)]
-  r_long[, zscorep := fhiplot::format_nor(n_zscore, 1)]
-  r_long[, n := fhiplot::format_nor(n, 0)]
-
-  r_wide <- dcast.data.table(
-    r_long,
-    tag_pretty + location_code + age ~ week_id,
-    value.var = c("n", "excessp", "n_baseline_thresholdu0", "n_zscore", "zscorep", "n_status")
-  )
-  r_wide <- r_wide[!(n_status_1=="normal" & n_status_2=="normal" & n_status_3=="normal" & n_status_4=="normal")]
-  setorder(r_wide, -n_zscore_4)
-  r_wide[,location_name := get_location_name(location_code)]
-
-  yrwks <- unique(r_long[, c("week_id", "yrwk")])
-  setorder(yrwks, week_id)
-
-  tab <- huxtable::huxtable(
-    geo = r_wide$location_name,
-    Alder = r_wide$age,
-    `n_1` = r_wide$n_1,
-    `n_2` = r_wide$n_2,
-    `n_3` = r_wide$n_3,
-    `n_4` = r_wide$n_4,
-    `excess_1` = r_wide$excessp_1,
-    `excess_2` = r_wide$excessp_2,
-    `excess_3` = r_wide$excessp_3,
-    `excess_4` = r_wide$excessp_4,
-    `zscore_1` = r_wide$zscorep_1,
-    `zscore_2` = r_wide$zscorep_2,
-    `zscore_3` = r_wide$zscorep_3,
-    `zscore_4` = r_wide$zscorep_4
-  ) %>%
+  ht <- huxtable::hux(
+    "Geo"=tab$location_name,
+    "Uke"=tab$variable,
+    "Tilfeller"=tab$pretty_msis_n,
+    "Terskel"=tab$pretty_msis_threshold,
+    "Konsultasjoner"=tab$pretty_norsyss_n,
+    "Andel"=tab$pretty_norsyss_pr100,
+    "Terskel"=tab$pretty_norsyss_pr100_threshold
+  )%>%
     huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
+  ht <- huxtable::set_background_color(ht, huxtable::evens, huxtable::everywhere, "#FFFFFF")
 
-  # coloring in
-  for (i in 1:4) {
-    z <- glue::glue("n_status_{i}")
-    column_to_color <- c(2, 6, 10) + i
-    index_low <- which(r_wide[[z]] == "normal") + 1
-    index_med <- which(r_wide[[z]] == "medium") + 1
-    index_hig <- which(r_wide[[z]] == "high") + 1
+  if (length(msis_index_hig) > 0) huxtable::background_color(ht)[msis_index_hig+1, 3] <- fhiplot::warning_color[["hig"]]
+  if (length(norsyss_index_hig) > 0) huxtable::background_color(ht)[norsyss_index_hig+1, 6] <- fhiplot::warning_color[["hig"]]
 
-    if (length(index_low) > 0) huxtable::background_color(tab)[index_low, column_to_color] <- fhiplot::warning_color[["low"]]
-    if (length(index_med) > 0) huxtable::background_color(tab)[index_med, column_to_color] <- fhiplot::warning_color[["med"]]
-    if (length(index_hig) > 0) huxtable::background_color(tab)[index_hig, column_to_color] <- fhiplot::warning_color[["hig"]]
-  }
-
-  tab[1, ] <- c(
-    "Geografisk omr\u00E5de",
-    "Alder",
-    yrwks$yrwk,
-    yrwks$yrwk,
-    yrwks$yrwk
-  )
-
-  tab <- huxtable::add_rows(tab, tab[1, ], after = 0)
-
-  huxtable::escape_contents(tab)[, 1] <- FALSE
-
-  tab <- huxtable::merge_cells(tab, 1:2, 1)
-  tab <- huxtable::merge_cells(tab, 1:2, 2)
-
-  tab <- huxtable::merge_cells(tab, 1, 3:6)
-  tab[1, 3] <- "Antall konsultasjoner"
-
-  tab <- huxtable::merge_cells(tab, 1, 7:10)
-  tab[1, 7] <- "Flere enn normalt<sup>1</sup>"
-
-  tab <- huxtable::merge_cells(tab, 1, 11:14)
-  tab[1, 11] <- "Z-verdi<sup>2</sup>"
-
-  huxtable::left_border(tab)[, c(3, 7, 11)] <- 5
-  huxtable::left_border_style(tab)[, c(3, 7, 11)] <- "double"
-
-  huxtable::align(tab) <- "center"
-
-  nr0 <- nrow(tab) + 1
-  tab <- huxtable::add_footnote(tab, glue::glue(
-    "<sup>1</sup>Differansen mellom antall registrete og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
-    "<sup>2</sup>Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner<br>",
-    "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
-    "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
-    "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br>",
-  ), border = 0)
-  nr1 <- nrow(tab)
-
-  huxtable::escape_contents(tab)[1, c(7, 11)] <- F
-  huxtable::escape_contents(tab)[nr0:nr1, ] <- F
-
-  huxtable::left_padding(tab) <-  5
-  huxtable::right_padding(tab) <-  5
-
-  # return(tab)
-  return(huxtable::to_html(tab))
-}
-
-xnorsyss_kht_covid19_table <- function(data){
-  tab <- copy(data$covid19$norsyss)
-  setnames(tab, "n", "n_norsyss")
-  tab[
-    data$covid19$msis,
-    on=c("location_code","yrwk"),
-    n_msis := fhiplot::format_nor(n)
-  ]
-
-  tab[,pr100_norsyss := fhiplot::format_nor_perc_1(100*n_norsyss/consult_with_influenza)]
-  tab[consult_with_influenza==0, pr100_norsyss := "0,0%"]
-  tab[,n_norsyss:=fhiplot::format_nor(n_norsyss)]
-
-  setorder(tab,location_code,yrwk)
-  tab[,week_id := 1:.N,by=.(location_code)]
-
-  tab_wide <- dcast.data.table(
-    tab,
-    location_code ~ week_id,
-    value.var = c("pr100_norsyss","n_norsyss","n_msis")
-  )
-  tab_wide <- rbind(tab_wide[location_code=="norge"],tab_wide[location_code!="norge"])
-  tab_wide[,location_name := get_location_name(location_code)]
-  tab_wide[, location_code := NULL]
-  tab_wide <- unique(tab_wide)
-  setcolorder(tab_wide, "location_name")
-
-  yrwks <- unique(tab[, c("week_id", "yrwk")])
-  setorder(yrwks, week_id)
-
-  ht <- huxtable::as_hux(tab_wide) %>%
-    huxtable::add_colnames() %>%
-    fhiplot::huxtable_theme_fhi_basic()
-
-  ht[1, ] <- c(
-    "Geografisk omr\u00E5de",
-    yrwks$yrwk,
-    yrwks$yrwk,
-    yrwks$yrwk
-  )
 
   ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
 
-  huxtable::escape_contents(ht)[, 2] <- FALSE
-
   ht <- huxtable::merge_cells(ht, 1:2, 1)
+  ht <- huxtable::merge_cells(ht, 1:2, 2)
 
-  ht <- huxtable::merge_cells(ht, 1, 2:5)
-  ht[1, 2] <- "NorSySS<sup>12</sup> andel"
+  ht <- huxtable::merge_cells(ht, 1, 3:4)
+  ht[1, 3] <- "MSIS"
 
-  ht <- huxtable::merge_cells(ht, 1, 6:9)
-  ht[1, 6] <- "NorSySS<sup>2</sup> antall"
+  ht <- huxtable::merge_cells(ht, 1, 5:7)
+  ht[1, 5] <- "NorSySS"
 
-  ht <- huxtable::merge_cells(ht, 1, 10:13)
-  ht[1, 10] <- "MSIS antall"
+  huxtable::left_border(ht)[, c(3, 5)] <- 2
+  #huxtable::left_border_style(ht)[, c(3, 5)] <- "double"
 
-  huxtable::left_border(ht)[, c(2, 6, 10)] <- 5
-  huxtable::left_border_style(ht)[, c(2, 6, 10)] <- "double"
-
-  huxtable::align(ht) <- "center"
-
-  nr0 <- nrow(ht) + 1
-  ht <- huxtable::add_footnote(ht, glue::glue(
-    "<sup>1</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
-    "<sup>2</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og her refererer til ICPC-2 koden R991: covid-19 (mistenkt eller bekreftet)<br>",
-  ), border = 0)
-  nr1 <- nrow(ht)
-
-  huxtable::escape_contents(ht)[1, ] <- F
-  huxtable::escape_contents(ht)[nr0:nr1, ] <- F
-
-  huxtable::left_padding(ht) <-  5
-  huxtable::right_padding(ht) <-  5
-
-  return(huxtable::to_html(ht))
+  ht <- huxtable::merge_repeated_rows(ht, huxtable::everywhere, 1)
+  huxtable::width(ht) <- 1
+  huxtable::tabular_environment(ht) <- "longtable"
+  ht
 }
 
-xui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, yrwk, n_status = c("medium", "high")){
-  force(location_codes)
-  force(x_tags)
-  force(yrwk)
-  force(n_status)
-  function(){
-    retval <- list()
-    for(tag in x_tags){
-      x_location_codes <- sc::tbl("results_norsyss_standard") %>%
-        dplyr::filter(granularity_time == "week") %>%
-        dplyr::filter(location_code %in% !!location_codes) %>%
-        dplyr::filter(tag_outcome %in% !!tag) %>%
-        dplyr::filter(yrwk %in% !!yrwk) %>%
-        dplyr::filter(n_status %in% !!n_status) %>%
-        dplyr::distinct(location_code) %>%
-        dplyr::collect() %>%
-        sc::latin1_to_utf8()
+areas_at_risk_ft <- function(tab, yrwks){
 
-      x_location_codes <- x_location_codes$location_code
+  msis_index_hig <- which(tab$msis_n > tab$msis_threshold & tab$variable %in% 3:4)
+  norsyss_index_hig <- which(tab$norsyss_pr100 > tab$norsyss_pr100_threshold & tab$variable %in% 3:4)
 
-      if(length(x_location_codes)==0){
-        retval[[tag]] <- data.table()
-      } else {
-        retval[[tag]] <- sc::tbl("results_norsyss_standard") %>%
-          dplyr::filter(granularity_time == "week") %>%
-          dplyr::filter(location_code %in% !!x_location_codes) %>%
-          dplyr::filter(tag_outcome %in% !!tag) %>%
-          dplyr::filter(yrwk %in% !!yrwk) %>%
-          dplyr::collect() %>%
-          sc::latin1_to_utf8()
-      }
-    }
+  levels(tab$variable) <- yrwks
 
-    retval
-  }
+  ft <- flextable::flextable(
+    data.frame(
+      "Geo"=tab$location_name,
+      "Uke"=tab$variable,
+      "Tilfeller"=tab$pretty_msis_n,
+      "Terskel"=tab$pretty_msis_threshold,
+      "Konsultasjoner"=tab$pretty_norsyss_n,
+      "Andel"=tab$pretty_norsyss_pr100,
+      "Terskel"=tab$pretty_norsyss_pr100_threshold
+    )
+  )
+  labs <- as.list(c(
+    "Geo",
+    "Uke",
+    "Tilfeller",
+    "Terskel",
+    "Konsultasjoner",
+    "Andel",
+    "Terskel"
+  ))
+  names(labs) <- ft$col_keys
+  ft <- flextable::set_header_labels(ft,values =labs)
+  ft <- flextable::autofit(ft)
+  ft <- flextable::merge_v(ft, j = ~ Geo )
+
+  ft <- flextable::add_header_row(
+    ft,
+    values = c(
+      "",
+      "MSIS",
+      "NorSySS"
+    ),
+    colwidths = c(
+      2,
+      2,
+      3
+    )
+  )
+  ft <- flextable::theme_box(ft)
+  ft <- flextable::align(ft, align = "center", part = "all")
+
+  if (length(msis_index_hig) > 0) ft <- flextable::bg(
+    ft,
+    i = msis_index_hig,
+    j = 3,
+    bg=fhiplot::warning_color[["hig"]]
+  )
+  if (length(norsyss_index_hig) > 0) ft <- flextable::bg(
+    ft,
+    i = norsyss_index_hig,
+    j = 6,
+    bg=fhiplot::warning_color[["hig"]]
+  )
+
+  return(ft)
 }
 
 ui_covid19_areas_at_risk_function_factory <- function(yrwk){

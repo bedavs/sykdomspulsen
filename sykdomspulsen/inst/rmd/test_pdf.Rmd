@@ -1,0 +1,15 @@
+---
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+hello this is a test
+
+```{r}
+print(cars)
+```

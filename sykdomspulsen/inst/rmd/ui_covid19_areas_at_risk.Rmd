@@ -6,147 +6,25 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r include=FALSE, results="hide"}
-d <- copy(data$covid19$norsyss)
-setorder(d,location_code,yrwk)
-d[,pr100:=100*n/consult_with_influenza]
-d[is.nan(pr100), pr100:=0]
-d[,yrwk_id := paste0("yrwk",1:.N), by=.(location_code)]
-
-yrwks <- unique(d$yrwk)
-
-d_wide <- dcast.data.table(d, location_code ~ yrwk_id, value.var = c("n","consult_with_influenza","pr100"))
-
-d_wide[,baseline := pmax(0.01,100*(n_yrwk1+n_yrwk2)/(consult_with_influenza_yrwk1+consult_with_influenza_yrwk2))]
-
-d_wide[,threshold_yrwk_1 := 0]
-d_wide[,threshold_yrwk_2 := 0]
-
-d_wide[,threshold_yrwk_3 := 100*qpois(0.975, lambda=baseline*consult_with_influenza_yrwk3/100)/consult_with_influenza_yrwk3]
-d_wide[is.nan(threshold_yrwk_3),threshold_yrwk_3:=0]
-
-d_wide[,threshold_yrwk_4 := 100*qpois(0.975, lambda=baseline*consult_with_influenza_yrwk4/100)/consult_with_influenza_yrwk4]
-d_wide[is.nan(threshold_yrwk_4),threshold_yrwk_4:=0]
-
-d_wide_norsyss <- d_wide
-
-location_code_norsyss <- d_wide_norsyss[pr100_yrwk3 > threshold_yrwk_3 | pr100_yrwk4 > threshold_yrwk_4]$location_code
-
-d <- copy(data$covid19$msis)
-setorder(d,location_code,yrwk)
-d[,yrwk_id := paste0("yrwk",1:.N), by=.(location_code)]
-
-d_wide <- dcast.data.table(d, location_code ~ yrwk_id, value.var = "n")
-d_wide[,baseline := pmax(1,round((yrwk1+yrwk2)/2))]
-d_wide[,threshold := qpois(0.975, lambda = baseline)]
-
-d_wide_msis <- d_wide
-location_code_msis <- d_wide_msis[yrwk3 > threshold | yrwk4 > threshold]$location_code
-
-location_codes <- unique(c(location_code_norsyss, location_code_msis))
-
-tab_norsyss <- melt.data.table(
-  d_wide_norsyss[location_code %in% location_codes],
-  id="location_code",
-  measure = patterns("^n_", "^pr100_","^threshold_"),
-  value.name = c("norsyss_n","norsyss_pr100","norsyss_pr100_threshold")
-)
-
-tab_norsyss
-
-tab_msis <- melt.data.table(
-  d_wide_msis[location_code %in% location_codes],
-  id.vars =c("location_code","threshold"),
-  measure.vars = c("yrwk1","yrwk2","yrwk3","yrwk4")
-)
-levels(tab_msis$variable) <- 1:4
-
-tab <- merge(
-  tab_msis,
-  tab_norsyss,
-  by=c("location_code","variable")
-)
-
-setnames(tab,c("threshold","value"),c("msis_threshold","msis_n"))
-
-tab[, pretty_msis_threshold:=fhiplot::format_nor(msis_threshold)]
-tab[, pretty_msis_n:=fhiplot::format_nor(msis_n)]
-tab[, pretty_norsyss_n:=fhiplot::format_nor(norsyss_n)]
-tab[, pretty_norsyss_pr100:=fhiplot::format_nor_perc_1(norsyss_pr100)]
-tab[, pretty_norsyss_pr100_threshold:=fhiplot::format_nor_perc_1(norsyss_pr100_threshold)]
-
-tab[variable %in% 1:2, pretty_msis_threshold:=""]
-tab[variable %in% 1:2, pretty_norsyss_pr100_threshold:=""]
-
-tab[,location_name := get_location_name(location_code)]
-tab[location_name=="Bergen"]
-
-tab[variable %in% 3:4,msis_difference := msis_n-msis_threshold]
-tab[variable %in% 3:4,norsyss_difference := norsyss_pr100-norsyss_pr100_threshold]
 
 ordering <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
 setorder(ordering,-msis_difference)
 ordering_msis <- as.character(unique(ordering$location_code))
 setorder(ordering,-norsyss_difference)
 ordering_norsyss <- as.character(unique(ordering$location_code))
-
-areas_at_risk_ht <- function(tab, yrwks){
-  msis_index_hig <- which(tab$msis_n > tab$msis_threshold & tab$variable %in% 3:4)
-  norsyss_index_hig <- which(tab$norsyss_pr100 > tab$norsyss_pr100_threshold & tab$variable %in% 3:4)
-  
-  levels(tab$variable) <- yrwks
-  
-  ht <- huxtable::hux(
-    "Geo"=tab$location_name,
-    "Uke"=tab$variable,
-    "Tilfeller"=tab$pretty_msis_n,
-    "Terskel"=tab$pretty_msis_threshold,
-    "Konsultasjoner"=tab$pretty_norsyss_n,
-    "Andel"=tab$pretty_norsyss_pr100,
-    "Terskel"=tab$pretty_norsyss_pr100_threshold
-  )%>%
-    huxtable::add_colnames() %>%
-    fhiplot::huxtable_theme_fhi_basic()
-  ht <- huxtable::set_background_color(ht, huxtable::evens, huxtable::everywhere, "#FFFFFF")
-  
-  if (length(msis_index_hig) > 0) huxtable::background_color(ht)[msis_index_hig+1, 3] <- fhiplot::warning_color[["hig"]]
-  if (length(norsyss_index_hig) > 0) huxtable::background_color(ht)[norsyss_index_hig+1, 6] <- fhiplot::warning_color[["hig"]]
-  
-  
-  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
-  
-  ht <- huxtable::merge_cells(ht, 1:2, 1)
-  ht <- huxtable::merge_cells(ht, 1:2, 2)
-  
-  ht <- huxtable::merge_cells(ht, 1, 3:4)
-  ht[1, 3] <- "MSIS"
-  
-  ht <- huxtable::merge_cells(ht, 1, 5:7)
-  ht[1, 5] <- "NorSySS"
-  
-  huxtable::left_border(ht)[, c(3, 5)] <- 2
-  #huxtable::left_border_style(ht)[, c(3, 5)] <- "double"
-  
-  ht <- huxtable::merge_repeated_rows(ht, huxtable::everywhere, 1)
-  huxtable::width(ht) <- 1
-  huxtable::tabular_environment(ht) <- "longtable"
-  ht
-}
 ```
 
 ## MSIS Alerts
 
-```{r include=FALSE, results="hide"}
+```{r dataclean1, include=FALSE, results="hide"}
 tab[,location_code:=factor(location_code, levels = ordering_msis)]
 setorder(tab,location_code,variable)
 
 location_codes <- ordering_msis[ordering_msis %in% location_code_msis]
 ```
 
-```{r, results="asis", echo=F}
-areas_at_risk_ht(tab[location_code %in% location_codes], yrwks = yrwks)
+```{r tabmsis, results="asis", echo=F}
+areas_at_risk_ht(tab = tab[location_code %in% location_codes], yrwks = yrwks)
 ```
 
 ## NorSySS Alerts
@@ -159,8 +37,11 @@ location_codes <- ordering_norsyss[!ordering_norsyss %in% location_code_msis]
 ```
 
 ```{r, results="asis", echo=F}
-areas_at_risk_ht(tab[location_code %in% location_codes[1:10]], yrwks = yrwks)
+areas_at_risk_ht(tab = tab[location_code %in% location_codes], yrwks = yrwks)
+areas_at_risk_ht(tab = tab[location_code %in% location_codes[1:10]], yrwks = yrwks)
 areas_at_risk_ht(tab[location_code %in% location_codes[11:20]], yrwks = yrwks)
 areas_at_risk_ht(tab[location_code %in% location_codes[21:30]], yrwks = yrwks)
-areas_at_risk_ht(tab[location_code %in% location_codes[31:38]], yrwks = yrwks)
+areas_at_risk_ht(tab[location_code %in% location_codes[31:40]], yrwks = yrwks)
+areas_at_risk_ht(tab[location_code %in% location_codes[41:45]], yrwks = yrwks)
 ```
+
