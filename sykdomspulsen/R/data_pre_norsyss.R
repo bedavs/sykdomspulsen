@@ -82,7 +82,7 @@ nav_to_freg <- list(
 norsyss_fetch_raw_data_and_aggregate <- function(
   date_from = "2018-01-01",
   date_to = lubridate::today(),
-  folder = "/input/norsyss/",
+  folder = "/input/sykdomspulsen_norsyss_input",
   overwrite_file = FALSE,
   diags,
   ...) {
@@ -442,7 +442,7 @@ old_delete_norsyss_aggregate_format_raw_data <- function(d, configs) {
 # get_n_doctors
 #
 # A function to extract the number of doctors per week
-get_n_doctors <- function(folder = "/input/norsyss/") {
+get_n_doctors <- function(folder = "/input/sykdomspulsen_norsyss_input") {
   db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
   res <- RODBC::sqlQuery(db, 'select count(distinct(Behandler_Id)) as behandlere, DATEPART("ISO_WEEK", Konsultasjonsdato) as week ,DATEPART("YEAR", Konsultasjonsdato) as year from Konsultasjon group by DATEPART("ISO_WEEK", Konsultasjonsdato) ,DATEPART("YEAR", Konsultasjonsdato)')
   setDT(res)
