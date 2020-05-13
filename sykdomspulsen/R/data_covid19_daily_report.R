@@ -7,9 +7,9 @@ data_covid19_daily_report <- function(data, argset, schema){
   # tm_run_task("data_covid19_daily_report")
 
   if(plnr::is_run_directly()){
-    data <- tm_get_data("data_covid19_daily_report")
-    argset <- tm_get_argset("data_covid19_daily_report")
-    schema <- tm_get_schema("data_covid19_daily_report")
+    data <- sc::tm_get_data("data_covid19_daily_report")
+    argset <- sc::tm_get_argset("data_covid19_daily_report")
+    schema <- sc::tm_get_schema("data_covid19_daily_report")
   }
 
   folder <- sc::path("input","sykdomspulsen_covid19_dagsrapport_input")

@@ -232,7 +232,7 @@ set_db <- function(){
     name = "data_covid19_deaths",
     schema = sc::Schema$new(
       db_table = "data_covid19_deaths",
-      db_config = config$db_config,
+      db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
