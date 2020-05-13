@@ -219,7 +219,7 @@ xui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags,
   function(){
     retval <- list()
     for(tag in x_tags){
-      x_location_codes <- tbl("results_norsyss_standard") %>%
+      x_location_codes <- sc::tbl("results_norsyss_standard") %>%
         dplyr::filter(granularity_time == "week") %>%
         dplyr::filter(location_code %in% !!location_codes) %>%
         dplyr::filter(tag_outcome %in% !!tag) %>%
@@ -234,7 +234,7 @@ xui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags,
       if(length(x_location_codes)==0){
         retval[[tag]] <- data.table()
       } else {
-        retval[[tag]] <- tbl("results_norsyss_standard") %>%
+        retval[[tag]] <- sc::tbl("results_norsyss_standard") %>%
           dplyr::filter(granularity_time == "week") %>%
           dplyr::filter(location_code %in% !!x_location_codes) %>%
           dplyr::filter(tag_outcome %in% !!tag) %>%
@@ -253,13 +253,13 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
   function(){
     retval <- list()
 
-    retval$msis <- tbl("data_covid19_msis_by_time_location") %>%
+    retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
       dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
 
-    retval$norsyss <- tbl("data_norsyss") %>%
+    retval$norsyss <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
       dplyr::filter(age=="total") %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
@@ -270,7 +270,7 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
       dplyr::collect() %>%
       sc::latin1_to_utf8()
 
-    retval$norsyss_norge <- tbl("data_norsyss") %>%
+    retval$norsyss_norge <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
       dplyr::filter(age=="total") %>%
       dplyr::filter(date >= "2020-03-09") %>%

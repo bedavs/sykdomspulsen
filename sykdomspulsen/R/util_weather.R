@@ -4,7 +4,7 @@
 #' @export
 get_weather <- function(impute_missing = FALSE) {
 
-  temp <- tbl("data_weather") %>%
+  temp <- sc::tbl("data_weather") %>%
     dplyr::collect() %>%
     sc::latin1_to_utf8()
 

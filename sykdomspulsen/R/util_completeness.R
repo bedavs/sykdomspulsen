@@ -1,6 +1,6 @@
 calculate_completeness <- function(location, x_year, x_granularity_time = "week", table = NULL) {
   if (is.null(table)) {
-    table <- tbl("results_qp")
+    table <- sc::tbl("results_qp")
   }
 
   results <- table %>%
@@ -26,7 +26,7 @@ calculate_completeness <- function(location, x_year, x_granularity_time = "week"
 # @import data.table
 calculate_confidence_interval <- function(data, last_weeks = NULL) {
   setDT(data)
-  table <- tbl("results_qp")
+  table <- sc::tbl("results_qp")
 
   N <- 10
   if (!is.null(last_weeks)) {

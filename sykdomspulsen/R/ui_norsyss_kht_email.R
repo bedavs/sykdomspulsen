@@ -344,7 +344,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
   function(){
     retval <- list()
     for(tag in x_tags){
-      x_location_codes <- tbl("results_norsyss_standard") %>%
+      x_location_codes <- sc::tbl("results_norsyss_standard") %>%
         dplyr::filter(granularity_time == "week") %>%
         dplyr::filter(location_code %in% !!location_codes) %>%
         dplyr::filter(tag_outcome %in% !!tag) %>%
@@ -359,7 +359,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
       if(length(x_location_codes)==0){
         retval[[tag]] <- data.table()
       } else {
-        retval[[tag]] <- tbl("results_norsyss_standard") %>%
+        retval[[tag]] <- sc::tbl("results_norsyss_standard") %>%
           dplyr::filter(granularity_time == "week") %>%
           dplyr::filter(location_code %in% !!x_location_codes) %>%
           dplyr::filter(tag_outcome %in% !!tag) %>%
@@ -379,14 +379,14 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
   function(){
     retval <- list()
 
-    retval$msis <- tbl("data_covid19_msis_by_time_location") %>%
+    retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
       dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
       latin1_to_utf8()
 
-    retval$norsyss <- tbl("data_norsyss") %>%
+    retval$norsyss <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(age=="total") %>%
@@ -408,7 +408,7 @@ ui_norsyss_kht_email_plans <- function(){
 
   #yrwk <- fhi::isoyearweek(lubridate::today()-seq(48,70,7))
 
-  val <- tbl("datar_norsyss_kht_email") %>%
+  val <- sc::tbl("datar_norsyss_kht_email") %>%
     dplyr::collect()
   setDT(val)
 
