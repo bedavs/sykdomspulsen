@@ -4,7 +4,14 @@
 \alias{data_pre_normomo}
 \title{data_pre_normomo}
 \usage{
-data_pre_normomo()
+data_pre_normomo(data, argset, schema)
+}
+\arguments{
+\item{data}{a}
+
+\item{argset}{a}
+
+\item{schema}{a}
 }
 \description{
 data_pre_normomo

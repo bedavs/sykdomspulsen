@@ -4,15 +4,16 @@
 #' @param schema a
 #' @export
 datar_norsyss_kht_email <- function(data, argset, schema){
-  if(FALSE){
+  if(plnr::is_run_directly()){
     tm_run_task("datar_norsyss_kht_email")
     data <- tm_get_data("datar_norsyss_kht_email")
     argset <- tm_get_argset("datar_norsyss_kht_email")
     schema <- tm_get_schema("datar_norsyss_kht_email")
-
   }
 
-  files <- fs::dir_ls(path("input", "norsyss"), regexp="Sykdomspulsen-Abonnement-")
+  folder <- sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE)
+
+  files <- fs::dir_ls(folder, regexp="Sykdomspulsen-Abonnement-")
   file <- max(files)
 
   d <- fread(file)

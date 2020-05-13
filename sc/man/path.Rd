@@ -4,12 +4,16 @@
 \alias{path}
 \title{This function gets the right folder for results}
 \usage{
-path(type = "output", ...)
+path(type = "output", ..., create_dir = FALSE, trailing_slash = FALSE)
 }
 \arguments{
 \item{type}{input, output}
 
 \item{...}{Second level and beyond}
+
+\item{create_dir}{create directory if it does not exist}
+
+\item{trailing_slash}{do you want a trailing /?}
 }
 \description{
 This function gets the right folder for results

@@ -313,7 +313,8 @@ data_norsyss <- function(data, argset, schema){
   # schema <- tm_get_schema("data_norsyss")
   syndromes <- argset$syndromes
 
-  file <- fs::dir_ls("/input/norsyss/", regexp="norsyss_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt")
+  folder <- sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE)
+  file <- fs::dir_ls(folder, regexp="norsyss_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt")
   file <- max(file)
 
   message(sprintf("Cleaning file %s", file))

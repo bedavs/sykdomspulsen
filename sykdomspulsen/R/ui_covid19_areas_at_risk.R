@@ -14,8 +14,7 @@ ui_covid19_areas_at_risk <- function(data, argset, schema) {
   }
 
   file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.pdf")
-  folder <- fs::path("/output","covid19",lubridate::today())
-  fs::dir_create(folder)
+  folder <- sc::path("output","sykdomspulsen_norsyss_restricted_output",lubridate::today(), create_dir = T)
 
   rmarkdown::render(
     input = system.file("rmd/ui_covid19_areas_at_risk.Rmd", package="sykdomspulsen"),

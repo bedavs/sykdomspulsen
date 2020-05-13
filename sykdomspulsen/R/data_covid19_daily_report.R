@@ -12,14 +12,19 @@ data_covid19_daily_report <- function(data, argset, schema){
     schema <- tm_get_schema("data_covid19_daily_report")
   }
 
-  file <- fs::dir_ls("/input/covid19/", regexp="dagsrapport_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].RDS")
+  folder <- sc::path("input","sykdomspulsen_covid19_dagsrapport_input")
+  if(!fs::dir_exists(folder)){
+    fs::dir_create(folder)
+  }
+  file <- fs::dir_ls(folder, regexp="dagsrapport_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].RDS")
   file <- file[!stringr::str_detect(file,"processed")]
   file <- max(file)
   file_processed <- stringr::str_replace(
     file,
-    "/input/covid19/",
-    "/input/covid19/processed_"
+    sc::path("input","sykdomspulsen_covid19_dagsrapport_input","dagsrapport"),
+    sc::path("input","sykdomspulsen_covid19_dagsrapport_input","processed_dagsrapport")
   )
+
   master <- readRDS(file)
 
   date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1

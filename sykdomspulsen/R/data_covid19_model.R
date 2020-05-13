@@ -13,7 +13,10 @@ data_covid19_model <- function(data, argset, schema){
   # argset <- tm_get_argset("data_covid19_model")
   # schema <- tm_get_schema("data_covid19_model")
 
-  file <- fs::dir_ls("/input/covid19/", regexp="modelling_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].csv")
+  if(!fs::dir_exists(sc::path("input","sykdomspulsen_covid19_dagsrapport_input"))){
+    fs::dir_create(sc::path("input","sykdomspulsen_covid19_dagsrapport_input"))
+  }
+  file <- fs::dir_ls(sc::path("input","sykdomspulsen_covid19_dagsrapport_input"), regexp="modelling_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].csv")
   file <- max(file)
   d <- fread(file)
 

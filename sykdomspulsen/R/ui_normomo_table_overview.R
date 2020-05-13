@@ -6,18 +6,17 @@
 #' @export
 ui_normomo_table_overview <- function(data, argset, schema) {
   if(FALSE){
-    tm_update_plans("ui_normomo_table_overview")
+    sc::tm_update_plans("ui_normomo_table_overview")
 
-    data <- tm_get_data("ui_normomo_table_overview", index_plan=1)
-    argset <- tm_get_argset("ui_normomo_table_overview", index_plan=1, index_argset = 1)
-    schema <- tm_get_schema("ui_normomo_table_overview")
+    data <- sc::tm_get_data("ui_normomo_table_overview", index_plan=1)
+    argset <- sc::tm_get_argset("ui_normomo_table_overview", index_plan=1, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_normomo_table_overview")
   }
 
   d <- copy(data$data)
 
   # folder
-  folder <- sc::path("output",glue::glue(argset$folder))
-  fs::dir_create(folder)
+  folder <- sc::path("output", argset$folder, create_dir = T)
   file <- glue::glue(argset$file)
   filepath <- fs::path(folder,file)
 

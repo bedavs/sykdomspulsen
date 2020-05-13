@@ -1,8 +1,10 @@
 #' This function gets the right folder for results
 #' @param type input, output
 #' @param ... Second level and beyond
+#' @param create_dir create directory if it does not exist
+#' @param trailing_slash do you want a trailing /?
 #' @export
-path <- function(type="output", ...) {
+path <- function(type="output", ..., create_dir=FALSE, trailing_slash = FALSE) {
   stopifnot(type %in% c("input","output"))
 
   start_location <- dplyr::case_when(
@@ -10,7 +12,12 @@ path <- function(type="output", ...) {
     type == "output" ~ config$path_output
   )
 
-  paste0(start_location,"/",glue::glue(fs::path(...)))
+  retval <- paste0(start_location,"/",glue::glue(fs::path(...)))
+  if(create_dir){
+    if(!fs::dir_exists(retval)) fs::dir_create(retval)
+  }
+  if(trailing_slash) retval <- paste0(retval,"/")
+  return(retval)
 }
 
 

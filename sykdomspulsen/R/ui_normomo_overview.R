@@ -22,11 +22,9 @@ ui_normomo_overview <- function(data, argset, schema) {
   d <- copy(data$data)
 
   # folder
-  folder <- sc::path("output", argset$folder)
+  folder <- sc::path("output", argset$folder, create_dir = T)
   file <- glue::glue(argset$file)
   filepath <- fs::path(folder,file)
-
-  fs::dir_create(folder)
 
   # caption
   caption <- glue::glue('Sist oppdatert: {strftime(argset$today, format = "%d/%m/%Y")}')

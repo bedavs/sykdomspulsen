@@ -1,13 +1,18 @@
 #' data_pre_normomo
+#' @param data a
+#' @param argset a
+#' @param schema a
 #' @export
-data_pre_normomo <- function(){
+data_pre_normomo <- function(data, argset, schema){
+  folder <- sc::path("input", "sykdomspulsen_normomo_input", create_dir = TRUE, trailing_slash = T)
+
   if(sc::config$is_production){
     data_grab <- glue::glue(
-      'get -r "ut" /input/normomo/\n',
+      'get -r "ut" {folder}\n',
       'rm ut/*'
     )
     data_grab <- glue::glue(
-      'get -r "ut" /input/normomo/\n'
+      'get -r "ut" {folder}\n'
     )
     data_grab_txt <- tempfile()
     cat(data_grab, file = data_grab_txt)
@@ -15,8 +20,8 @@ data_pre_normomo <- function(){
     cmd <- glue::glue(
       'sshpass -p{Sys.getenv("NORMOMO_EVRY_PW")} ',
       'sftp -o StrictHostKeyChecking=no -oBatchMode=no -b {data_grab_txt} {Sys.getenv("NORMOMO_EVRY_USER")}; ',
-      'mv /input/normomo/ut/* /input/normomo/; ',
-      'rmdir /input/normomo/ut'
+      'mv {folder}ut/* {folder}; ',
+      'rmdir {folder}ut'
     )
     system(cmd)
   }
@@ -36,31 +41,9 @@ datar_normomo <- function(data, argset, schema){
     schema <- tm_get_schema("data_normomo")
   }
 
-  d <- datar_normomo_internal()
-  schema$output$db_drop_table()
-  schema$output$db_connect()
-  schema$output$db_drop_constraint()
-  schema$output$db_load_data_infile(d)
-  schema$output$db_add_constraint()
-}
+  folder <- sc::path("input", "sykdomspulsen_normomo_input", create_dir = TRUE)
 
-#' datar_normomo_drop
-#' @param data a
-#' @param argset a
-#' @param schema a
-#' @export
-datar_normomo_drop <- function(data, argset, schema){
-  # tm_run_task("datar_normomo_drop")
-  # data <- tm_get_data("datar_normomo_drop")
-  # argset <- tm_get_argset("datar_normomo_drop")
-  # schema <- tm_get_schema("datar_normomo_drop")
-
-  schema$output$db_drop_table()
-}
-
-
-datar_normomo_internal <- function(){
-  files <- fs::dir_ls(sc::path("input", "normomo"), regexp="FHIDOD2_[0-9]+.txt$")
+  files <- fs::dir_ls(folder, regexp="FHIDOD2_[0-9]+.txt$")
   file <- max(files)
   date_extracted <- stringr::str_extract(file, "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
   date_extracted <- glue::glue(
@@ -117,5 +100,23 @@ datar_normomo_internal <- function(){
   d[,uuid:=1:.N]
   d[, date_extracted:=date_extracted]
 
-  d
+  schema$output$db_drop_table()
+  schema$output$db_connect()
+  schema$output$db_drop_constraint()
+  schema$output$db_load_data_infile(d)
+  schema$output$db_add_constraint()
+}
+
+#' datar_normomo_drop
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
+datar_normomo_drop <- function(data, argset, schema){
+  # tm_run_task("datar_normomo_drop")
+  # data <- tm_get_data("datar_normomo_drop")
+  # argset <- tm_get_argset("datar_normomo_drop")
+  # schema <- tm_get_schema("datar_normomo_drop")
+
+  schema$output$db_drop_table()
 }

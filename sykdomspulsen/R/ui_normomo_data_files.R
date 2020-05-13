@@ -14,8 +14,7 @@ ui_normomo_data_files <- function(data, argset, schema) {
   d <- copy(data$data)
 
   # folder
-  folder <- sc::path("output",argset$folder)
-  fs::dir_create(folder)
+  folder <- sc::path("output",argset$folder, create_dir = T)
   file <- glue::glue(argset$file)
   filepath <- fs::path(folder,file)
 

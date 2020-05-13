@@ -30,18 +30,6 @@ set_tasks <- function() {
     )
   )
 
-  # data_covid19_msis ----
-  sc::add_task(
-    sc::task_from_config(
-      list(
-        name = "data_covid19_msis",
-        type = "data",
-        action = "data_covid19_msis",
-        schema = list(output = sc::config$schemas$data_covid19_msis)
-      )
-    )
-  )
-
   # data ----
   # data_pre_normomo ----
   sc::add_task(
@@ -542,7 +530,7 @@ set_tasks <- function() {
         for_each_plan = list("location_code" = "all", "age" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/graphs_thresholds",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/graphs_thresholds",
           filename = "{tag}_{argset$location_code}_{argset$age}_{argset$today}.png"
         )
       )
@@ -561,7 +549,7 @@ set_tasks <- function() {
         for_each_plan = list("age" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/overview",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview",
           filename = "by_{argset$by}_{argset$age}_{argset$today}.png",
           by="location"
         )
@@ -581,7 +569,7 @@ set_tasks <- function() {
         for_each_plan = list("location_code" = "all"),
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/overview",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview",
           filename = "by_{argset$by}_{argset$location_code}_{argset$today}.png",
           by="age"
         )
@@ -602,7 +590,7 @@ set_tasks <- function() {
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/overview",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview",
           filename = "overview_{argset$location_code}_{argset$today}.png"
         )
       )
@@ -622,7 +610,7 @@ set_tasks <- function() {
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/overview",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview",
           filename = "overview_excess_only_sort_{argset$sort}_{argset$today}.png",
           sort = "location"
         )
@@ -643,7 +631,7 @@ set_tasks <- function() {
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/overview",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview",
           filename = "overview_excess_only_sort_{argset$sort}_{argset$today}.png",
           sort = "age"
         )
@@ -664,7 +652,7 @@ set_tasks <- function() {
         #filter = "age=='total'",
         dependencies = c("results_normomo_standard"),
         args = list(
-          folder = "normomo/{argset$today}/data",
+          folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/data",
           filename = "data_{argset$today}.xlsx"
         )
       )
@@ -682,19 +670,19 @@ set_tasks <- function() {
         dependencies = c("results_normomo_standard"),
         args = list(
           tab1 = "overview_norge_{argset$today}.png",
-          tab1_filepath = "normomo/{argset$today}/overview/overview_norge_{argset$today}.png",
+          tab1_filepath = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview/overview_norge_{argset$today}.png",
 
           tab2 = "overview_excess_only_sort_location_{argset$today}.png",
-          tab2_filepath = "normomo/{argset$today}/overview/overview_excess_only_sort_location_{argset$today}.png",
+          tab2_filepath = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview/overview_excess_only_sort_location_{argset$today}.png",
 
           fig1 = "incl_reported_norge_total_{argset$today}.png",
-          fig1_filepath = "normomo/{argset$today}/graphs_thresholds/incl_reported_norge_total_{argset$today}.png",
+          fig1_filepath = "sykdomspulsen_normomo_restricted_output/{argset$today}/graphs_thresholds/incl_reported_norge_total_{argset$today}.png",
 
           fig2 = "by_location_total_{argset$today}.png",
-          fig2_filepath = "normomo/{argset$today}/overview/by_location_total_{argset$today}.png",
+          fig2_filepath = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview/by_location_total_{argset$today}.png",
 
           fig3 = "by_age_norge_{argset$today}.png",
-          fig3_filepath = "normomo/{argset$today}/overview/by_age_norge_{argset$today}.png"
+          fig3_filepath = "sykdomspulsen_normomo_restricted_output/{argset$today}/overview/by_age_norge_{argset$today}.png"
         )
       )
     )

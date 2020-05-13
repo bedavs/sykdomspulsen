@@ -96,7 +96,7 @@ analysis_normomo_plans <- function(){
     location_code = "norway",
     year_end = fhi::isoyear_n(date_extracted),
     date_extracted = date_extracted,
-    wdir = sc::path("output","normomo",lubridate::today(),"ssi"),
+    wdir = sc::path("output","sykdomspulsen_normomo_restricted_output",lubridate::today(),"ssi", create_dir = T),
     upload = FALSE,
     momo_groups = list(
       "0to4" =  "age >= 0 & age <=4",

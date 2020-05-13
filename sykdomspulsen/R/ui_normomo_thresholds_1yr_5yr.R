@@ -25,7 +25,7 @@ ui_normomo_thresholds_1yr_5yr <- function(data, argset, schema) {
     argset$folder,
     today = argset$today
   )
-  fs::dir_create(sc::path("output",folder))
+  sc::path("output",folder, create_dir = T)
 
   # caption
   caption <- glue::glue('Sist oppdatert: {strftime(argset$today, format = "%d/%m/%Y")}')

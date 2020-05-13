@@ -22,8 +22,7 @@ ui_normomo_table_excess_only <- function(data, argset, schema) {
   d <- d[n_obs > 0]
 
   # folder
-  folder <- sc::path("output",glue::glue(argset$folder))
-  fs::dir_create(folder)
+  folder <- sc::path("output",argset$folder, create_dir = T)
   file <- glue::glue(argset$file)
   filepath <- fs::path(folder,file)
 
