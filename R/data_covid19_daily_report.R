@@ -30,6 +30,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   names(master)
 
   # data_covid19_msis_by_time_location ----
+  # municip
   master$data_covid19_msis_by_time_location_municip
 
   skeleton <- expand.grid(
@@ -52,7 +53,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   d_municip[is.na(n), n:=0]
   d_municip[, granularity_geo := "municip"]
 
-  # now generate county data
+  # county
   master$data_covid19_msis_by_time_location_county
 
   skeleton <- expand.grid(
@@ -75,7 +76,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   d_county[is.na(n), n:=0]
   d_county[, granularity_geo := "county"]
 
-  # generate norge data
+  # norge
   master$data_covid19_msis_by_time_location_county
 
   skeleton <- expand.grid(
@@ -188,7 +189,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   # data_covid19_lab_by_time ----
   master$data_covid19_lab_by_time
 
-  retval <- master$data_covid19_lab_by_time
+  retval <- data.table(master$data_covid19_lab_by_time)
   retval[, granularity_time := "day"]
   retval[,location_code:="norge"]
 
@@ -200,20 +201,35 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_lab_by_time$db_load_data_infile(retval)
   schema$data_covid19_lab_by_time$db_add_constraint()
 
-  # data_covid19_nir_by_time ----
-  master$data_covid19_nir_by_time
+  # data_covid19_hospital_by_time ----
+  master$data_covid19_hospital_by_time
 
-  retval <- master$data_covid19_nir_by_time
+  retval <- master$data_covid19_hospital_by_time
   retval[, granularity_time := "day"]
   retval[,location_code:="norge"]
 
   fill_in_missing(retval)
 
-  schema$data_covid19_nir_by_time$db_drop_table()
-  schema$data_covid19_nir_by_time$db_connect()
-  schema$data_covid19_nir_by_time$db_drop_constraint()
-  schema$data_covid19_nir_by_time$db_load_data_infile(retval)
-  schema$data_covid19_nir_by_time$db_add_constraint()
+  schema$data_covid19_hospital_by_time$db_drop_table()
+  schema$data_covid19_hospital_by_time$db_connect()
+  schema$data_covid19_hospital_by_time$db_drop_constraint()
+  schema$data_covid19_hospital_by_time$db_load_data_infile(retval)
+  schema$data_covid19_hospital_by_time$db_add_constraint()
+
+  # data_covid19_deaths ----
+  master$data_covid19_deaths
+
+  retval <- master$data_covid19_deaths[, .(cum_n = ant_m)]
+  retval[, granularity_time := "total"]
+  retval[,location_code:="norge"]
+
+  fill_in_missing(retval)
+
+  schema$data_covid19_deaths$db_drop_table()
+  schema$data_covid19_deaths$db_connect()
+  schema$data_covid19_deaths$db_drop_constraint()
+  schema$data_covid19_deaths$db_load_data_infile(retval)
+  schema$data_covid19_deaths$db_add_constraint()
 
   # move processed file ----
   fs::file_move(

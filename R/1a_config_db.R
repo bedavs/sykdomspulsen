@@ -187,8 +187,8 @@ set_db <- function(){
     ),
 
     # data_covid19_nir_by_time ----
-    data_covid19_nir_by_time = Schema$new(
-      db_table = "data_covid19_nir_by_time",
+    data_covid19_hospital_by_time = Schema$new(
+      db_table = "data_covid19_hospital_by_time",
       db_config = config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -204,7 +204,38 @@ set_db <- function(){
         "x" = "DOUBLE",
         "date" = "DATE",
 
-        "n_icu" = "INTEGER"
+        "n_icu" = "INTEGER",
+        "cum_n_icu" = "INTEGER",
+        "cum_n_hospital_any_cause" = "INTEGER",
+        "cum_n_hospital_main_cause" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      )
+    ),
+
+    # data_covid19_deaths ----
+    data_covid19_deaths = Schema$new(
+      db_table = "data_covid19_deaths",
+      db_config = config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "cum_n" = "INTEGER"
       ),
       db_load_folder = tempdir(),
       keys =  c(
