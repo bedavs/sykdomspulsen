@@ -62,7 +62,7 @@ set_progressr <- function(){
 }
 
 set_email <- function(){
-  config$email$mm <- reticulate::import("marrow.mailer")
+  config$email$mm <- reticulate::import("marrow.mailer", delay_load = TRUE)
   config$email$values <- list(
     host = Sys.getenv("EMAIL_HOST"),
     port = Sys.getenv("EMAIL_PORT"),
@@ -70,18 +70,19 @@ set_email <- function(){
     password = Sys.getenv("EMAIL_PASSWORD"),
     author = Sys.getenv("EMAIL_AUTHOR")
   )
-  config$email$mailer <- config$email$mm$Mailer(reticulate::dict(
-    transport = reticulate::dict(
-      use = 'smtp',
-      host = config$email$values$host,
-      port = config$email$values$port,
-      username = config$email$values$username,
-      password = config$email$values$password,
-      tls = 'required',
-      debug = TRUE
-    )
-  )
-  )
+  if(!(.Platform$OS.type=="windows" & !reticulate::py_available())){
+    config$email$mailer <- config$email$mm$Mailer(reticulate::dict(
+      transport = reticulate::dict(
+        use = 'smtp',
+        host = config$email$values$host,
+        port = config$email$values$port,
+        username = config$email$values$username,
+        password = config$email$values$password,
+        tls = 'required',
+        debug = TRUE
+      )
+    ))
+  }
 
 }
 

@@ -43,9 +43,7 @@ Imports:
   lme4,
   maptools,
   magrittr,
-  mem,
   magick,
-  MOMO,
   ncdf4,
   odbc,
   org,
@@ -57,7 +55,6 @@ Imports:
   R6,
   reticulate,
   rvest,
-  RAWmisc,
   RODBC,
   readr,
   reshape2,
@@ -72,13 +69,15 @@ Imports:
   utils,
   withr,
   writexl,
-  xlsx,
   XML,
   xml2,
   zoo
 Suggests: testthat,
     knitr,
-    usethis
+    usethis,
+    mem,
+    MOMO,
+    xlsx
 License: GPL-3 + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.0
