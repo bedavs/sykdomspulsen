@@ -5,17 +5,17 @@
 #' @export
 ui_normomo_table_excess_only <- function(data, argset, schema) {
   if(FALSE){
-    tm_update_plans("ui_normomo_table_excess_only_sort_location")
+    sc::tm_update_plans("ui_normomo_table_excess_only_sort_location")
 
-    data <- tm_get_data("ui_normomo_table_excess_only_sort_location", index_plan=1)
-    argset <- tm_get_argset("ui_normomo_table_excess_only_sort_location", index_plan=1, index_argset = 1)
-    schema <- tm_get_schema("ui_normomo_table_excess_only_sort_location")
+    data <- sc::tm_get_data("ui_normomo_table_excess_only_sort_location", index_plan=1)
+    argset <- sc::tm_get_argset("ui_normomo_table_excess_only_sort_location", index_plan=1, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_normomo_table_excess_only_sort_location")
 
-    tm_update_plans("ui_normomo_table_excess_only_sort_age")
+    sc::tm_update_plans("ui_normomo_table_excess_only_sort_age")
 
-    data <- tm_get_data("ui_normomo_table_excess_only_sort_age", index_plan=1)
-    argset <- tm_get_argset("ui_normomo_table_excess_only_sort_age", index_plan=1, index_argset = 1)
-    schema <- tm_get_schema("ui_normomo_table_excess_only_sort_age")
+    data <- sc::tm_get_data("ui_normomo_table_excess_only_sort_age", index_plan=1)
+    argset <- sc::tm_get_argset("ui_normomo_table_excess_only_sort_age", index_plan=1, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_normomo_table_excess_only_sort_age")
   }
 
   d <- copy(data$data)
