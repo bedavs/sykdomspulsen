@@ -18,23 +18,18 @@ ui_normomo_overview <- function(data, argset, schema) {
     argset <- tm_get_argset("ui_normomo_overview_by_age", index_plan=1, index_argset = 1)
     schema <- tm_get_schema("ui_normomo_overview_by_age")
   }
-
   d <- copy(data$data)
-
   # folder
   folder <- sc::path("output", argset$folder, create_dir = T)
   file <- glue::glue(argset$file)
   filepath <- fs::path(folder,file)
-
   # caption
   caption <- glue::glue('Sist oppdatert: {strftime(argset$today, format = "%d/%m/%Y")}')
-
   x_yrwk <- rev(sort(as.character(unique(d$yrwk))))[1:52]
   plotData <- d[yrwk %in% x_yrwk]
   plotData[, status := "1veryhigh"]
   plotData[ncor_est < ncor_baseline_thresholdu1, status := "2high"]
   plotData[ncor_est < ncor_baseline_thresholdu0, status := "3expected"]
-
   plotData[norway_locations_long(), on = "location_code", location_name := location_name]
   plotData <- plotData[!is.na(location_name)]
   unique(plotData$location_code)

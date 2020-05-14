@@ -12,7 +12,7 @@ path <- function(type="output", ..., create_dir=FALSE, trailing_slash = FALSE) {
     type == "output" ~ config$path_output
   )
 
-  retval <- paste0(start_location,"/",glue::glue(fs::path(...)))
+  retval <- paste0(start_location,"/",glue::glue(fs::path(...), .envir = parent.frame(n=1)))
   if(create_dir){
     if(!fs::dir_exists(retval)) fs::dir_create(retval)
   }
