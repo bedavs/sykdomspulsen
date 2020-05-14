@@ -4,10 +4,12 @@
 #' @param schema a
 #' @export
 analysis_qp <- function(data, argset, schema){
-  # tm_update_plans("analysis_norsyss_qp_weekly")
-  # data <- tm_get_data("analysis_norsyss_qp_weekly", index_plan = 1)
-  # argset <- tm_get_argset("analysis_norsyss_qp_weekly", index_plan = 1, index_argset = 90)
-  # schema <- tm_get_schema("analysis_norsyss_qp_weekly")
+  if(plnr::is_run_directly()){
+    sc::tm_update_plans("analysis_norsyss_qp_weekly")
+    data <- sc::tm_get_data("analysis_norsyss_qp_weekly", index_plan = 1)
+    argset <- sc::tm_get_argset("analysis_norsyss_qp_weekly", index_plan = 1, index_argset = 90)
+    schema <- sc::tm_get_schema("analysis_norsyss_qp_weekly")
+  }
 
   # arguments start
   d <- data$data[location_code == argset$location_code]

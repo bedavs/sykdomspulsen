@@ -127,11 +127,11 @@ set_db <- function(){
     )
   )
 
-  # data_covid19_msis_by_sex_age ----
+  # data_covid19_msis_by_time_sex_age ----
   sc::add_schema(
-    name = "data_covid19_msis_by_sex_age",
+    name = "data_covid19_msis_by_time_sex_age",
     schema = sc::Schema$new(
-      db_table = "data_covid19_msis_by_sex_age",
+      db_table = "data_covid19_msis_by_time_sex_age",
       db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",

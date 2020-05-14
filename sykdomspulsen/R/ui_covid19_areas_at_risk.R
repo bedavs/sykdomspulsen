@@ -4,9 +4,7 @@
 #' @param schema a
 #' @export
 ui_covid19_areas_at_risk <- function(data, argset, schema) {
-  if(FALSE){
-    tm_run_task("ui_covid19_areas_at_risk")
-  }
+  # tm_run_task("ui_covid19_areas_at_risk")
 
   if(plnr::is_run_directly()){
     sc::tm_update_plans("ui_covid19_areas_at_risk")
