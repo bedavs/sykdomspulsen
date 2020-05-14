@@ -167,9 +167,11 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_msis_by_time_infected_abroad$db_add_constraint()
   # tbl("data_covid19_msis_by_time_infected_abroad")
 
-  # data_covid19_msis_by_sex_age ----
-  master$data_covid19_msis_by_sex_age
-  master$data_covid19_msis_by_sex_age[
+  # data_covid19_msis_by_time_sex_age ----
+  master$data_covid19_msis_by_time_sex_age
+  retval <- copy(master$data_covid19_msis_by_time_sex_age)
+
+  retval[
     ,
     sex := dplyr::case_when(
       sex == "Kvinne" ~ "female",
@@ -177,18 +179,53 @@ data_covid19_daily_report <- function(data, argset, schema){
     )
     ]
 
-  retval <- master$data_covid19_msis_by_sex_age
-  retval[, granularity_time := "total"]
-  retval[,location_code:="norge"]
+  skeleton <- expand.grid(
+    yrwk = unique(retval$yrwk),
+    sex = c("female","male"),
+    age = c(
+      "0-9",
+      "10-19",
+      "20-29",
+      "30-39",
+      "40-49",
+      "50-59",
+      "60-69",
+      "70-79",
+      "80-89",
+      "90+"
+    ),
+    stringsAsFactors = F
+  )
+  setDT(skeleton)
+  retval <- merge(
+    skeleton,
+    retval,
+    by=c("yrwk","sex","age"),
+    all=T
+  )
+  retval[is.na(n), n:=0]
 
+  retval[, granularity_time := "week"]
+  retval[,location_code:="norge"]
   fill_in_missing(retval)
 
-  schema$data_covid19_msis_by_sex_age$db_drop_table()
-  schema$data_covid19_msis_by_sex_age$db_connect()
-  schema$data_covid19_msis_by_sex_age$db_drop_constraint()
-  schema$data_covid19_msis_by_sex_age$db_load_data_infile(retval)
-  schema$data_covid19_msis_by_sex_age$db_add_constraint()
-  # tbl("data_covid19_msis_by_sex_age")
+  total <- retval[,.(
+    n = sum(n)
+  ), keyby=.(
+    sex,age
+  )]
+  total[, granularity_time := "total"]
+  total[,location_code:="norge"]
+  fill_in_missing(total)
+
+  retval <- rbind_standardize(retval,total)
+
+  schema$data_covid19_msis_by_time_sex_age$db_drop_table()
+  schema$data_covid19_msis_by_time_sex_age$db_connect()
+  schema$data_covid19_msis_by_time_sex_age$db_drop_constraint()
+  schema$data_covid19_msis_by_time_sex_age$db_load_data_infile(retval)
+  schema$data_covid19_msis_by_time_sex_age$db_add_constraint()
+  # tbl("data_covid19_msis_by_time_sex_age")
 
   # data_covid19_lab_by_time ----
   master$data_covid19_lab_by_time

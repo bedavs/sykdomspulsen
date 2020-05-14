@@ -1,5 +1,5 @@
 ---
-output: pdf_document
+output: word_document
 editor_options: 
   chunk_output_type: console
 ---
@@ -24,8 +24,10 @@ location_codes <- ordering_msis[ordering_msis %in% location_code_msis]
 ```
 
 ```{r tabmsis, results="asis", echo=F}
-areas_at_risk_ht(tab = tab[location_code %in% location_codes], yrwks = yrwks)
+areas_at_risk_ft(tab = tab[location_code %in% location_codes], yrwks = yrwks)
 ```
+
+\newpage
 
 ## NorSySS Alerts
 
@@ -37,11 +39,6 @@ location_codes <- ordering_norsyss[!ordering_norsyss %in% location_code_msis]
 ```
 
 ```{r, results="asis", echo=F}
-areas_at_risk_ht(tab = tab[location_code %in% location_codes], yrwks = yrwks)
-areas_at_risk_ht(tab = tab[location_code %in% location_codes[1:10]], yrwks = yrwks)
-areas_at_risk_ht(tab[location_code %in% location_codes[11:20]], yrwks = yrwks)
-areas_at_risk_ht(tab[location_code %in% location_codes[21:30]], yrwks = yrwks)
-areas_at_risk_ht(tab[location_code %in% location_codes[31:40]], yrwks = yrwks)
-areas_at_risk_ht(tab[location_code %in% location_codes[41:45]], yrwks = yrwks)
+areas_at_risk_ft(tab = tab[location_code %in% location_codes], yrwks = yrwks)
 ```
 
