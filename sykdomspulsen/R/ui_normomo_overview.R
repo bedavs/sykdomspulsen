@@ -4,14 +4,14 @@
 #' @param schema a
 #' @export
 ui_normomo_overview <- function(data, argset, schema) {
-  if(FALSE){
-    tm_run_task("ui_normomo_overview_by_location")
-    tm_run_task("ui_normomo_overview_by_age")
+  if(plnr::is_run_directly()){
+    # tm_run_task("ui_normomo_overview_by_location")
+    # tm_run_task("ui_normomo_overview_by_age")
 
-    tm_update_plans("ui_normomo_overview_by_location")
-    data <- tm_get_data("ui_normomo_overview_by_location", index_plan=1)
-    argset <- tm_get_argset("ui_normomo_overview_by_location", index_plan=1, index_argset = 1)
-    schema <- tm_get_schema("ui_normomo_overview_by_location")
+    sc::tm_update_plans("ui_normomo_overview_by_location")
+    data <- sc::tm_get_data("ui_normomo_overview_by_location", index_plan=1)
+    argset <- sc::tm_get_argset("ui_normomo_overview_by_location", index_plan=1, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_normomo_overview_by_location")
 
     tm_update_plans("ui_normomo_overview_by_age")
     data <- tm_get_data("ui_normomo_overview_by_age", index_plan=1)

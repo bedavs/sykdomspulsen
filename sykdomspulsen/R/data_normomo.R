@@ -36,9 +36,9 @@ data_pre_normomo <- function(data, argset, schema){
 datar_normomo <- function(data, argset, schema){
   if(plnr::is_run_directly()){
     # sc::tm_run_task("datar_normomo")
-    data <- tm_get_data("data_normomo")
-    argset <- tm_get_argset("data_normomo")
-    schema <- tm_get_schema("data_normomo")
+    data <- tm_get_data("datar_normomo")
+    argset <- tm_get_argset("datar_normomo")
+    schema <- tm_get_schema("datar_normomo")
   }
 
   folder <- sc::path("input", "sykdomspulsen_normomo_input", create_dir = TRUE)
