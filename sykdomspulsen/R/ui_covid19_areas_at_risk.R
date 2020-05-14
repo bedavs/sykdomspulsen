@@ -17,6 +17,8 @@ ui_covid19_areas_at_risk <- function(data, argset, schema) {
   }
 
   d <- copy(data$covid19$norsyss)
+  if(nrow(d)==0) return()
+
   setorder(d,location_code,yrwk)
   d[,pr100:=100*n/consult_with_influenza]
   d[is.nan(pr100), pr100:=0]
@@ -95,7 +97,7 @@ ui_covid19_areas_at_risk <- function(data, argset, schema) {
 
   # render it
 
-  file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.pdf")
+  file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.docx")
   folder <- sc::path("output","sykdomspulsen_norsyss_restricted_output",lubridate::today(), create_dir = T)
   tempdir <- tempdir()
 
