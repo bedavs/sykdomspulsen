@@ -12,7 +12,18 @@ path <- function(type="output", ..., create_dir=FALSE, trailing_slash = FALSE) {
     type == "output" ~ config$path_output
   )
 
-  retval <- paste0(start_location,"/",glue::glue(fs::path(...), .envir = parent.frame(n=1)))
+  end_location <- glue::glue(fs::path(...), .envir = parent.frame(n=1))
+  end_location <- stringr::str_split(end_location, "/")[[1]]
+  end_location <- end_location[end_location!=""]
+  if(!config$is_production){
+    if(length(end_location)==1){
+      end_location <- c(end_location[1], "test")
+    } else if(length(end_location)>=2){
+      end_location <- c(end_location[1], "test", end_location[2:length(end_location)])
+    }
+  }
+
+  retval <- paste0(c(start_location,end_location),collapse="/")
   if(create_dir){
     if(!fs::dir_exists(retval)) fs::dir_create(retval)
   }
