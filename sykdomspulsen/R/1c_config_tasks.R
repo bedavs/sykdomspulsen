@@ -694,7 +694,7 @@ set_tasks <- function() {
     sc::Task$new(
       name = "ui_norsyss_kht_email",
       type = "ui",
-      permission = config$permissions$ui_norsyss_kht_email,
+      permission = sc::config$permissions$ui_norsyss_kht_email,
       update_plans_fn = ui_norsyss_kht_email_plans,
       schema = c("input" = sc::config$schemas$results_norsyss_standard)
     )

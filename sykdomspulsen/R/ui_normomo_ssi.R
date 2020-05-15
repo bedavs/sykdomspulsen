@@ -25,17 +25,17 @@ ui_normomo_ssi <- function(data, argset, schema) {
     "Norway"
   )
 
-  if(config$permissions$ui_normomo_email_ssi$has_permission()){
+  if(sc::config$permissions$ui_normomo_email_ssi$has_permission()){
     mailr(
       subject = glue::glue("[euromomo input] [Norway] [{yrwk}]"),
       html = html,
       to = e_emails(
         "ui_normomo_ssi",
-        is_final = config$permissions$ui_normomo_email_ssi$is_final()
+        is_final = sc::config$permissions$ui_normomo_email_ssi$is_final()
       ),
       attachments = file,
-      is_final = config$permissions$ui_normomo_email_ssi$is_final()
+      is_final = sc::config$permissions$ui_normomo_email_ssi$is_final()
     )
-    config$permissions$ui_normomo_email_ssi$revoke_permission()
+    sc::config$permissions$ui_normomo_email_ssi$revoke_permission()
   }
 }

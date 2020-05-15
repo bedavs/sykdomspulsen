@@ -10,13 +10,13 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   }
 
   if(plnr::is_run_directly()){
-    tm_update_plans("ui_norsyss_kht_email")
-    length(config$tasks$list_task$ui_norsyss_kht_email$plans)
+    sc::tm_update_plans("ui_norsyss_kht_email")
+    length(sc::config$tasks$list_task$ui_norsyss_kht_email$plans)
 
     index_plan <- 1
-    data <- tm_get_data("ui_norsyss_kht_email", index_plan=index_plan)
-    argset <- tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
-    schema <- tm_get_schema("ui_norsyss_kht_email")
+    data <- sc::tm_get_data("ui_norsyss_kht_email", index_plan=index_plan)
+    argset <- sc::tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_norsyss_kht_email")
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -140,12 +140,12 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   mailr(
     subject = e_subject(
       email_subject,
-      is_final = config$permissions$ui_norsyss_kht_email$is_final()
+      is_final = sc::config$permissions$ui_norsyss_kht_email$is_final()
     ),
     html = email_text,
     to = argset$email,
     bcc = bcc,
-    is_final = config$permissions$ui_norsyss_kht_email$is_final()
+    is_final = sc::config$permissions$ui_norsyss_kht_email$is_final()
   )
 }
 
@@ -352,7 +352,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
         dplyr::filter(n_status %in% !!n_status) %>%
         dplyr::distinct(location_code) %>%
         dplyr::collect() %>%
-        latin1_to_utf8()
+        sc::latin1_to_utf8()
 
       x_location_codes <- x_location_codes$location_code
 
@@ -365,7 +365,7 @@ ui_norsyss_kht_email_alert_function_factory <- function(location_codes, x_tags, 
           dplyr::filter(tag_outcome %in% !!tag) %>%
           dplyr::filter(yrwk %in% !!yrwk) %>%
           dplyr::collect() %>%
-          latin1_to_utf8()
+          sc::latin1_to_utf8()
       }
     }
 
@@ -384,7 +384,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval$norsyss <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
@@ -396,7 +396,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::group_by(location_code,yrwk) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
       dplyr::collect() %>%
-      latin1_to_utf8()
+      sc::latin1_to_utf8()
 
     retval
   }
@@ -413,7 +413,7 @@ ui_norsyss_kht_email_plans <- function(){
   setDT(val)
 
   # if it's not final, then restrict the email addresses
-  if(!config$permissions$ui_norsyss_kht_email$is_final()){
+  if(!sc::config$permissions$ui_norsyss_kht_email$is_final()){
     val <- val[
       email %in% c(
         "richardaubrey.white@fhi.no",

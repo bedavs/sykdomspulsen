@@ -50,18 +50,18 @@ ui_normomo_email_internal <- function(data, argset, schema) {
     "</html>"
   )
 
-  if(config$permissions$ui_normomo_email_internal$has_permission()){
+  if(sc::config$permissions$ui_normomo_email_internal$has_permission()){
     mailr(
       subject = glue::glue("Resultater fra NorMOMO {argset$today}"),
       html = html,
       to = e_emails(
         "ui_normomo_results",
-        is_final = config$permissions$ui_normomo_email_internal$is_final()
+        is_final = sc::config$permissions$ui_normomo_email_internal$is_final()
       ),
       inlines = c(tab1_filepath, tab2_filepath, fig1_filepath, fig2_filepath, fig3_filepath),
-      is_final = config$permissions$ui_normomo_email_internal$is_final()
+      is_final = sc::config$permissions$ui_normomo_email_internal$is_final()
     )
 
-    config$permissions$ui_normomo_email_internal$revoke_permission()
+    sc::config$permissions$ui_normomo_email_internal$revoke_permission()
   }
 }
