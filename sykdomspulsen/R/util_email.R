@@ -13,10 +13,10 @@ e_key <- function() {
 e_subject <- function(subject, is_final = TRUE) {
   today <- lubridate::wday(lubridate::today(), week_start = 1)
 
-  if (!config$is_production) {
+  if (!sc::config$is_production) {
     subject <- glue::glue("TEST: {subject}")
   }
-  if (config$is_production & !is_final) {
+  if (sc::config$is_production & !is_final) {
     subject <- glue::glue("PRELIMINARY: {subject}")
   }
   return(subject)

@@ -6,39 +6,10 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-ordering <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
-setorder(ordering,-msis_difference)
-ordering_msis <- as.character(unique(ordering$location_code))
-setorder(ordering,-norsyss_difference)
-ordering_norsyss <- as.character(unique(ordering$location_code))
 ```
 
-## MSIS Alerts
-
-```{r dataclean1, include=FALSE, results="hide"}
-tab[,location_code:=factor(location_code, levels = ordering_msis)]
-setorder(tab,location_code,variable)
-
-location_codes <- ordering_msis[ordering_msis %in% location_code_msis]
-```
+## Alerts
 
 ```{r tabmsis, results="asis", echo=F}
-areas_at_risk_ft(tab = tab[location_code %in% location_codes], yrwks = yrwks)
+areas_at_risk_ft(tab = tab)
 ```
-
-\newpage
-
-## NorSySS Alerts
-
-```{r include=FALSE, results="hide"}
-tab[,location_code:=factor(location_code, levels = ordering_norsyss)]
-setorder(tab,location_code,variable)
-
-location_codes <- ordering_norsyss[!ordering_norsyss %in% location_code_msis]
-```
-
-```{r, results="asis", echo=F}
-areas_at_risk_ft(tab = tab[location_code %in% location_codes], yrwks = yrwks)
-```
-

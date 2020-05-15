@@ -16,8 +16,29 @@ ui_covid19_areas_at_risk <- function(data, argset, schema) {
     schema <- sc::tm_get_schema("ui_covid19_areas_at_risk")
   }
 
-  d <- copy(data$covid19$norsyss)
-  if(nrow(d)==0) return()
+  tab <- areas_at_risk(data)
+  # render it
+
+  file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.docx")
+  folder <- sc::path("output","sykdomspulsen_norsyss_restricted_output",lubridate::today(), create_dir = T)
+  tempdir <- tempdir()
+
+  rmarkdown::render(
+    input = system.file("rmd/ui_covid19_areas_at_risk.Rmd", package="sykdomspulsen"),
+    output_dir = tempdir,
+    output_file = file,
+    intermediates_dir = tempdir
+  )
+
+  sc::mv(
+    fs::path(tempdir, file),
+    fs::path(folder, file)
+  )
+}
+
+areas_at_risk <- function(data){
+  d <- copy(data$covid19$norsyss_combined)
+  if(nrow(d)==0) return(NULL)
 
   setorder(d,location_code,yrwk)
   d[,pr100:=100*n/consult_with_influenza]
@@ -95,79 +116,38 @@ ui_covid19_areas_at_risk <- function(data, argset, schema) {
   tab[variable %in% 3:4,msis_difference := msis_n-msis_threshold]
   tab[variable %in% 3:4,norsyss_difference := norsyss_pr100-norsyss_pr100_threshold]
 
-  # render it
+  tab[, yrwk := variable]
+  levels(tab$yrwk) <- yrwks
 
-  file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.docx")
-  folder <- sc::path("output","sykdomspulsen_norsyss_restricted_output",lubridate::today(), create_dir = T)
-  tempdir <- tempdir()
+  # get the ordering of locations right
+  ordering_msis <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
+  setorder(ordering_msis, -msis_difference, -norsyss_difference)
+  ordering_msis <- unique(ordering_msis$location_code)
 
-  rmarkdown::render(
-    input = system.file("rmd/ui_covid19_areas_at_risk.Rmd", package="sykdomspulsen"),
-    output_dir = tempdir,
-    output_file = file,
-    intermediates_dir = tempdir
-  )
+  ordering_norsyss <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
+  setorder(ordering_norsyss, -norsyss_difference, -msis_difference)
+  ordering_norsyss <- unique(ordering_norsyss$location_code)
 
-  sc::mv(
-    fs::path(tempdir, file),
-    fs::path(folder, file)
-  )
+  location_codes_1 <- ordering_msis[ordering_msis %in% location_code_msis]
+  location_codes_2 <- ordering_norsyss[!ordering_norsyss %in% location_code_msis]
+  location_codes <- c(location_codes_1, location_codes_2)
+
+  tab[,location_code:=factor(location_code, levels = location_codes)]
+  setorder(tab,location_code,variable)
+
+
+  return(tab)
 }
 
-areas_at_risk_ht <- function(tab, yrwks){
-  msis_index_hig <- which(tab$msis_n > tab$msis_threshold & tab$variable %in% 3:4)
-  norsyss_index_hig <- which(tab$norsyss_pr100 > tab$norsyss_pr100_threshold & tab$variable %in% 3:4)
-
-  levels(tab$variable) <- yrwks
-
-  ht <- huxtable::hux(
-    "Geo"=tab$location_name,
-    "Uke"=tab$variable,
-    "Tilfeller"=tab$pretty_msis_n,
-    "Terskel"=tab$pretty_msis_threshold,
-    "Konsultasjoner"=tab$pretty_norsyss_n,
-    "Andel"=tab$pretty_norsyss_pr100,
-    "Terskel"=tab$pretty_norsyss_pr100_threshold
-  )%>%
-    huxtable::add_colnames() %>%
-    fhiplot::huxtable_theme_fhi_basic()
-  ht <- huxtable::set_background_color(ht, huxtable::evens, huxtable::everywhere, "#FFFFFF")
-
-  if (length(msis_index_hig) > 0) huxtable::background_color(ht)[msis_index_hig+1, 3] <- fhiplot::warning_color[["hig"]]
-  if (length(norsyss_index_hig) > 0) huxtable::background_color(ht)[norsyss_index_hig+1, 6] <- fhiplot::warning_color[["hig"]]
-
-
-  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
-
-  ht <- huxtable::merge_cells(ht, 1:2, 1)
-  ht <- huxtable::merge_cells(ht, 1:2, 2)
-
-  ht <- huxtable::merge_cells(ht, 1, 3:4)
-  ht[1, 3] <- "MSIS"
-
-  ht <- huxtable::merge_cells(ht, 1, 5:7)
-  ht[1, 5] <- "NorSySS"
-
-  huxtable::left_border(ht)[, c(3, 5)] <- 2
-  #huxtable::left_border_style(ht)[, c(3, 5)] <- "double"
-
-  ht <- huxtable::merge_repeated_rows(ht, huxtable::everywhere, 1)
-  huxtable::width(ht) <- 1
-  huxtable::tabular_environment(ht) <- "longtable"
-  ht
-}
-
-areas_at_risk_ft <- function(tab, yrwks){
+areas_at_risk_ft <- function(tab){
 
   msis_index_hig <- which(tab$msis_n > tab$msis_threshold & tab$variable %in% 3:4)
   norsyss_index_hig <- which(tab$norsyss_pr100 > tab$norsyss_pr100_threshold & tab$variable %in% 3:4)
-
-  levels(tab$variable) <- yrwks
 
   ft <- flextable::flextable(
     data.frame(
       "Geo"=tab$location_name,
-      "Uke"=tab$variable,
+      "Uke"=tab$yrwk,
       "Tilfeller"=tab$pretty_msis_n,
       "Terskel"=tab$pretty_msis_threshold,
       "Konsultasjoner"=tab$pretty_norsyss_n,
@@ -232,7 +212,7 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
       dplyr::collect() %>%
       sc::latin1_to_utf8()
 
-    retval$norsyss <- sc::tbl("data_norsyss") %>%
+    retval$norsyss_combined <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
       dplyr::filter(age=="total") %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
