@@ -5,10 +5,10 @@
 #' @export
 datar_norsyss_kht_email <- function(data, argset, schema){
   if(plnr::is_run_directly()){
-    tm_run_task("datar_norsyss_kht_email")
-    data <- tm_get_data("datar_norsyss_kht_email")
-    argset <- tm_get_argset("datar_norsyss_kht_email")
-    schema <- tm_get_schema("datar_norsyss_kht_email")
+    # tm_run_task("datar_norsyss_kht_email")
+    data <- sc::tm_get_data("datar_norsyss_kht_email")
+    argset <- sc::tm_get_argset("datar_norsyss_kht_email")
+    schema <- sc::tm_get_schema("datar_norsyss_kht_email")
   }
 
   folder <- sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE)
@@ -34,7 +34,8 @@ datar_norsyss_kht_email <- function(data, argset, schema){
   d <- d[!email %in% c(
     "post@fhi.no",
     "postmottak@tullemail.kommune.no",
-    "postmottak@tullekommune.kommune.no"
+    "postmottak@tullekommune.kommune.no",
+    ""
   )]
   d <- unique(d)
 
@@ -60,9 +61,7 @@ datar_norsyss_kht_email <- function(data, argset, schema){
 
   schema$output$db_drop_table()
   schema$output$db_connect()
-  schema$output$db_drop_constraint()
   schema$output$db_load_data_infile(d)
-  schema$output$db_add_constraint()
 }
 
 #' datar_norsyss_kht_email_drop
