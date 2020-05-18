@@ -305,6 +305,7 @@ set_db <- function(){
         "DoR" = "DATE",
         "DoB" = "DATE",
         "age" = "INTEGER",
+        "sex" = "TEXT",
         "location_code" = "TEXT",
         "date_extracted" = "DATE"
       ),

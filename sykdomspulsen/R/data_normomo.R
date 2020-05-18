@@ -35,10 +35,10 @@ data_pre_normomo <- function(data, argset, schema){
 #' @export
 datar_normomo <- function(data, argset, schema){
   if(plnr::is_run_directly()){
-    # sc::tm_run_task("datar_normomo")
-    data <- tm_get_data("datar_normomo")
-    argset <- tm_get_argset("datar_normomo")
-    schema <- tm_get_schema("datar_normomo")
+    # tm_run_task("datar_normomo")
+    data <- sc::tm_get_data("datar_normomo")
+    argset <- sc::tm_get_argset("datar_normomo")
+    schema <- sc::tm_get_schema("datar_normomo")
   }
 
   folder <- sc::path("input", "sykdomspulsen_normomo_input", create_dir = TRUE)
@@ -82,6 +82,11 @@ datar_normomo <- function(data, argset, schema){
 
   d <- d[keep == TRUE]
 
+  d[, sex := dplyr::case_when(
+    KJONN == "K" ~ "female",
+    KJONN == "M" ~ "male"
+  )]
+
   d[, county_code := NULL]
   d[, FYLKE := NULL]
   d[, weighting := NULL]
@@ -97,13 +102,22 @@ datar_normomo <- function(data, argset, schema){
 
   setnames(d, "county_code_current", "location_code")
 
-  d[,uuid:=1:.N]
   d[, date_extracted:=date_extracted]
+
+  d2 <- copy(d)
+  d2[, sex := "total"]
+  retval <- rbind(d,d2)
+
+  d <- copy(retval)
+  d[, location_code := "norge"]
+  retval <- rbind(retval,d)
+
+  retval[,uuid:=1:.N]
 
   schema$output$db_drop_table()
   schema$output$db_connect()
   schema$output$db_drop_constraint()
-  schema$output$db_load_data_infile(d)
+  schema$output$db_load_data_infile(retval)
   schema$output$db_add_constraint()
 }
 

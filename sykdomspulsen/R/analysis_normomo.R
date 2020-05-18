@@ -5,7 +5,9 @@
 #' @export
 analysis_normomo <-  function(data, argset, schema){
   if(plnr::is_run_directly()){
-    # sc::tm_run_task("analysis_normomo")
+    # tm_run_task("datar_normomo")
+    # tm_run_task("datar_normomo_drop")
+    # tm_run_task("analysis_normomo")
 
     sc::tm_update_plans("analysis_normomo")
     data <- sc::tm_get_data("analysis_normomo", index_plan=4)
@@ -51,7 +53,8 @@ analysis_normomo <-  function(data, argset, schema){
     data_dirty <- rbindlist(MOMO::dataExport$toSave, fill = TRUE)
     data_clean <- clean_exported_momo_data(
       data_dirty,
-      location_code = argset$location_code
+      location_code = argset$location_code,
+      sex = argset$sex
     )
     # only upload
     data_clean <- data_clean[year >= argset$year_start_upload]
@@ -67,11 +70,13 @@ analysis_normomo_hfile <- function() {
   return(as.data.frame(hfile))
 }
 
-analysis_normomo_function_factory <- function(location_code) {
+analysis_normomo_function_factory <- function(location_code, sex) {
   force(location_code)
+  force(sex)
   function(){
     sc::tbl("datar_normomo") %>%
       dplyr::filter(location_code==!!location_code) %>%
+      dplyr::filter(sex==!!sex) %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
   }
@@ -88,6 +93,8 @@ analysis_normomo_plans <- function(){
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
   list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
     sc::tbl("datar_normomo") %>%
+      dplyr::filter(location_code=="norge") %>%
+      dplyr::filter(sex=="total") %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
   })
@@ -106,7 +113,10 @@ analysis_normomo_plans <- function(){
       "Total" = "age >= 0 | is.na(age)",
       "65to74" = "65 <= age & age <= 74",
       "75to84" = "75 <= age & age <= 84",
-      "85P" = "age >= 85 | is.na(age)"
+      "85P" = "age >= 85 | is.na(age)",
+      "0to14" = "age >= 0 & age <= 14",
+      "15to44" = "age >= 15 & age <= 44",
+      "45to64" = "age >= 45 & age <= 64"
     ),
     momo_models = c(
       "0to4" = "LINE",
@@ -116,7 +126,10 @@ analysis_normomo_plans <- function(){
       "Total" = "LINE_SIN",
       "65to74" = "LINE_SIN",
       "75to84" = "LINE_SIN",
-      "85P" = "LINE_SIN"
+      "85P" = "LINE_SIN",
+      "0to14" = "LINE_SIN",
+      "15to44" = "LINE_SIN",
+      "45to64" = "LINE_SIN"
     ),
     Ydrop = 2020,
     Wdrop = 01
@@ -126,56 +139,19 @@ analysis_normomo_plans <- function(){
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
   list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
     sc::tbl("datar_normomo") %>%
+      dplyr::filter(sex=="total") %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
   })
 
-  # FHI - Norway ----
-  for(i in 2012:fhi::isoyear_n(date_extracted)){
-    if(i==fhi::isoyear_n(date_extracted)){
-      date_extracted_year_specific <- date_extracted
-    } else {
-      date_extracted_year_specific <- fhidata::days[stringr::str_detect(yrwk, as.character(i))][.N]$sun
-    }
-
-    list_plan[[length(list_plan)]]$add_analysis(
-      fn = analysis_normomo,
-      location_code = "norge",
-      year_start_upload = ifelse(i<=2015, i-4,i-1), ##ifelse(i==2012, 2008, i-1),
-      year_end = i,
-      date_extracted = date_extracted_year_specific,
-      wdir = tempdir(),
-      upload = TRUE,
-      momo_groups = list(
-        "0to4" =  "age >= 0 & age <=4",
-        "5to14" = "age >= 5 & age <=14",
-        "15to64" = "age >= 15 & age <=64",
-        "65to74" = "65 <= age & age <= 74",
-        "75to84" = "75 <= age & age <= 84",
-        "85P" = "age >= 85 | is.na(age)",
-        "Total" = "age >= 0 | is.na(age)",
-        "65P" = "age >= 65 | is.na(age)"
-      ),
-      momo_models = c(
-        "0to4" = "LINE",
-        "5to14" = "LINE",
-        "15to64" = "LINE_SIN",
-        "65to74" = "LINE_SIN",
-        "75to84" = "LINE_SIN",
-        "85P" = "LINE_SIN",
-        "Total" = "LINE_SIN",
-        "65P" = "LINE_SIN"
-      ),
-      Ydrop = 2020,
-      Wdrop = 01
-    )
-  }
-
-  # FHI - County ----
-  for(j in unique(norway_locations()$county_code)){
+  # FHI - Norge/County ----
+  for(j in c("norge",unique(norway_locations()$county_code))) for(sex in c("total")) {
     list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
 
-    list_plan[[length(list_plan)]]$add_data(name = "raw", fn=analysis_normomo_function_factory(location_code = j))
+    list_plan[[length(list_plan)]]$add_data(name = "raw", fn=analysis_normomo_function_factory(
+      location_code = j,
+      sex = sex
+      ))
     for(i in 2012:fhi::isoyear_n(date_extracted)){
       if(i==fhi::isoyear_n(date_extracted)){
         date_extracted_year_specific <- date_extracted
@@ -186,6 +162,7 @@ analysis_normomo_plans <- function(){
       list_plan[[length(list_plan)]]$add_analysis(
         fn = analysis_normomo,
         location_code = j,
+        sex = sex,
         year_start_upload = ifelse(i==2012, 2008, i-1),
         year_end = i,
         date_extracted = date_extracted_year_specific,
@@ -222,7 +199,7 @@ analysis_normomo_plans <- function(){
 
 clean_exported_momo_data <- function(
   data_dirty,
-  location_code
+  location_code, sex
   ) {
 
   data_dirty <- data_dirty[
@@ -299,7 +276,7 @@ clean_exported_momo_data <- function(
     TRUE ~ "county"
   )]
   data_dirty[,border := config$border]
-  data_dirty[,sex:="total"]
+  data_dirty[,sex:=sex]
   data_dirty[,season:=fhi::season(yrwk)]
   data_dirty[,x:=fhi::x(week)]
 
