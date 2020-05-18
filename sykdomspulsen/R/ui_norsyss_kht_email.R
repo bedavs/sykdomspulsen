@@ -5,11 +5,13 @@
 #' @export
 ui_norsyss_kht_email <- function(data, argset, schema) {
   if(FALSE){
+    # GRY RUN THIS
     tm_run_task("datar_norsyss_kht_email")
     # tm_run_task("ui_norsyss_kht_email")
   }
 
   if(plnr::is_run_directly()){
+    # GRY, START RUNNING HERE
     sc::tm_update_plans("ui_norsyss_kht_email")
     length(sc::config$tasks$list_task$ui_norsyss_kht_email$plans)
 
@@ -17,6 +19,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     data <- sc::tm_get_data("ui_norsyss_kht_email", index_plan=index_plan)
     argset <- sc::tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
+
+    #argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
