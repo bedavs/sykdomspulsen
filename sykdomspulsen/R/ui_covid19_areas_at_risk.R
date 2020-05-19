@@ -241,7 +241,7 @@ ui_covid19_areas_at_risk_function_factory <- function(yrwk){
 
 ui_covid19_areas_at_risk_plans <- function(){
   x_tags <- c("respiratoryexternal_vk_ot", "gastro_vk_ot")
-  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-1)
+  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-2)
 
   list_plan <- list()
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
