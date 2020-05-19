@@ -182,7 +182,8 @@ set_db <- function(){
 
         "n_neg" = "INTEGER",
         "n_pos" = "INTEGER",
-        "pr100_pos" = "DOUBLE"
+        "pr100_pos" = "DOUBLE",
+        "cum_n_tested" = "INTEGER"
       ),
       db_load_folder = tempdir(),
       keys =  c(
