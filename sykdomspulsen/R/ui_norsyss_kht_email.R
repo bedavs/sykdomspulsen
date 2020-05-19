@@ -176,6 +176,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     bcc = bcc,
     is_final = sc::config$permissions$ui_norsyss_kht_email$is_final()
   )
+  # END OF FUNCTION
+  # GRY DONT RUN BEYOND HERE
 }
 
 norsyss_kht_obs_table <- function(results, tag_outcome) {
@@ -384,8 +386,8 @@ norsyss_kht_covid19_overview_table <- function(data){
 
   nr0 <- nrow(ht) + 1
   ht <- huxtable::add_footnote(ht, glue::glue(
-    "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til ICPC-2 kodene R991 og R992. For ukene 17 og 18 viser R991 data for covid-19 (mistenkt eller bekreftet), mens R992 ikke var opprettet enda",
-    "s{fhi::nb$aa} det er ingen data for disse ukene. For uke 19 og 20 brukes R991 for covid-19 (mistenkt/sannsynlig) og R992 for covid-19 (bekreftet).<br>",
+    "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til ICPC-2 kodene R991 og R992. For ukene 18 viser R991 data for covid-19 (mistenkt eller bekreftet), mens R992 ikke var opprettet enda",
+    "s{fhi::nb$aa} det er ingen data for disse ukene. For uke 19, 20 og 21 brukes R991 for covid-19 (mistenkt/sannsynlig) og R992 for covid-19 (bekreftet).<br>",
     "<sup>2</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
   ), border = 0)
   nr1 <- nrow(ht)
