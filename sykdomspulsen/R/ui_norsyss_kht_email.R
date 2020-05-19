@@ -392,7 +392,7 @@ norsyss_kht_covid19_overview_table <- function(data){
   ht <- huxtable::add_footnote(ht, glue::glue(
     "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt med ICPC-2 kodene R991 og R992.",
     "For uke 18 viser R991 data for covid-19 (mistenkt eller bekreftet), mens R992 ikke var opprettet enda ",
-    " s{fhi::nb$aa} det er ingen data for disse ukene. For uke 19, 20 og 21 brukes R991 for covid-19 (mistenkt/sannsynlig) og R992 for covid-19 (bekreftet).<br>",
+    "s{fhi::nb$aa} det er ingen data for disse ukene. For uke 19, 20 og 21 brukes R991 for covid-19 (mistenkt/sannsynlig) og R992 for covid-19 (bekreftet).<br>",
     "<sup>2</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
   ), border = 0)
   nr1 <- nrow(ht)
