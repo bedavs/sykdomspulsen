@@ -150,7 +150,7 @@ mailgun <- function(
 # @param project a
 # @param is_final Is final or preliminary email?
 e_emails <- function(project, is_final = TRUE) {
-  if (config$is_production & is_final) {
+  if (sc::config$is_production & is_final) {
     email_loc <- "/etc/gmailr/emails.xlsx"
   } else {
     email_loc <- "/etc/gmailr/emails_test.xlsx"
