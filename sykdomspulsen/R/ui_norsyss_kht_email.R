@@ -559,7 +559,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
 
 ui_norsyss_kht_email_plans <- function(){
   x_tags <- c("respiratoryexternal_vk_ot", "gastro_vk_ot")
-  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-1)
+  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-2)
 
   #yrwk <- fhi::isoyearweek(lubridate::today()-seq(48,70,7))
 
