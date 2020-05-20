@@ -245,7 +245,8 @@ data_covid19_daily_report <- function(data, argset, schema){
   # data_covid19_hospital_by_time ----
   master$data_covid19_hospital_by_time
 
-  retval <- master$data_covid19_hospital_by_time
+  retval <- copy(master$data_covid19_hospital_by_time)
+  retval[,date:=as.Date(date)]
   retval[, granularity_time := "day"]
   retval[,location_code:="norge"]
 
@@ -256,6 +257,7 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_hospital_by_time$db_drop_constraint()
   schema$data_covid19_hospital_by_time$db_load_data_infile(retval)
   schema$data_covid19_hospital_by_time$db_add_constraint()
+  sc::tbl("data_covid19_hospital_by_time")
 
   # data_covid19_deaths ----
   master$data_covid19_deaths
@@ -272,11 +274,20 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_deaths$db_load_data_infile(retval)
   schema$data_covid19_deaths$db_add_constraint()
 
-  # move processed file ----
-  fs::file_move(
-    path = file,
-    new_path = file_processed
-  )
+  # data_covid19_demographics ----
+  master$data_covid19_demographics
+
+  retval <- copy(master$data_covid19_demographics)
+  retval[, granularity_time := "total"]
+  retval[,location_code:="norge"]
+
+  fill_in_missing(retval)
+
+  schema$data_covid19_demographics$db_drop_table()
+  schema$data_covid19_demographics$db_connect()
+  schema$data_covid19_demographics$db_drop_constraint()
+  schema$data_covid19_demographics$db_load_data_infile(retval)
+  schema$data_covid19_demographics$db_add_constraint()
 }
 
 

@@ -215,9 +215,7 @@ set_db <- function(){
         "date" = "DATE",
 
         "n_icu" = "INTEGER",
-        "cum_n_icu" = "INTEGER",
-        "cum_n_hospital_any_cause" = "INTEGER",
-        "cum_n_hospital_main_cause" = "INTEGER"
+        "n_hospital_main_cause" = "INTEGER"
       ),
       db_load_folder = tempdir(),
       keys =  c(
@@ -255,6 +253,41 @@ set_db <- function(){
         "granularity_time",
         "location_code",
         "date"
+      )
+    )
+  )
+
+  # data_covid19_demographics ----
+  sc::add_schema(
+    name = "data_covid19_demographics",
+    schema = sc::Schema$new(
+      db_table = "data_covid19_demographics",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date",
+        "age",
+        "sex",
+        "tag_outcome"
       )
     )
   )
