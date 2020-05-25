@@ -44,7 +44,9 @@ schema class description
   db_table,
   db_field_types,
   db_load_folder,
-  keys
+  keys,
+  validator_field_types = validator_field_types_blank,
+  validator_field_contents = validator_field_contents_blank
 )}\if{html}{\out{</div>}}
 }
 

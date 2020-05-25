@@ -59,7 +59,9 @@ set_db <- function(){
       keys =  c(
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -90,7 +92,9 @@ set_db <- function(){
         "granularity_time",
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -123,7 +127,9 @@ set_db <- function(){
         "location_code",
         "date",
         "tag_location_infected"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -156,7 +162,9 @@ set_db <- function(){
         "age",
         "sex",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -190,7 +198,9 @@ set_db <- function(){
         "granularity_time",
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -222,7 +232,9 @@ set_db <- function(){
         "granularity_time",
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -253,7 +265,9 @@ set_db <- function(){
         "granularity_time",
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -288,7 +302,81 @@ set_db <- function(){
         "age",
         "sex",
         "tag_outcome"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  # data_covid19_self_reporting ----
+  sc::add_schema(
+    name = "data_covid19_self_reporting",
+    schema = sc::Schema$new(
+      db_table = "data_covid19_self_reporting",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n" = "INTEGER",
+        "n_symps_0" = "INTEGER",
+        "n_symps_1" = "INTEGER",
+        "n_symps_2" = "INTEGER",
+        "n_symps_3" = "INTEGER",
+        "n_symps_4" = "INTEGER",
+        "n_symps_5" = "INTEGER",
+        "n_symps_6" = "INTEGER",
+        "n_symps_7" = "INTEGER",
+        "n_symps_8" = "INTEGER",
+        "n_symps_9" = "INTEGER",
+        "n_symps_10" = "INTEGER",
+        "n_symp_cough" = "INTEGER",
+        "n_symp_fever" = "INTEGER",
+        "n_symp_throat" = "INTEGER",
+        "n_symp_headache" = "INTEGER",
+        "n_symp_muscle" = "INTEGER",
+        "n_symp_breath" = "INTEGER",
+        "n_symp_taste_smell" = "INTEGER",
+        "n_symp_other" = "INTEGER",
+        "n_symps_yesfever_cough_or_breath" = "INTEGER",
+        "n_symps_nofever_cough_or_breath" = "INTEGER",
+        "n_symps_yesfever_throat_or_nose" = "INTEGER",
+        "n_symps_nofever_throat_or_nose" = "INTEGER",
+        "n_symps_yesfever_muscle_or_headache" = "INTEGER",
+        "n_symps_nofever_muscle_or_headache" = "INTEGER",
+        "n_symps_yesfever_gastro_or_taste_smell_or_other" = "INTEGER",
+        "n_symps_nofever_gastro_or_taste_smell_or_other" = "INTEGER",
+        "n_today_0normal" = "INTEGER",
+        "n_today_1tired" = "INTEGER",
+        "n_today_2need_rest" = "INTEGER",
+        "n_today_3bedridden_some_help" = "INTEGER",
+        "n_today_4bedridden_lots_help" = "INTEGER",
+        "n_tested" = "INTEGER",
+        "n_tested_has_any_result" = "INTEGER",
+        "n_tested_has_pos_result" = "INTEGER",
+        "n_contact_doctor_yes" = "INTEGER",
+        "n_contact_doctor_no" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date",
+        "age",
+        "sex"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -323,7 +411,9 @@ set_db <- function(){
       keys =  c(
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -399,7 +489,9 @@ set_db <- function(){
       keys =  c(
         "location_code",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -437,7 +529,9 @@ set_db <- function(){
         "year",
         "date",
         "age"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -511,6 +605,7 @@ set_db <- function(){
 
         "forecast" = "BOOLEAN"
       ),
+      db_load_folder = tempdir(),
       keys = c(
         "granularity_time",
         "granularity_geo",
@@ -521,7 +616,8 @@ set_db <- function(){
         "week",
         "date"
       ),
-      db_load_folder = tempdir()
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -567,7 +663,9 @@ set_db <- function(){
         "year",
         "week",
         "date"
-      )
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 

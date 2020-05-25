@@ -30,9 +30,7 @@ Task
   plans = NULL,
   update_plans_fn = NULL,
   schema,
-  dependencies = c(),
   cores = 1,
-  chunk_size = 100,
   upsert_at_end_of_each_plan = FALSE
 )}\if{html}{\out{</div>}}
 }

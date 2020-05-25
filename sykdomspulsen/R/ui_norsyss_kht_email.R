@@ -138,7 +138,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
       "<h2>NorSySS + MSIS: Signaler for covid-19</h2>",
 
       "Dersom du ser en tabell under, betyr det at det i det geografiske omr{fhi::nb$aa}det du har valgt, har ",
-      "v{fhi::nb$ae}rt en eller flere uker med en økning som er statistisk signifikant.<br>",
+      "v{fhi::nb$ae}rt en eller flere uker med en {fhi::nb$oe}kning som er statistisk signifikant.<br>",
       "Vi bruker her gjennomsnittet med 95% konfidensintervall av uke ",
       "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
       "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",

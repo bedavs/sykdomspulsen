@@ -296,9 +296,11 @@ datar_weather <- function(data, argset, schema) {
 data_weather <- function(data, argset, schema) {
   # tm_run_task("data_weather")
 
-  # data <- tm_get_data("data_weather")
-  # argset <- tm_get_argset("data_weather")
-  # schema <- tm_get_schema("data_weather")
+  if(plnr::is_run_directly()){
+    data <- sc::tm_get_data("data_weather")
+    argset <- sc::tm_get_argset("data_weather")
+    schema <- sc::tm_get_schema("data_weather")
+  }
 
   temp <- schema$input$dplyr_tbl() %>%
     dplyr::collect() %>%

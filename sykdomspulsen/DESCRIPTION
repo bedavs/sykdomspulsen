@@ -1,14 +1,15 @@
 Package: sykdomspulsen
 Title: NIPH infectious disease surveillance system
-Version: 2020.5.19
+Version: 2020.5.25
 Authors@R: c(
-  person("Richard", "White", email = "w@rwhite.no", role = c("aut", "cre")),
+  person("Richard", "White", email = "hello@rwhite.no", role = c("aut", "cre")),
   person("Gunnar", "R\u00F8", email = "GunnarOyvindIsaksson.Ro@fhi.no", role = c("aut")), 
-  person("B", "V", email = "beva@fhi.no", role = c("aut"))
+  person("B", "V", email = "beva@fhi.no", role = c("aut")),
+  person("Gry", "Gr\u00F8neng", email = "GryMarysol.Groneng@fhi.no", role = c("aut"))
   )
-Description: Sykdomspulsen is a free and open-source health surveillance system designed and developed by the Norwegian Institute of Public Health.
+Description: `Sykdomspulsen` is the Norwegian Institute of Public Health's implementation of surveillance systems using `sc`.
 URL: https://sykdomspulsen-dokumentasjon.no
-BugReports: https://github.com/folkehelseinstituttet/fhi/sykdomspulsen/issues
+BugReports: https://github.com/folkehelseinstituttet/sykdomspulsen/issues
 Depends:
   R (>= 3.5.0)
 Imports:
@@ -22,6 +23,8 @@ Imports:
   DBI,
   devtools,
   dplyr,
+  epitrix,
+  flextable,
   future,
   foreach,
   fhi,

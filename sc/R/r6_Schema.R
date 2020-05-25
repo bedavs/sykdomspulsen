@@ -1,3 +1,83 @@
+#' Blank field_types validator
+#' @param db_field_types db_field_types passed to schema
+#' @export
+validator_field_types_blank <- function(db_field_types){
+  return(TRUE)
+}
+
+#' Blank data validator
+#' @param data data passed to schema
+#' @export
+validator_field_contents_blank <- function(data){
+  return(TRUE)
+}
+
+#' validator_field_types_sykdomspulsen
+#' An example (schema) validator of field_types used in Sykdomspulsen
+#' @param db_field_types db_field_types passed to schema
+#' @export
+validator_field_types_sykdomspulsen <- function(db_field_types){
+  if(!inherits(db_field_types,"character")) return(FALSE)
+  if(!length(db_field_types) >= 12) return(FALSE)
+  if(!identical(
+    db_field_types[1:12],
+    c(
+      "granularity_time" = "TEXT",
+      "granularity_geo" = "TEXT",
+      "location_code" = "TEXT",
+      "border" = "INTEGER",
+      "age" = "TEXT",
+      "sex" = "TEXT",
+      "year" = "INTEGER",
+      "week" = "INTEGER",
+      "yrwk" = "TEXT",
+      "season" = "TEXT",
+      "x" = "DOUBLE",
+      "date" = "DATE"
+    )
+  )) return(FALSE)
+
+  return(TRUE)
+}
+
+#' validator_field_contents_sykdomspulsen
+#' An example (schema) validator of database data used in Sykdomspulsen
+#' @param data data passed to schema
+#' @export
+validator_field_contents_sykdomspulsen <- function(data){
+  if(sum(!unique(data$granularity_time) %in% c(
+    "total",
+    "year",
+    "month",
+    "week",
+    "day",
+    "hour",
+    "minute"
+  ))>0) return(FALSE)
+
+  if(sum(!unique(data$granularity_geo) %in% c(
+    "nation",
+    "county",
+    "municip",
+    "ward",
+    "station"
+  ))>0) return(FALSE)
+
+  if(sum(!unique(data$border) %in% c(
+    "2020"
+  ))>0) return(FALSE)
+
+  if(sum(!unique(data$sex) %in% c(
+    "male",
+    "female",
+    "total"
+  ))>0) return(FALSE)
+
+  if(!inherits(data$date,"Date")) return(FALSE)
+
+  return(TRUE)
+}
+
 #' add schema
 #' @param name the name of the schema
 #' @param schema a Schema R6 class
@@ -21,7 +101,18 @@ Schema <- R6Class("Schema",
                     db_load_folder = NULL,
                     keys = NULL,
                     keys_with_length = NULL,
-                    initialize = function(dt = NULL, conn = NULL, db_config = NULL, db_table, db_field_types, db_load_folder, keys) {
+                    validator_field_contents = NULL,
+                    initialize = function(
+                      dt = NULL,
+                      conn = NULL,
+                      db_config = NULL,
+                      db_table,
+                      db_field_types,
+                      db_load_folder,
+                      keys,
+                      validator_field_types=validator_field_types_blank,
+                      validator_field_contents=validator_field_contents_blank
+                    ) {
                       self$dt <- dt
                       self$conn <- conn
                       self$db_config <- db_config
@@ -30,6 +121,10 @@ Schema <- R6Class("Schema",
                       self$db_load_folder <- db_load_folder
                       self$keys <- keys
                       self$keys_with_length <- keys
+
+                      # validators
+                      if(!is.null(validator_field_types)) if(!validator_field_types(self$db_field_types)) stop(glue::glue("db_field_types not validated in {db_table}"))
+                      self$validator_field_contents <- validator_field_contents
 
                       ind <- self$db_field_types[self$keys] == "TEXT"
                       if (sum(ind) > 0) {
@@ -92,6 +187,8 @@ Schema <- R6Class("Schema",
                       return(retval)
                     },
                     db_load_data_infile = function(newdata, verbose = TRUE) {
+                      if(!self$validator_field_contents(newdata)) stop(glue::glue("db_load_data_infile not validated in {self$db_table}"))
+
                       infile <- random_file(self$db_load_folder)
                       load_data_infile(
                         conn = self$conn,
@@ -102,8 +199,9 @@ Schema <- R6Class("Schema",
                       )
                     },
                     db_upsert_load_data_infile = function(newdata, drop_indexes = NULL, verbose = TRUE) {
-                      infile <- random_file(self$db_load_folder)
+                      if(!self$validator_field_contents(newdata)) stop(glue::glue("db_upsert_load_data_infile not validated in {self$db_table}"))
 
+                      infile <- random_file(self$db_load_folder)
                       upsert_load_data_infile(
                         # conn = self$conn,
                         db_config = self$db_config,

@@ -6,62 +6,79 @@ add_task <- function(task){
 }
 
 #' task_from_config
-#' @param conf config
+#' @param name Name of task
+#' @param type Type of task ("data","single", "analysis", "ui")
+#' @param cores Number of cores to run the task on
+#' @param db_table Database table
+#' @param filter Filter for the database table
+#' @param for_each_plan Create a plan for each value
+#' @param for_each_argset Create an argset for each value
+#' @param upsert_at_end_of_each_plan If TRUE, then schema$output is used to upsert at the end of each plan
+#' @param action Text
+#' @param schema List of schema mappings
+#' @param args List of args
 #' @export
-task_from_config <- function(conf) {
-  name <- conf$name
+task_from_config <- function(
+  name,
+  type,
+  cores = 1,
+  db_table=NULL,
+  filter = "",
+  for_each_plan=NULL,
+  for_each_argset=NULL,
+  upsert_at_end_of_each_plan = FALSE,
+  action,
+  schema=NULL,
+  args=NULL
+) {
+
+  stopifnot(type %in% c("data","single", "analysis", "ui"))
+  stopifnot(cores %in% 1:parallel::detectCores())
+  stopifnot(upsert_at_end_of_each_plan %in% c(T,F))
   plans <- list()
-  schema <- conf$schema
-  cores <- get_list(conf, "cores", 1)
-  chunk_size <- get_list(conf, "chunk_size", 1)
+
   task <- NULL
-  if (conf$type %in% c("data", "single")) {
+  if (type %in% c("data", "single")) {
     plan <- plnr::Plan$new()
     arguments <- list(
-      fn_name = conf$action,
+      fn_name = action,
       name = name,
       today = Sys.Date()
     )
-    if ("args" %in% names(conf)) {
-      arguments <- c(arguments, conf$args)
-    }
+    if (!is.null(args)) arguments <- c(arguments, args)
     do.call(plan$add_analysis, arguments)
 
     task <- Task$new(
       name = name,
-      type = conf$type,
+      type = type,
       plans = list(plan),
       schema = schema,
-      dependencies = get_list(conf, "dependencies", c()),
       cores = cores,
-      chunk_size = chunk_size,
-      upsert_at_end_of_each_plan = get_list(conf, "upsert_at_end_of_each_plan", FALSE)
+      upsert_at_end_of_each_plan = upsert_at_end_of_each_plan
     )
-  } else if (conf$type %in% c("analysis", "ui")) {
+  } else if (type %in% c("analysis", "ui")) {
     task <- Task$new(
       name = name,
-      type = conf$type,
+      type = type,
       plans = plans,
       schema = schema,
-      dependencies = get_list(conf, "dependencies", c()),
       cores = cores,
-      chunk_size = chunk_size,
-      upsert_at_end_of_each_plan = get_list(conf, "upsert_at_end_of_each_plan", FALSE)
+      upsert_at_end_of_each_plan = upsert_at_end_of_each_plan
     )
 
     task$update_plans_fn <- function() {
-      table_name <- conf$db_table
+      table_name <- db_table
       x_plans <- list()
 
       filters_plan <- get_filters(
-        for_each = conf$for_each_plan,
+        for_each = for_each_plan,
         table_name = table_name,
-        filter = get_list(conf, "filter", default = "")
+        filter = filter
       )
       filters_argset <- get_filters(
-        for_each = conf$for_each_argset,
+        for_each = for_each_argset,
         table_name = table_name,
-        filter = get_list(conf, "filter", default = "")
+        filter = filter
       )
 
       filters_plan <- do.call(tidyr::crossing, filters_plan)
@@ -71,7 +88,7 @@ task_from_config <- function(conf) {
         current_plan <- plnr::Plan$new()
         fs <- c()
         arguments <- list(
-          fn_name = conf$action, name = glue::glue("{name}_{i}"),
+          fn_name = action, name = glue::glue("{name}_{i}"),
           source_table = table_name,
           today = Sys.Date()
         )
@@ -79,17 +96,14 @@ task_from_config <- function(conf) {
           arguments[n] <- filters_plan[i, n]
           fs <- c(fs, glue::glue("{n}=='{filters_plan[i,n]}'"))
         }
-        extra_filter <- get_list(conf, "filter", default = "")
 
-        filter <- paste(fs, collapse = " & ")
-        if (extra_filter != "") {
-          filter <- paste(filter, extra_filter, sep = " & ")
+        filter_x <- paste(fs, collapse = " & ")
+        if (filter != "") {
+          filter_x <- paste(filter_x, filter, sep = " & ")
         }
-        current_plan$add_data(name = "data", fn = data_function_factory(table_name, filter))
+        current_plan$add_data(name = "data", fn = data_function_factory(table_name, filter_x))
 
-        if ("args" %in% names(conf)) {
-          arguments <- c(arguments, conf$args)
-        }
+        if (!is.null(args)) arguments <- c(arguments, args)
 
         if (nrow(filters_argset) == 0) {
           do.call(current_plan$add_analysis, arguments)
@@ -124,9 +138,7 @@ Task <- R6::R6Class(
     permission = NULL,
     plans = list(),
     schema = list(),
-    dependencies = list(),
     cores = 1,
-    chunk_size = 100,
     upsert_at_end_of_each_plan = FALSE,
     name = NULL,
     update_plans_fn = NULL,
@@ -137,9 +149,7 @@ Task <- R6::R6Class(
                               plans = NULL,
                               update_plans_fn = NULL,
                               schema,
-                              dependencies = c(),
                               cores = 1,
-                              chunk_size = 100,
                               upsert_at_end_of_each_plan = FALSE) {
       self$name <- name
       self$type <- type
@@ -148,8 +158,6 @@ Task <- R6::R6Class(
       self$update_plans_fn <- update_plans_fn
       self$schema <- schema
       self$cores <- cores
-      self$dependencies <- dependencies
-      self$chunk_size <- chunk_size
       self$upsert_at_end_of_each_plan <- upsert_at_end_of_each_plan
     },
     update_plans = function() {
@@ -173,17 +181,7 @@ Task <- R6::R6Class(
 
       upsert_at_end_of_each_plan <- self$upsert_at_end_of_each_plan
 
-
       self$update_plans()
-
-      # progressr::with_progress({
-      #   pb <- progressr::progressor(steps = self$num_argsets())
-      #   for (i in seq_along(plans)) {
-      #     if(!interactive()) print(i)
-      #     plans[[i]]$set_progress(pb)
-      #     plans[[i]]$run_all(schema = schema)
-      #   }
-      # })
 
       message(glue::glue("Running task={self$name} with plans={length(self$plans)} and argsets={self$num_argsets()}"))
 
@@ -212,7 +210,7 @@ Task <- R6::R6Class(
         parallel <- "plans=sequential, argset=sequential"
       }
 
-      message(glue::glue("{parallel} with cores={cores} and chunk_size={self$chunk_size}"))
+      message(glue::glue("{parallel} with cores={cores}"))
 
       if (cores == 1) {
         # not running in parallel
