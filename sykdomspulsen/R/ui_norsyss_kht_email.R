@@ -37,7 +37,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
     "- Det er n{fhi::nb$aa} mulig {fhi::nb$aa} laste ned tallmaterialet bak den f{fhi::nb$oe}rste grafen og modelleringsresultatene p{fhi::nb$aa} websiden.",
-    " Det er ogs{fhi::nb$aa} mulig {fhi::nb$aa} kopiere figurene p{fhi::nb$aa} ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
+    " Det er ogs{fhi::nb$aa} mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
     "- Du vil innen et par uker f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om websiden og de ukentlige mailene.",
     "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
 
