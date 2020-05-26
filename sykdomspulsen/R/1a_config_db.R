@@ -670,6 +670,80 @@ set_db <- function(){
   )
 
   sc::add_schema(
+    name = "results_norsyss_mem",
+    schema = sc::Schema$new(
+      db_table = "results_mem",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "n" = "INTEGER",
+        "n_denominator" = "INTEGER",
+        "rp100" = "DOUBLE",
+        "rp100_baseline_thresholdu0" = "DOUBLE",
+        "rp100_baseline_thresholdu1" = "DOUBLE",
+        "rp100_baseline_thresholdu2" = "DOUBLE",
+        "rp100_baseline_thresholdu3" = "DOUBLE",
+        "rp100_status"= "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome",
+        "location_code",
+        "year",
+        "date",
+        "age"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  sc::add_schema(
+    name = "results_norsyss_mem_limits",
+    schema = sc::Schema$new(
+      db_table = "results_mem_limits",
+      db_config = sc::config$db_config,
+      db_field_types = list(        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "location_code" = "TEXT",
+        "rp100_baseline_thresholdu0" = "DOUBLE",
+        "rp100_baseline_thresholdu1" = "DOUBLE",
+        "rp100_baseline_thresholdu2" = "DOUBLE",
+        "rp100_baseline_thresholdu3" = "DOUBLE"
+      ),
+      db_load_folder = tempdir(),
+      keys = c("season", "tag_outcome", "age", "location_code"),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  sc::add_schema(
     name = "results_simple",
     schema = sc::Schema$new(
       db_table = "results_simple",
@@ -704,63 +778,6 @@ set_db <- function(){
     )
   )
 
-  sc::add_schema(
-    name = "results_mem",
-    schema = sc::Schema$new(
-      db_table = "results_mem",
-      db_config = sc::config$db_config,
-      db_field_types =  c(
-        "tag_outcome" = "TEXT",
-        "source" = "TEXT",
-        "location_code" = "TEXT",
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "border" = "INTEGER",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "date" = "DATE",
-        "season" = "TEXT",
-        "yrwk" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "n" = "INTEGER",
-        "n_denominator" = "INTEGER",
-        "rp100" = "DOUBLE",
-        "rp100_baseline_thresholdu0" = "DOUBLE",
-        "rp100_baseline_thresholdu1" = "DOUBLE",
-        "rp100_baseline_thresholdu2" = "DOUBLE",
-        "rp100_baseline_thresholdu3" = "DOUBLE",
-        "rp100_status"= "TEXT"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "tag_outcome",
-        "location_code",
-        "year",
-        "date",
-        "age"
-      )
-    )
-  )
 
-  sc::add_schema(
-    name = "results_mem_limits",
-    schema = sc::Schema$new(
-      db_table = "results_mem_limits",
-      db_config = sc::config$db_config,
-      db_field_types = list(
-        "season" = "TEXT",
-        "tag_outcome" = "TEXT",
-        "age" = "TEXT",
-        "location_code" = "TEXT",
-        "rp100_baseline_thresholdu0" = "DOUBLE",
-        "rp100_baseline_thresholdu1" = "DOUBLE",
-        "rp100_baseline_thresholdu2" = "DOUBLE",
-        "rp100_baseline_thresholdu3" = "DOUBLE"
-      ),
-      db_load_folder = tempdir(),
-      keys = c("season", "tag_outcome", "age", "location_code")
-    )
-  )
 }
 

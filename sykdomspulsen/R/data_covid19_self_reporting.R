@@ -17,6 +17,9 @@ data_covid19_self_reporting <- function(data, argset, schema){
   file <- fs::dir_ls(folder, regexp="selvrapportering_kommune_fylke_faar_kjonn_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].csv")
   file <- max(file)
 
+  # date max
+  date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
+
   master <- fread(file, encoding="Latin-1")
 
   setnames(master, epitrix::clean_labels(names(master)))
@@ -50,7 +53,6 @@ data_covid19_self_reporting <- function(data, argset, schema){
   nrow(master)
 
   # dates
-  date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
   date_min <- min(master$hvilken_dag_fikk_du_symptomer)
 
   # gen variables
