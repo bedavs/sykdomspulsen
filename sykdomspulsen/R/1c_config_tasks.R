@@ -407,8 +407,8 @@ set_tasks <- function() {
       filter = "(granularity_geo=='county' | granularity_geo=='nation') & tag_outcome=='influensa_vk_o'",
       for_each_plan = list("location_code" = "all"),
       schema = list(
-        output = sc::config$schemas$results_mem,
-        output_limits = sc::config$schemas$results_mem_limits
+        output = sc::config$schemas$results_norsyss_mem,
+        output_limits = sc::config$schemas$results_norsyss_mem_limits
       ),
       args = list(
         age = jsonlite::toJSON(list("total" = c("total"))),
@@ -420,6 +420,7 @@ set_tasks <- function() {
     )
   )
 
+  # analysis_norsyss_mem_influensa_all ----
   sc::add_task(
     sc::task_from_config(
       name = "analysis_norsyss_mem_influensa_all",
