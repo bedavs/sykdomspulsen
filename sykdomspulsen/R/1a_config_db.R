@@ -672,7 +672,7 @@ set_db <- function(){
   sc::add_schema(
     name = "results_norsyss_mem",
     schema = sc::Schema$new(
-      db_table = "results_mem",
+      db_table = "results_norsyss_mem",
       db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -714,9 +714,10 @@ set_db <- function(){
   sc::add_schema(
     name = "results_norsyss_mem_limits",
     schema = sc::Schema$new(
-      db_table = "results_mem_limits",
+      db_table = "results_norsyss_mem_limits",
       db_config = sc::config$db_config,
-      db_field_types = list(        "granularity_time" = "TEXT",
+      db_field_types = c(
+        "granularity_time" = "TEXT",
         "granularity_geo" = "TEXT",
         "location_code" = "TEXT",
         "border" = "INTEGER",
