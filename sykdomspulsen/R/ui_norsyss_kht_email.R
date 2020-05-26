@@ -38,8 +38,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "<u>Nytt fra Sykdomspulsen:</u><br>",
     "- Det er nå mulig {fhi::nb$aa} laste ned tallmaterialet bak den første grafen og modelleringsresultatene p{fhi::nb$aa} websiden.",
     " Det er også mulig {fhi::nb$aa} kopiere figurene p{fhi::nb$aa} ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
-    "- Du vil innen et par uker få en spørreundersøkelse fra Sykdomspulsen for kommunehelsetjenesten om websiden og de ukentlige mailene.",
-    "Vi setter stor pris på om du kan svare på denne.<br><br>",
+    "- Du vil innen et par uker f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om websiden og de ukentlige mailene.",
+    "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
 
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
 
