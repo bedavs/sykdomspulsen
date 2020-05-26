@@ -31,9 +31,15 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_text_top <- glue::glue(
     "<b>Dette er en ukentlig oversikt over FHI data fra Sykdomspulsen for kommunehelsetjenesten</b><br>",
     "Under ser du tabeller med de geografiske omr{fhi::nb$aa}dene du har valgt med informasjon ",
-    "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer). Du kan endre det geografiske ",
-    "omr{fhi::nb$aa}de ved {fhi::nb$aa} g{fhi::nb$aa} til 'Geografisk omr{fhi::nb$aa}de' i websiden. Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken ",
-    "og har derfor kun data fra mandag og tirsdag.<br><br>",
+    "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer).<br>",
+    "Du kan endre det geografiske omr{fhi::nb$aa}de ved {fhi::nb$aa} g{fhi::nb$aa} til 'Geografisk omr{fhi::nb$aa}de' i websiden.<br>",
+    "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
+
+    "<u>Nytt fra Sykdomspulsen:</u><br>",
+    "- Det er nå mulig {fhi::nb$aa} laste ned tallmaterialet bak den første grafen og modelleringsresultatene p{fhi::nb$aa} websiden.",
+    " Det er også mulig {fhi::nb$aa} kopiere figurene p{fhi::nb$aa} ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
+    "- Du vil innen et par uker få en spørreundersøkelse fra Sykdomspulsen for kommunehelsetjenesten om websiden og de ukentlige mailene.",
+    "Vi setter stor pris på om du kan svare på denne.<br><br>",
 
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
 
@@ -42,32 +48,6 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   )
 
   email_text_bottom <- glue::glue(
-    "<u>Nytt fra Sykdomspulsen:</u><br>",
-
-    "- Vi har inkludert signaler for covid-19.",
-    " Signalsystemet bruker gjennomsnittet med 95% konfidensintervall av uke ",
-    "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
-    "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
-    "{fhi::isoyearweek(lubridate::today()-7-1)} og {fhi::isoyearweek(lubridate::today()-0-1)}.<br>",
-    "Dette er kun et signal og trenger ikke {fhi::nb$aa} v{fhi::nb$ae}re noe man m{fhi::nb$aa} gj{fhi::nb$oe}re noe med,",
-    " men det kan v{fhi::nb$ae}re en fordel {fhi::nb$aa} sjekke websiden og f{fhi::nb$oe}lge med.<br>",
-
-    "- Det er mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier', ",
-    "vi jobber med at dere ogs{fhi::nb$aa} skal kunne laste ned tallmaterialet bak grafene.<br>",
-
-    "- Vi vet at det er mange som ikke liker v{fhi::nb$aa}r p{fhi::nb$aa}loggingsl{fhi::nb$oe}sning med egen ",
-    "kommune(over)lege(n) e-postadresse. Vi synes dette er synd, men ser ingen annen utvei s{fhi::nb$aa} lenge ",
-    "det ikke finnes et nasjonalt autorisert register over kommuneleger/kommuneoverleger som fortl{fhi::nb$oe}pende ",
-    "blir oppdatert med endringer i kommunene. Folkehelseinstituttet har ikke kapasitet til {fhi::nb$aa} forvalte ",
-    "et slikt register p{fhi::nb$aa} vegne av kommunene, men samarbeider gjerne med kommunene og KS for {fhi::nb$aa} ",
-    "f{fhi::nb$aa} til et slikt register som vil v{fhi::nb$ae}re viktig i fremtidig beredskapsarbeid med ",
-    "{fhi::nb$oe}kt digitalisering. Dette er bakgrunnen for at vi er blitt n{fhi::nb$oe}dt til {fhi::nb$aa} ",
-    "foresl{fhi::nb$aa} denne l{fhi::nb$oe}sningen med rollebaserte mailkontoer i den enkelte kommune. Dermed er ",
-    "det kommunene selv som m{fhi::nb$aa} p{fhi::nb$aa}se at den som enhver tid innehar rollen ogs{fhi::nb$aa} har ",
-    "tilgang  til denne e-postadressen.<br>",
-
-    "- Vi {fhi::nb$oe}nsker fortsatt deltakere til et brukerpanel som kan gi innspill om websiden og den ukentlige oversikten over FHI data, send mail til sykdomspulsen@fhi.no<br><br>",
-
 
     "<u>Tabellen med covid-19 viser</u> antall konsultasjoner hos lege og legevakt (NorSySS) ",
     "og antall bekreftede tilfeller registrert i MSIS.<br>",
@@ -97,8 +77,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner.<br>",
     "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
     "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
-    "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br><br>",
-
+    "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br>",
     "Varselet er en informasjon om at det kan v{fhi::nb$ae}re noe som b{fhi::nb$oe}r f{fhi::nb$oe}lges opp i din kommune eller i et fylke. ",
     "Det anbefales {fhi::nb$aa} g{fhi::nb$aa} inn i Sykdomspulsen websiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
 
@@ -106,6 +85,18 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Dette sees som oftest i sm{fhi::nb$aa} kommuner der det vanligvis ikke er mange konsultasjoner. For ikke {fhi::nb$aa} bli forstyrret ",
     "av slike signaler har vi n{fhi::nb$aa} lagt inn en nedre grense for gult signal p{fhi::nb$aa} p{fhi::nb$aa} minst tre konsultasjoner og en nedre grense for ",
     "r{fhi::nb$oe}dt signal p{fhi::nb$aa} minst fire konsultasjoner.<br><br>",
+
+    "Vi vet at det er mange som ikke liker v{fhi::nb$aa}r p{fhi::nb$aa}loggingsl{fhi::nb$oe}sning med egen ",
+    "kommune(over)lege(n) e-postadresse. Vi synes dette er synd, men ser ingen annen utvei s{fhi::nb$aa} lenge ",
+    "det ikke finnes et nasjonalt autorisert register over kommuneleger/kommuneoverleger som fortl{fhi::nb$oe}pende ",
+    "blir oppdatert med endringer i kommunene. Folkehelseinstituttet har ikke kapasitet til {fhi::nb$aa} forvalte ",
+    "et slikt register p{fhi::nb$aa} vegne av kommunene, men samarbeider gjerne med kommunene og KS for {fhi::nb$aa} ",
+    "f{fhi::nb$aa} til et slikt register som vil v{fhi::nb$ae}re viktig i fremtidig beredskapsarbeid med ",
+    "{fhi::nb$oe}kt digitalisering. Dette er bakgrunnen for at vi er blitt n{fhi::nb$oe}dt til {fhi::nb$aa} ",
+    "foresl{fhi::nb$aa} denne l{fhi::nb$oe}sningen med rollebaserte mailkontoer i den enkelte kommune. Dermed er ",
+    "det kommunene selv som m{fhi::nb$aa} p{fhi::nb$aa}se at den som enhver tid innehar rollen ogs{fhi::nb$aa} har ",
+    "tilgang  til denne e-postadressen.<br><br>",
+
 
     "Ta kontakt med oss om du har sp{fhi::nb$oe}rsm{fhi::nb$aa}l eller om det er noe som er uklart p{fhi::nb$aa} sykdomspulsen@fhi.no.<br><br>",
 
@@ -391,8 +382,6 @@ norsyss_kht_covid19_overview_table <- function(data){
   nr0 <- nrow(ht) + 1
   ht <- huxtable::add_footnote(ht, glue::glue(
     "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt med ICPC-2 kodene R991 og R992.",
-    "For uke 18 viser R991 data for covid-19 (mistenkt eller bekreftet), mens R992 ikke var opprettet enda ",
-    "s{fhi::nb$aa} det er ingen data for disse ukene. For uke 19, 20 og 21 brukes R991 for covid-19 (mistenkt/sannsynlig) og R992 for covid-19 (bekreftet).<br>",
     "<sup>2</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
   ), border = 0)
   nr1 <- nrow(ht)
