@@ -530,6 +530,10 @@ set_db <- function(){
         "date",
         "age"
       ),
+      indexes = list(
+        "ind1" = c("year"),
+        "ind2" = c("year", "tag_outcome")
+      ),
       validator_field_types = sc::validator_field_types_sykdomspulsen,
       validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
@@ -669,6 +673,7 @@ set_db <- function(){
     )
   )
 
+  # results_norsyss_mem ----
   sc::add_schema(
     name = "results_norsyss_mem",
     schema = sc::Schema$new(
@@ -711,6 +716,7 @@ set_db <- function(){
     )
   )
 
+  # results_norsyss_mem_limits ----
   sc::add_schema(
     name = "results_norsyss_mem_limits",
     schema = sc::Schema$new(
@@ -731,7 +737,6 @@ set_db <- function(){
         "date" = "DATE",
 
         "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
         "rp100_baseline_thresholdu0" = "DOUBLE",
         "rp100_baseline_thresholdu1" = "DOUBLE",
         "rp100_baseline_thresholdu2" = "DOUBLE",

@@ -48,6 +48,7 @@ validator_field_contents_sykdomspulsen <- function(data){
   if(sum(!unique(data$granularity_time) %in% c(
     "total",
     "year",
+    "season",
     "month",
     "week",
     "day",
@@ -101,6 +102,7 @@ Schema <- R6Class("Schema",
                     db_load_folder = NULL,
                     keys = NULL,
                     keys_with_length = NULL,
+                    indexes = NULL,
                     validator_field_contents = NULL,
                     initialize = function(
                       dt = NULL,
@@ -110,6 +112,7 @@ Schema <- R6Class("Schema",
                       db_field_types,
                       db_load_folder,
                       keys,
+                      indexes=NULL,
                       validator_field_types=validator_field_types_blank,
                       validator_field_contents=validator_field_contents_blank
                     ) {
@@ -121,6 +124,7 @@ Schema <- R6Class("Schema",
                       self$db_load_folder <- db_load_folder
                       self$keys <- keys
                       self$keys_with_length <- keys
+                      self$indexes <- indexes
 
                       # validators
                       if(!is.null(validator_field_types)) if(!validator_field_types(self$db_field_types)) stop(glue::glue("db_field_types not validated in {db_table}"))
@@ -198,7 +202,7 @@ Schema <- R6Class("Schema",
                         file = infile
                       )
                     },
-                    db_upsert_load_data_infile = function(newdata, drop_indexes = NULL, verbose = TRUE) {
+                    db_upsert_load_data_infile = function(newdata, drop_indexes = names(self$indexes), verbose = TRUE) {
                       if(!self$validator_field_contents(newdata)) stop(glue::glue("db_upsert_load_data_infile not validated in {self$db_table}"))
 
                       infile <- random_file(self$db_load_folder)
@@ -218,6 +222,9 @@ Schema <- R6Class("Schema",
                     },
                     db_drop_rows_where = function(condition){
                       drop_rows_where(self$conn, self$db_table, condition)
+                    },
+                    db_keep_rows_where = function(condition){
+                      keep_rows_where(self$conn, self$db_table, condition)
                     },
                     get_data = function(...) {
                       dots <- dplyr::quos(...)
@@ -270,12 +277,35 @@ Schema <- R6Class("Schema",
                       return(retval)
                     },
 
-                    add_index_db = function() {
-                      txt <- glue::glue_collapse(glue::glue("`{self$keys}`(20)"), sep = ",")
-                      DBI::dbExecute(
-                        self$conn,
-                        glue::glue("ALTER TABLE `{self$db_table}` ADD INDEX `ind1` ({txt})")
+                    list_indexes_db = function(){
+                      list_indexes(
+                        conn = self$conn,
+                        table = self$db_table
                       )
+                    },
+
+                    add_indexes = function() {
+                      for(i in names(self$indexes)){
+                        message(glue::glue("Adding index {i}"))
+
+                        add_index(
+                          conn = self$conn,
+                          table = self$db_table,
+                          index = i,
+                          keys = self$indexes[[i]]
+                        )
+                      }
+                    },
+
+                    drop_indexes = function() {
+                      for(i in names(self$indexes)){
+                        message(glue::glue("Dropping index {i}"))
+                        drop_index(
+                          conn= self$conn,
+                          table = self$db_table,
+                          index = i
+                        )
+                      }
                     },
 
                     identify_dt_that_exists_in_db = function() {

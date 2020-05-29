@@ -27,7 +27,9 @@ schema class description
 \item \href{#method-get_data_dt}{\code{Schema$get_data_dt()}}
 \item \href{#method-get_data_db}{\code{Schema$get_data_db()}}
 \item \href{#method-dplyr_tbl}{\code{Schema$dplyr_tbl()}}
-\item \href{#method-add_index_db}{\code{Schema$add_index_db()}}
+\item \href{#method-list_indexes_db}{\code{Schema$list_indexes_db()}}
+\item \href{#method-add_indexes}{\code{Schema$add_indexes()}}
+\item \href{#method-drop_indexes}{\code{Schema$drop_indexes()}}
 \item \href{#method-identify_dt_that_exists_in_db}{\code{Schema$identify_dt_that_exists_in_db()}}
 \item \href{#method-clone}{\code{Schema$clone()}}
 }
@@ -45,6 +47,7 @@ schema class description
   db_field_types,
   db_load_folder,
   keys,
+  indexes = NULL,
   validator_field_types = validator_field_types_blank,
   validator_field_contents = validator_field_contents_blank
 )}\if{html}{\out{</div>}}
@@ -187,11 +190,29 @@ schema class description
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_index_db"></a>}}
-\if{latex}{\out{\hypertarget{method-add_index_db}{}}}
-\subsection{Method \code{add_index_db()}}{
+\if{html}{\out{<a id="method-list_indexes_db"></a>}}
+\if{latex}{\out{\hypertarget{method-list_indexes_db}{}}}
+\subsection{Method \code{list_indexes_db()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Schema$add_index_db()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Schema$list_indexes_db()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_indexes"></a>}}
+\if{latex}{\out{\hypertarget{method-add_indexes}{}}}
+\subsection{Method \code{add_indexes()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Schema$add_indexes()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-drop_indexes"></a>}}
+\if{latex}{\out{\hypertarget{method-drop_indexes}{}}}
+\subsection{Method \code{drop_indexes()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Schema$drop_indexes()}\if{html}{\out{</div>}}
 }
 
 }
