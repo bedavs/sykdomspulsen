@@ -22,13 +22,21 @@ data_pre_norsyss <- function(data, argset, schema){
   } else if(!"data_norsyss" %in% sc::list_tables()){
     argset$date_from <- "2006-01-02"
   } else {
-    date_max <- sc::tbl("data_norsyss") %>%
-      dplyr::summarize(date_max = max(date)) %>%
+    date_min <- sc::tbl("data_norsyss") %>%
+      dplyr::summarize(date_min = min(date)) %>%
       dplyr::collect()
-    date_max <- date_max$date_max
-    date_min <-  date_max-365*2
-    year_min <- fhi::isoyear_n(date_min)
-    date_min <- fhidata::days[year==year_min][1]$mon
+    date_min <- date_min$date_min
+    if(date_min != "2006-01-02"){
+      date_min <- "2006-01-02"
+    } else {
+      date_max <- sc::tbl("data_norsyss") %>%
+        dplyr::summarize(date_max = max(date)) %>%
+        dplyr::collect()
+      date_max <- date_max$date_max
+      date_min <-  date_max-365*2
+      year_min <- fhi::isoyear_n(date_min)
+      date_min <- fhidata::days[year==year_min][1]$mon
+    }
     argset$date_from <- date_min
   }
 
