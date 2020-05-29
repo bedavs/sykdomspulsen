@@ -352,8 +352,6 @@ data_norsyss <- function(data, argset, schema){
   schema$output$db_keep_rows_where(glue::glue("year<{skeleton_year_min}"))
   lubridate::now()
 
-  #schema$output$db_drop_constraint()
-
   master <- d
 
   for (i in 1:nrow(syndromes)) {
@@ -371,10 +369,16 @@ data_norsyss <- function(data, argset, schema){
     )
     res[, tag_outcome:=conf$tag_output]
 
-    #schema$output$db_upsert_load_data_infile(res)
     schema$output$db_load_data_infile(res)
   }
-  #schema$output$db_add_constraint()
+  message("Copying into data_norsyss_recent")
+
+  sc::drop_table("data_norsyss_recent")
+  sql <- glue::glue("SELECT * INTO data_norsyss_recent FROM {schema$output$db_table} WHERE year >= {fhi::isoyear_n()-1};")
+  DBI::dbExecute(schema$output$conn, sql)
+
   message("New data is now formatted and ready")
+
+
   return(TRUE)
 }
