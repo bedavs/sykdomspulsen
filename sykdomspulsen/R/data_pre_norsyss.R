@@ -43,7 +43,7 @@ data_pre_norsyss <- function(data, argset, schema){
   message(glue::glue("Downloading from {argset$date_from}"))
   norsyss_fetch_raw_data_and_aggregate(
     date_from = argset$date_from,
-    date_to = format(Sys.time(), "%Y-%m-%d"),
+    date_to = lubridate::today()-1,
     folder = sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE),
     overwrite_file=FALSE,
     diags = argset$diags
