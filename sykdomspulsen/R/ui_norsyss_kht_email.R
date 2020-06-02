@@ -10,8 +10,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     # tm_run_task("ui_norsyss_kht_email")
   }
 
+  # GRY, START RUNNING HERE
   if(plnr::is_run_directly()){
-    # GRY, START RUNNING HERE
     sc::tm_update_plans("ui_norsyss_kht_email")
     length(sc::config$tasks$list_task$ui_norsyss_kht_email$plans)
 
@@ -32,16 +32,17 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "<b>Dette er en ukentlig oversikt over FHI data fra Sykdomspulsen for kommunehelsetjenesten</b><br>",
     "Under ser du tabeller med de geografiske omr{fhi::nb$aa}dene du har valgt med informasjon ",
     "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer).<br>",
-    "Du kan endre det geografiske omr{fhi::nb$aa}de ved {fhi::nb$aa} g{fhi::nb$aa} til 'Geografisk omr{fhi::nb$aa}de' i websiden.<br>",
+    "Du kan endre det geografiske omr{fhi::nb$aa}de ved {fhi::nb$aa} g{fhi::nb$aa} til 'Geografisk omr{fhi::nb$aa}de' i nettsiden.<br>",
     "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Det er n{fhi::nb$aa} mulig {fhi::nb$aa} laste ned tallmaterialet bak den f{fhi::nb$oe}rste grafen og modelleringsresultatene p{fhi::nb$aa} websiden.",
+    "- Det vil snart v{fhi::nb$ae}re mulig {fhi::nb$aa} sammenlikne data for kommuner, fylker og Norge, dette vil komme i en ny fane under covid-19 delen p{fhi::nb$aa} nettsiden.<br>",
+    "- Det er mulig {fhi::nb$aa} laste ned tallmaterialet bak noen av figurene p{fhi::nb$aa} nettsiden ved {fhi::nb$aa} bruke 'last ned tabell' knappen over figuren.",
     " Det er ogs{fhi::nb$aa} mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
-    "- Du vil innen et par uker f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om websiden og de ukentlige mailene.",
+    "- Du vil innen et par uker f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
     "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
 
-    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} websiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
+    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
 
     "Dersom dere har problemer med p{fhi::nb$aa}loggingen eller andre sp\u00F8rsm\u00E5l, vennligst send en mail til sykdomspulsen@fhi.no<br>"
 
@@ -54,10 +55,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "For NorSySS data ble diagnosekoden R991: covid-19 (mistenkt eller bekreftet) ",
     "brukt mellom 06.03.2020 til 03.05.2020. Det ble en endring i covid-19 ICPC-2 diagnosekodene ",
     "04.05.2020 til R991: covid-19 (mistenkt/sannsynlig) og R992: covid-19 (bekreftet). ",
-    "For uke 18 viser R991 data for covid-19 (mistenkt eller bekreftet),",
-    "mens R992 ikke var opprettet enda s{fhi::nb$aa} det er ingen data for denne uken.",
-    "For uke 19, 20 og 21 brukes R991 for covid-19 (mistenkt/sannsynlig) og R992",
-    "for covid-19 (bekreftet).  Sykdomspulsen har data for konsultasjoner,",
+    "Sykdomspulsen har data for konsultasjoner,",
     "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
     "flere ganger hvis personen kontakter legen flere ganger.<br>",
 
@@ -68,7 +66,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
     "{fhi::isoyearweek(lubridate::today()-7-1)} og {fhi::isoyearweek(lubridate::today()-0-1)}.<br>",
     "Dette er kun et signal og trenger ikke {fhi::nb$aa} v{fhi::nb$ae}re noe man m{fhi::nb$aa} gj{fhi::nb$oe}re noe med,",
-    " men det kan v{fhi::nb$ae}re en fordel {fhi::nb$aa} sjekke websiden og f{fhi::nb$oe}lge med.<br><br>",
+    " men det kan v{fhi::nb$ae}re en fordel {fhi::nb$aa} sjekke nettsiden og f{fhi::nb$oe}lge med.<br><br>",
 
     "<u>Tabellene med mage-tarminfeksjoner og luftveisinfeksjoner har kun NorSySS data og viser disse verdiene:</u><br>",
     "Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
@@ -79,7 +77,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
     "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br>",
     "Varselet er en informasjon om at det kan v{fhi::nb$ae}re noe som b{fhi::nb$oe}r f{fhi::nb$oe}lges opp i din kommune eller i et fylke. ",
-    "Det anbefales {fhi::nb$aa} g{fhi::nb$aa} inn i Sykdomspulsen websiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
+    "Det anbefales {fhi::nb$aa} g{fhi::nb$aa} inn i Sykdomspulsen nettsiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
 
     "Sykdomspulsen kan i noen tilfeller generere et signal selv om det bare er en eller to konsultasjoner for et symptom/sykdom. ",
     "Dette sees som oftest i sm{fhi::nb$aa} kommuner der det vanligvis ikke er mange konsultasjoner. For ikke {fhi::nb$aa} bli forstyrret ",
@@ -128,8 +126,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     glue::glue(
       "<h2>NorSySS + MSIS: Signaler for covid-19</h2>",
 
-      "Dersom du ser en tabell under, betyr det at det i det geografiske omr{fhi::nb$aa}det du har valgt, har ",
-      "v{fhi::nb$ae}rt en eller flere uker med en {fhi::nb$oe}kning som er statistisk signifikant.<br>",
+      "Dersom du ser en tabell under, er det",
+      " en eller flere uker med en {fhi::nb$oe}kning som er statistisk signifikant i det geografiske omr{fhi::nb$aa}det du har valgt.<br>",
       "Vi bruker her gjennomsnittet med 95% konfidensintervall av uke ",
       "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
       "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
@@ -381,7 +379,7 @@ norsyss_kht_covid19_overview_table <- function(data){
 
   nr0 <- nrow(ht) + 1
   ht <- huxtable::add_footnote(ht, glue::glue(
-    "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt med ICPC-2 kodene R991 og R992.",
+    "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt med ICPC-2 kodene R991 og R992.<br>",
     "<sup>2</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
   ), border = 0)
   nr1 <- nrow(ht)
