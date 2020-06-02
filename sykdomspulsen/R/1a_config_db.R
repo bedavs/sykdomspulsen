@@ -97,6 +97,38 @@ set_db <- function(){
       validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
+  # prelim_data_covid19_msis_by_time_location ----
+  sc::add_schema(
+    name = "prelim_data_covid19_msis_by_time_location",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_msis_by_time_location",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
 
   # data_covid19_msis_by_time_infected_abroad ----
   sc::add_schema(
@@ -133,11 +165,81 @@ set_db <- function(){
     )
   )
 
+  # prelim_data_covid19_msis_by_time_infected_abroad ----
+  sc::add_schema(
+    name = "prelim_data_covid19_msis_by_time_infected_abroad",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_msis_by_time_infected_abroad",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_location_infected" = "TEXT",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date",
+        "tag_location_infected"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   # data_covid19_msis_by_time_sex_age ----
   sc::add_schema(
     name = "data_covid19_msis_by_time_sex_age",
     schema = sc::Schema$new(
       db_table = "data_covid19_msis_by_time_sex_age",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "age",
+        "sex",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  # prelim_data_covid19_msis_by_time_sex_age ----
+  sc::add_schema(
+    name = "prelim_data_covid19_msis_by_time_sex_age",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_msis_by_time_sex_age",
       db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -204,11 +306,81 @@ set_db <- function(){
     )
   )
 
+  # prelim_data_covid19_lab_by_time ----
+  sc::add_schema(
+    name = "prelim_data_covid19_lab_by_time",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_lab_by_time",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n_neg" = "INTEGER",
+        "n_pos" = "INTEGER",
+        "pr100_pos" = "DOUBLE",
+        "cum_n_tested" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   # data_covid19_hospital_by_time ----
   sc::add_schema(
     name = "data_covid19_hospital_by_time",
     schema = sc::Schema$new(
       db_table = "data_covid19_hospital_by_time",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n_icu" = "INTEGER",
+        "n_hospital_main_cause" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  # prelim_data_covid19_hospital_by_time ----
+  sc::add_schema(
+    name = "prelim_data_covid19_hospital_by_time",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_hospital_by_time",
       db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",
@@ -271,11 +443,81 @@ set_db <- function(){
     )
   )
 
+  # prelim_data_covid19_deaths ----
+  sc::add_schema(
+    name = "prelim_data_covid19_deaths",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_deaths",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "cum_n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   # data_covid19_demographics ----
   sc::add_schema(
     name = "data_covid19_demographics",
     schema = sc::Schema$new(
       db_table = "data_covid19_demographics",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "n" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date",
+        "age",
+        "sex",
+        "tag_outcome"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  # prelim_data_covid19_demographics ----
+  sc::add_schema(
+    name = "prelim_data_covid19_demographics",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_demographics",
       db_config = sc::config$db_config,
       db_field_types =  c(
         "granularity_time" = "TEXT",

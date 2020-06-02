@@ -5,6 +5,7 @@
 #' @export
 data_covid19_daily_report <- function(data, argset, schema){
   # tm_run_task("data_covid19_daily_report")
+  # tm_run_task("prelim_data_covid19_daily_report")
 
   if(plnr::is_run_directly()){
     data <- sc::tm_get_data("data_covid19_daily_report")
