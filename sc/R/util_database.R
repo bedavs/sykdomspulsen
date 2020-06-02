@@ -443,36 +443,75 @@ drop_constraint.default <- function(conn, table) {
   try(a <- DBI::dbExecute(conn, sql),TRUE)
 }
 
-######### add_index
-add_index <- function(conn, table, keys) UseMethod("add_index")
+drop_index <- function(conn, table, index) UseMethod("drop_index")
 
-add_index.default <- function(conn, table, keys, index = random_uuid()) {
+drop_index.default <- function(conn, table, index){
+  try(
+    DBI::dbExecute(
+      conn,
+      glue::glue("ALTER TABLE `{table}` DROP INDEX `{index}`")
+    ),
+    TRUE
+  )
+}
+
+`drop_index.Microsoft SQL Server` <- function(conn, table, index){
+  try(
+    DBI::dbExecute(
+      conn,
+      glue::glue("DROP INDEX {table}.{index}")
+    ),
+    TRUE
+  )
+}
+
+add_index <- function(conn, table, index, keys) UseMethod("add_index")
+
+add_index.default <- function(conn, table, keys, index) {
   keys <- glue::glue_collapse(keys, sep = ", ")
-  index <- glue::glue("IND_{index}")
 
   sql <- glue::glue("
     ALTER TABLE `{table}` ADD INDEX `{index}` ({keys})
     ;")
   #print(sql)
-  try(a <- DBI::dbExecute(conn, sql),TRUE)
+  try(a <- DBI::dbExecute(conn, sql),T)
 }
 
-`add_index.Microsoft SQL Server` <- function(conn, table, keys, index = random_uuid()) {
+`add_index.Microsoft SQL Server` <- function(conn, table, keys, index){
   keys <- glue::glue_collapse(keys, sep = ", ")
-  index <- glue::glue("IND_{index}")
 
-  sql <- glue::glue("
-    CREATE UNIQUE CLUSTERED INDEX {index} ON {table} ({keys})
-    ;")
-  #print(sql)
-  try(a <- DBI::dbExecute(conn, sql),TRUE)
+  try(
+    DBI::dbExecute(
+      conn,
+      glue::glue("CREATE INDEX {index} ON {table} ({keys});")
+    ),
+    T
+  )
 }
+
+
 
 
 drop_all_rows <- function(conn, table) {
   a <- DBI::dbExecute(conn, glue::glue({
-    "DELETE FROM {table};"
+    "TRUNCATE TABLE {table};"
   }))
+}
+
+keep_rows_where <- function(conn, table, condition) {
+  t0 <- Sys.time()
+  temp_name <- paste0("tmp",sc:::random_uuid())
+
+  sql <- glue::glue("SELECT * INTO {temp_name} FROM {table} WHERE {condition}")
+  DBI::dbExecute(conn, sql)
+
+  DBI::dbRemoveTable(conn, name = table)
+
+  sql <- glue::glue("EXEC sp_rename '{temp_name}', '{table}'")
+  DBI::dbExecute(conn, sql)
+  t1 <- Sys.time()
+  dif <- round(as.numeric(difftime(t1, t0, units = "secs")), 1)
+  if(config$verbose) message(glue::glue("Kept rows in {dif} seconds from {table}"))
 }
 
 drop_rows_where <- function(conn, table, condition) {
@@ -576,6 +615,26 @@ tbl <- function(table, db = config$db_config$db) {
     use_db(connections[[db]], db)
   }
   return(dplyr::tbl(connections[[db]], table))
+}
+
+#' list_indexes
+#' @param table tbl
+#' @param conn conn
+#' @export
+list_indexes <- function(table, conn=NULL){
+  if(is.null(conn)){
+    db <- config$db_config$db
+    if (is.null(connections[[db]])) {
+      connections[[db]] <- get_db_connection(db = db)
+      use_db(connections[[db]], db)
+      conn <- connections
+    }
+  }
+  retval <- DBI::dbGetQuery(
+    conn,
+    glue::glue("select * from sys.indexes where object_id = (select object_id from sys.objects where name = '{table}')")
+  )
+  return(retval)
 }
 
 #' list_tables

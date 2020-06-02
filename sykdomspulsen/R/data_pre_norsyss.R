@@ -5,12 +5,47 @@
 #' @export
 data_pre_norsyss <- function(data, argset, schema){
   # tm_run_task("data_pre_norsyss")
-  # argset = tm_get_argset("data_pre_norsyss")
 
+  if(plnr::is_run_directly()){
+    data <- sc::tm_get_data("data_pre_norsyss")
+    argset <- sc::tm_get_argset("data_pre_norsyss")
+    schema <- sc::tm_get_schema("data_pre_norsyss")
+  }
+
+  argset_extra <- sc::tm_get_argset("data_norsyss")
+
+  if(!identical(
+    sort(argset_extra$syndromes$tag_input),
+    sort(argset_extra$syndromes$tag_input)
+  )){
+    argset$date_from <- "2006-01-02"
+  } else if(!"data_norsyss" %in% sc::list_tables()){
+    argset$date_from <- "2006-01-02"
+  } else {
+    date_min <- sc::tbl("data_norsyss") %>%
+      dplyr::summarize(date_min = min(date)) %>%
+      dplyr::collect()
+    date_min <- date_min$date_min
+    if(date_min != "2006-01-02"){
+      date_min <- "2006-01-02"
+    } else {
+      date_max <- sc::tbl("data_norsyss") %>%
+        dplyr::summarize(date_max = max(date)) %>%
+        dplyr::collect()
+      date_max <- date_max$date_max
+      date_min <-  date_max-365*2
+      year_min <- fhi::isoyear_n(date_min)
+      date_min <- fhidata::days[year==year_min][1]$mon
+    }
+    argset$date_from <- date_min
+  }
+
+  message(glue::glue("Downloading from {argset$date_from}"))
   norsyss_fetch_raw_data_and_aggregate(
     date_from = argset$date_from,
-    date_to = format(Sys.time(), "%Y-%m-%d"),
+    date_to = lubridate::today()-1,
     folder = sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE),
+    overwrite_file=FALSE,
     diags = argset$diags
   )
   get_n_doctors(sc::path("input", "sykdomspulsen_norsyss_input"))
@@ -76,13 +111,46 @@ nav_to_freg <- list(
   "1607" = 1601
 )
 
+nav_to_freg_bydel <- c(
+  "312" = 30105,
+  "313"	= 30104,
+  "314"	= 30103,
+  "315"	= 30102,
+  "316"	= 30101,
+  "318"	= 30114,
+  "319"	= 30115,
+  "321"	= 30113,
+  "326"	= 30112,
+  "327"	= 30111,
+  "328"	= 30110,
+  "330"	= 30109,
+  "331"	= 30108,
+  "334"	= 30107,
+  "335"	= 30106,
+  "1161" = 110303,
+  "1162" = 110301,
+  "1164" = 110306,
+  "1165" = 110304,
+  "1202" = 120103,
+  "1203" = 120108,
+  "1204" = 120101,
+  "1205" = 120104,
+  "1206" = 120105,
+  "1208" = 120107,
+  "1209" = 120102,
+  "1210" = 120106
+)
+nav_to_freg_bydel <- data.table(
+  nav= as.numeric(names(nav_to_freg_bydel)),
+  freg = nav_to_freg_bydel
+)
 
 
 # norsyss_fetch_raw_data_and_aggregate
 norsyss_fetch_raw_data_and_aggregate <- function(
   date_from = "2018-01-01",
   date_to = lubridate::today(),
-  folder = "/input/sykdomspulsen_norsyss_input",
+  folder,
   overwrite_file = FALSE,
   diags,
   ...) {
@@ -109,15 +177,7 @@ norsyss_fetch_raw_data_and_aggregate <- function(
   # Remove future dates
   datesToExtract <- datesToExtract[from <= date_to]
 
-  # predefine storage of results
-  # pb <- progress::progress_bar$new(
-  #   format = "[:bar] :current/:total (:percent) in :elapsedfull, eta: :eta",
-  #   clear = FALSE,
-  #   total =  nrow(datesToExtract)
-  # )
-  # pb$tick(0)
   for (i in 1:nrow(datesToExtract)) {
-    #pb$tick()
     cat(i, "/", nrow(datesToExtract), "\n")
 
     command <- paste0(
@@ -208,11 +268,25 @@ norsyss_aggregate_raw_data <- function(d, diags) {
     d[as.character(BehandlerKommune) == old, BehandlerKommune := nav_to_freg[old]]
   }
 
+  # extract out the bydel and append
+  unique(d$PasientKommune)
+  d[
+    nav_to_freg_bydel,
+    on="PasientKommune==nav",
+    bydel := freg
+  ]
+  d[, is_bydel := FALSE]
+  b <- d[!is.na(bydel)]
+  b[, BehandlerKommune := bydel]
+  b[, is_bydel := TRUE]
+  d <- rbind(d,b)
+
   # Collapsing it down to 1 row per consultation
   d <- d[,
          lapply(.SD, sum),
          by = .(
            Id,
+           is_bydel,
            BehandlerKommune,
            age,
            Konsultasjonsdato,
@@ -226,6 +300,7 @@ norsyss_aggregate_raw_data <- function(d, diags) {
   # Collapsing it down to 1 row per kommune/age/day
   d <- d[, lapply(.SD, sum), ,
          by = .(
+           is_bydel,
            BehandlerKommune,
            age,
            Konsultasjonsdato,
@@ -235,7 +310,8 @@ norsyss_aggregate_raw_data <- function(d, diags) {
          .SDcols = c(names(diags), "consult")
          ]
 
-  d[, municip := paste0("municip", formatC(BehandlerKommune, width = 4, flag = 0))]
+  d[, location_code := paste0("municip", formatC(BehandlerKommune, width = 4, flag = 0))]
+  d[is_bydel==T, location_code := paste0("ward", formatC(BehandlerKommune, width = 6, flag = 0, format="fg"))]
   d[, BehandlerKommune := NULL]
   setnames(d, "Konsultasjonsdato", "date")
 

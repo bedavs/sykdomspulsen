@@ -36,6 +36,7 @@ check_env_vars <- function(){
       packageStartupMessage(crayon::blue(glue::glue("{i}='{getval}'")))
     }
   }
+  packageStartupMessage(glue::glue("spulscore: {utils::packageVersion('sc')}"))
 
 }
 

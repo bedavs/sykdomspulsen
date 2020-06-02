@@ -132,9 +132,95 @@ run_mem_model <- function(data, conf) {
 #' @param schema a
 #' @export
 analysis_mem <-  function(data, argset, schema){
-  # arguments start
-  conf <- argset
-  run_mem(data$data, conf, schema$output, schema$output_limits,argset$source_table)
+  # tm_run_task("analysis_norsyss_mem_influensa_vk_o")
+  # tm_run_task("analysis_norsyss_mem_influensa_vk_ot")
+
+  if(plnr::is_run_directly()){
+    sc::tm_update_plans("analysis_norsyss_mem_influensa_vk_o")
+    data <- sc::tm_get_data("analysis_norsyss_mem_influensa_vk_o")
+    argset <- sc::tm_get_argset("analysis_norsyss_mem_influensa_vk_o")
+    schema <- sc::tm_get_schema("analysis_norsyss_mem_influensa_vk_o")
+  }
+
+  if(plnr::is_run_directly()){
+    sc::tm_update_plans("analysis_norsyss_mem_influensa_vk_oe")
+    data <- sc::tm_get_data("analysis_norsyss_mem_influensa_vk_oe")
+    argset <- sc::tm_get_argset("analysis_norsyss_mem_influensa_vk_oe")
+    schema <- sc::tm_get_schema("analysis_norsyss_mem_influensa_vk_oe")
+  }
+
+
+
+  input_data <- data$data
+  ages <- jsonlite::fromJSON(argset$age)
+  for (age_group in names(ages)) {
+    data_age <- ages[[age_group]]
+
+    data <- data.table()
+    for (part_age in data_age) {
+      new_data <- input_data[age == part_age]
+      data <- rbind(data, new_data)
+    }
+
+    #data[, yrwk := fhi::isoyearweek(date)]
+    #data[, year := fhi::isoyear_n(date)]
+    #data[, week := fhi::isoweek_n(date)]
+    #data[, season := fhi::season(yrwk)]
+    data <- data[, .(
+      n = sum(n),
+      consult_without_influenza = sum(consult_without_influenza),
+      consult_with_influenza = sum(consult_with_influenza),
+      pop = sum(pop)
+    ),
+    by = c("location_code", "tag_outcome", "granularity_time", "granularity_geo",
+           "sex",
+           "border", "yrwk", "season", "year", "week")
+    ]
+
+    data[, denominator:=get(argset$denominator)]
+
+
+    mem_df <- prepare_data_frame(data, mult_factor = argset$multiplicative_factor)
+    mem_results <- run_mem_model(mem_df, argset)
+    mem_results_db <- mem_results
+    mem_results_db[, age := age_group]
+    mem_results_db[, location_code:=argset$location_code ]
+    mem_results_db[, tag_outcome := argset$tag]
+    mem_results_db[, rp100_baseline_thresholdu0:=low]
+    mem_results_db[, rp100_baseline_thresholdu1:=medium]
+    mem_results_db[, rp100_baseline_thresholdu2:=high]
+    mem_results_db[, rp100_baseline_thresholdu3:=very_high]
+    mem_results_db[, granularity_time := "season"]
+    fill_in_missing(mem_results_db)
+
+    schema$output_limits$db_upsert_load_data_infile(mem_results_db)
+
+    data[mem_results, on = "season", low := low]
+    data[mem_results, on = "season", medium := medium]
+    data[mem_results, on = "season", high := high]
+    data[mem_results, on = "season", very_high := very_high]
+
+    data[, age := age_group]
+    data[, tag := argset$tag]
+    data[, rp100 := n / denominator * argset$multiplicative_factor]
+    data[fhidata::days, on = "yrwk", date := sun]
+
+    data[, rp100_status := as.character(NA)]
+    data[rp100 < low, rp100_status := "verylow"]
+    data[rp100 >= low & rp100 < medium, rp100_status := "low"]
+    data[rp100 >= medium & rp100 < high, rp100_status := "medium"]
+    data[rp100 >= high & rp100 < very_high, rp100_status := "high"]
+    data[rp100 >= very_high, rp100_status := "veryhigh"]
+    data[, granularity_time:="week"]
+    data[, rp100_baseline_thresholdu0:=low]
+    data[, rp100_baseline_thresholdu1:=medium]
+    data[, rp100_baseline_thresholdu2:=high]
+    data[, rp100_baseline_thresholdu3:=very_high]
+    data[, x := fhi::x(week)]
+    data[, n_denominator:=denominator]
+    # print(head(data, 40))
+    schema$output$db_upsert_load_data_infile(data)
+  }
 }
 
 

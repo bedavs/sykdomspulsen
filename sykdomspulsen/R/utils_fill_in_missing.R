@@ -7,7 +7,7 @@ fill_in_missing <- function(d){
     )]
   }
   if(!"border" %in% names(d)){
-    d[, border:=config$border]
+    d[, border := config$border]
   }
   if(!"age" %in% names(d)){
     d[, age := "total"]
@@ -15,6 +15,21 @@ fill_in_missing <- function(d){
   if(!"sex" %in% names(d)){
     d[,sex := "total"]
   }
+  # only providing season
+  if(!"date" %in% names(d) & !"yrwk" %in% names(d) & "season" %in% names(d)){
+    x <- copy(fhidata::days)
+    x[,season:=fhi::season(yrwk)]
+    setorder(x,-yrwk)
+    x[,row:=1:.N,by=.(season)]
+    x <- x[row==1]
+    d[
+      x,
+      on="season",
+      date:=sun
+    ]
+  }
+
+  # only providing yrwk
   if(!"date" %in% names(d) & "yrwk" %in% names(d)){
     d[
       fhidata::days,
@@ -22,6 +37,7 @@ fill_in_missing <- function(d){
       date:=sun
       ]
   }
+
   if(!"date" %in% names(d) & !"yrwk" %in% names(d)){
     d[,date:=as.Date("1900-01-01")]
   }

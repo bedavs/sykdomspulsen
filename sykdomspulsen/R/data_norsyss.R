@@ -26,7 +26,9 @@ CleanData <- function(d,
   county <- NULL
   location <- NULL
   # end
+
   CONFIG <- config
+
   # fix population age categories
   for (i in which(names(CONFIG$def$age$norsyss) != "total")) {
     population[age %in% CONFIG$def$age$norsyss[[i]], agex := names(CONFIG$def$age$norsyss)[i]]
@@ -63,40 +65,45 @@ CleanData <- function(d,
     "consult_without_influenza"
   ))
 
-  d <- d[municip != "municip9999",
+  d <- d[location_code != "municip9999",
     lapply(.SD, sum),
-    by = .(age, date, municip),
+    by = .(age, date, location_code),
     .SDcols = syndromeAndConsult
   ]
 
+  # seperate out municip vs ward
+  d_m <- d[stringr::str_detect(location_code,"^municip")]
+  d_w <- d[stringr::str_detect(location_code,"^ward")]
+
+  # create skeleton for municips
   dateMin <- min(skeleton_date_min)
   dateMax <- max(skeleton_date_max)
   if (removeMunicipsWithoutConsults) {
-    d[, total := sum(consult_with_influenza, na.rm = T), by = municip]
-    d <- d[is.finite(total)]
-    d <- d[total > 0]
-    d[, total := NULL]
+    d_m[, total := sum(consult_with_influenza, na.rm = T), by = municip]
+    d_m <- d_m[is.finite(total)]
+    d_m <- d_m[total > 0]
+    d_m[, total := NULL]
     skeleton <-
       data.table(expand.grid(
-        municip = unique(norway_municip_merging()[municip_code_current %in% unique(d$municip) |
-          municip_code_original %in% unique(d$municip)]$municip_code_original),
-        unique(d$age),
+        location_code = unique(norway_municip_merging()[municip_code_current %in% unique(d_m$location_code) |
+          municip_code_original %in% unique(d$location_code)]$municip_code_original),
+        unique(d_m$age),
         seq.Date(dateMin, dateMax, 1)
       ))
   } else {
     skeleton <-
       data.table(expand.grid(
-        municip = unique(norway_municip_merging()$municip_code_original),
-        unique(d$age),
+        location_code = unique(norway_municip_merging()$municip_code_original),
+        unique(d_m$age),
         seq.Date(dateMin, dateMax, 1)
       ))
   }
-  setnames(skeleton, c("municip", "age", "date"))
+  setnames(skeleton, c("location_code", "age", "date"))
   skeleton[, date := data.table::as.IDate(date)]
   data <-
     merge(skeleton,
-      d,
-      by = c("municip", "age", "date"),
+      d_m,
+      by = c("location_code", "age", "date"),
       all.x = TRUE
     )
 
@@ -104,9 +111,9 @@ CleanData <- function(d,
     data[is.na(get(i)), (i) := 0]
   }
 
-  total <- data[municip != "municip9999",
+  total <- data[,
     lapply(.SD, sum),
-    keyby = .(date, municip),
+    keyby = .(date, location_code),
     .SDcols = syndromeAndConsult
   ]
   total[, age := "total"]
@@ -129,7 +136,7 @@ CleanData <- function(d,
   data <-
     merge(data,
       norway_municip_merging()[, c("municip_code_original", "year", "municip_code_current", "weighting")],
-      by.x = c("municip", "year"),
+      by.x = c("location_code", "year"),
       by.y = c("municip_code_original", "year"),
       all.x = T,
       allow.cartesian = T
@@ -153,12 +160,12 @@ CleanData <- function(d,
     data[, (i) := ceiling(get(i))]
   }
   dim(data)
-  setnames(data, "municip_code_current", "municip")
+  setnames(data, "municip_code_current", "location_code")
 
   # merge in population
   n1 <- nrow(data)
   data <- merge(data, population,
-    by.x = c("municip", "age", "year"),
+    by.x = c("location_code", "age", "year"),
     by.y = c("location_code", "age", "year")
   )
   n2 <- nrow(data)
@@ -168,14 +175,14 @@ CleanData <- function(d,
   }
 
   # merging in municipalitiy-fylke names
-  data[norway_locations(), on = "municip==municip_code", county := county_code]
+  data[norway_locations(), on = "location_code==municip_code", county := county_code]
 
   for (i in syndromeAndConsult) {
     data[is.na(get(i)), (i) := 0]
   }
 
   data <- data[date >= data.table::as.IDate("2006-01-01")]
-  data[, municip := as.character(municip)]
+  data[, location_code := as.character(location_code)]
 
   setnames(hellidager, c("date", "HelligdagIndikator"))
   hellidager[, date := data.table::as.IDate(date)]
@@ -200,7 +207,7 @@ CleanData <- function(d,
     c(
       "date",
       "HelligdagIndikator",
-      "municip",
+      "location_code",
       "age",
       "n",
       "consult_without_influenza",
@@ -215,11 +222,10 @@ CleanData <- function(d,
     )
   ))
 
-  setorder(data, municip, age, date)
-  setkey(data, municip, age, date)
+  setorder(data, location_code, age, date)
+  setkey(data, location_code, age, date)
 
   data[, granularityGeo := "municip"]
-  setnames(data, "municip", "location")
 
   # create fylke
   fylke <- data[, .(
@@ -231,7 +237,7 @@ CleanData <- function(d,
   ), keyby = .(county, age, date, year, yrwk, week, month, season,x)]
 
   fylke[, granularityGeo := "county"]
-  fylke[, location:=county]
+  fylke[, location_code:=county]
   fylke[, county:= NULL]
 
   # create national
@@ -244,13 +250,13 @@ CleanData <- function(d,
   ), keyby = .(age, date, year, yrwk, week, month, season,x)]
 
   data[, county:=NULL]
-  norge[, location := "norge"]
+  norge[, location_code := "norge"]
   norge[, granularityGeo := "nation"]
 
   data <- rbind(data, fylke, norge)
-  setcolorder(data, c("granularityGeo",  "location", "age", "date"))
-  setorderv(data, c("granularityGeo", "location", "age", "date"))
-  setkey(data, location, age)
+  setcolorder(data, c("granularityGeo",  "location_code", "age", "date"))
+  setorderv(data, c("granularityGeo", "location_code", "age", "date"))
+  setkey(data, location_code, age)
   setnames(data, c(
     "granularity_geo",
     "location_code",
@@ -309,8 +315,16 @@ IdentifyDatasets <-
 #' @export
 data_norsyss <- function(data, argset, schema){
   # tm_run_task("data_norsyss")
-  # argset <- tm_get_argset("data_norsyss")
-  # schema <- tm_get_schema("data_norsyss")
+
+  if(plnr::is_run_directly()){
+    data <- sc::tm_get_data("data_norsyss")
+    argset <- sc::tm_get_argset("data_norsyss")
+    schema <- sc::tm_get_schema("data_norsyss")
+  }
+
+  schema$output$add_indexes()
+  schema$output$list_indexes_db()
+
   syndromes <- argset$syndromes
 
   folder <- sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE)
@@ -328,58 +342,24 @@ data_norsyss <- function(data, argset, schema){
 
   skeleton_date_max <- as.Date(stringr::str_extract(file, "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
   skeleton_date_min <- as.Date(min(d$x_date))
+  skeleton_year_min <- fhi::isoyear_n(skeleton_date_min)
 
   d[dates,on="x_date", date:=date]
   d[dates,on="x_date", isoyear:=isoyear]
   d[,x_date:=NULL]
 
-  # finding dates to run
-  max_year_in_data <- fhi::isoyear_n(max(d$date))
+  lubridate::now()
+  schema$output$db_keep_rows_where(glue::glue("year<{skeleton_year_min}"))
+  lubridate::now()
 
-  max_date <- schema$output$dplyr_tbl() %>%
-    dplyr::group_by(tag_outcome) %>%
-    dplyr::summarise(date = max(date, na.rm=T)) %>%
-    dplyr::collect() %>%
-    sc::latin1_to_utf8()
-
-  if(nrow(max_date)==0){
-    max_year_in_db <- 2006
-  } else {
-    max_date <- min(max_date$date)
-    max_year_in_db <- fhi::isoyear_n(max_date)-10
-  }
-  if(max_year_in_db <=2006) max_year_in_db <- 2006
-
-  # if we aren't deleting all the data
-  # check to see if the required syndromes are in the database for each year
-  # if we don't have a perfect syndrome match, then delete all the data
-  # and start again
-  if(max_year_in_db > 2006){
-    syndromes_in_db <- schema$output$dplyr_tbl() %>%
-      dplyr::distinct(year, tag_outcome) %>%
-      dplyr::collect() %>%
-      sc::latin1_to_utf8()
-
-    delete_all_data <- FALSE
-    for(y in unique(syndromes_in_db$year)){
-      syndromes_in_db_in_year <- syndromes_in_db[year==y]$tag_outcome
-      if(sum(!argset$syndromes$tag_output %in% syndromes_in_db_in_year)>0) delete_all_data <- TRUE
-      if(sum(!syndromes_in_db_in_year %in% argset$syndromes$tag_output)>0) delete_all_data <- TRUE
-    }
-    if(delete_all_data) max_year_in_db <- 2006
-  }
-
-  schema$output$db_drop_rows_where(glue::glue("year>={max_year_in_db}"))
-  #schema$output$db_drop_constraint()
-  years_to_process <- max_year_in_db:max_year_in_data
+  master <- d
 
   for (i in 1:nrow(syndromes)) {
     conf <- syndromes[i]
     message(sprintf("Processing %s/%s: %s -> %s", i, nrow(syndromes), conf$tag_input, conf$tag_output))
 
     res <- CleanData(
-      d = copy(d[
-        isoyear %in% years_to_process &
+      d = copy(master[
         Kontaktype %in% conf$contactType[[1]] &
         Praksis %in% conf$practice_type[[1]]
         ]),
@@ -388,13 +368,17 @@ data_norsyss <- function(data, argset, schema){
       skeleton_date_min = skeleton_date_min
     )
     res[, tag_outcome:=conf$tag_output]
-    res[, gender:="total"]
-    # make sure there's nothing funny going on with week 53
-    res <- res[year %in% years_to_process]
 
     schema$output$db_load_data_infile(res)
   }
-  #schema$output$db_add_constraint()
+  message("Copying into data_norsyss_recent")
+
+  sc::drop_table("data_norsyss_recent")
+  sql <- glue::glue("SELECT * INTO data_norsyss_recent FROM {schema$output$db_table} WHERE year >= {fhi::isoyear_n()-1};")
+  DBI::dbExecute(schema$output$conn, sql)
+
   message("New data is now formatted and ready")
+
+
   return(TRUE)
 }

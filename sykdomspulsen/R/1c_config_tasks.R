@@ -1,5 +1,5 @@
 set_tasks <- function() {
-  # covid19 ----
+  # **** covid19 **** ----
   # data_covid19_model ----
   sc::add_task(
     sc::task_from_config(
@@ -28,6 +28,24 @@ set_tasks <- function() {
     )
   )
 
+  # prelim_data_covid19_daily_report ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "prelim_data_covid19_daily_report",
+      type = "data",
+      action = "sykdomspulsen::data_covid19_daily_report",
+      schema = list(
+        data_covid19_msis_by_time_location = sc::config$schemas$prelim_data_covid19_msis_by_time_location,
+        data_covid19_msis_by_time_infected_abroad = sc::config$schemas$prelim_data_covid19_msis_by_time_infected_abroad,
+        data_covid19_msis_by_time_sex_age = sc::config$schemas$prelim_data_covid19_msis_by_time_sex_age,
+        data_covid19_lab_by_time = sc::config$schemas$prelim_data_covid19_lab_by_time,
+        data_covid19_hospital_by_time = sc::config$schemas$prelim_data_covid19_hospital_by_time,
+        data_covid19_deaths = sc::config$schemas$prelim_data_covid19_deaths,
+        data_covid19_demographics = sc::config$schemas$prelim_data_covid19_demographics
+      )
+    )
+  )
+
   # data_covid19_self_reporting ----
   sc::add_task(
     sc::task_from_config(
@@ -40,7 +58,7 @@ set_tasks <- function() {
     )
   )
 
-  # data ----
+  # **** data **** ----
   # data_pre_normomo ----
   sc::add_task(
     sc::task_from_config(
@@ -95,7 +113,7 @@ set_tasks <- function() {
       action = "sykdomspulsen::data_pre_norsyss",
       schema = list(),
       args = list(
-        date_from = "2014-01-01",
+        date_from = "2006-01-01",
         diags = list(
           "influensa" = c("R80"),
           "gastro" = c("D11", "D70", "D73"),
@@ -322,7 +340,7 @@ set_tasks <- function() {
     )
   )
 
-  # analysis ----
+  # **** analysis **** ----
   # analysis_normomo ----
   sc::add_task(
     sc::Task$new(
@@ -397,13 +415,13 @@ set_tasks <- function() {
     )
   )
 
-  # analysis_norsyss_mem_influensa ----
+  # analysis_norsyss_mem_influensa_vk_o ----
   sc::add_task(
     sc::task_from_config(
-      name = "analysis_norsyss_mem_influensa",
+      name = "analysis_norsyss_mem_influensa_vk_o",
       db_table = "data_norsyss",
       type = "analysis",
-      action = "analysis_mem",
+      action = "sykdomspulsen::analysis_mem",
       filter = "(granularity_geo=='county' | granularity_geo=='nation') & tag_outcome=='influensa_vk_o'",
       for_each_plan = list("location_code" = "all"),
       schema = list(
@@ -412,7 +430,7 @@ set_tasks <- function() {
       ),
       args = list(
         age = jsonlite::toJSON(list("total" = c("total"))),
-        tag = "influensa",
+        tag = "influensa_vk_o",
         weeklyDenominatorFunction = "sum",
         multiplicative_factor = 100,
         denominator = "consult_with_influenza"
@@ -420,25 +438,25 @@ set_tasks <- function() {
     )
   )
 
-  # analysis_norsyss_mem_influensa_all ----
+  # analysis_norsyss_mem_influensa_vk_ot ----
   sc::add_task(
     sc::task_from_config(
-      name = "analysis_norsyss_mem_influensa_all",
+      name = "analysis_norsyss_mem_influensa_vk_ot",
       db_table = "data_norsyss",
       type = "analysis",
       action = "sykdomspulsen::analysis_mem",
-      filter = "(granularity_geo=='county' | granularity_geo=='norge') & tag_outcome=='influensa_vk_ote'",
+      filter = "(granularity_geo=='county' | granularity_geo=='nation') & tag_outcome=='influensa_vk_ot'",
       for_each_plan = list("location_code" = "all"),
       schema = list(
-        output = sc::config$schemas$results_mem,
-        output_limits = sc::config$schemas$results_mem_limits
+        output = sc::config$schemas$results_norsyss_mem,
+        output_limits = sc::config$schemas$results_norsyss_mem_limits
       ),
       args = list(
         age = jsonlite::toJSON(list(
           "0-4" = c("0-4"), "5-14" = c("5-14"),
           "15-64" = c("15-19", "20-29", "30-64"), "65+" = c("65+")
         )),
-        tag = "influensa",
+        tag = "influensa_vk_ot",
         weeklyDenominatorFunction = "sum",
         multiplicative_factor = 100,
         denominator = "consult_with_influenza"
@@ -461,8 +479,7 @@ set_tasks <- function() {
     )
   )
 
-  ############
-  # ui ----
+  # **** ui ****----
   # ui_surveillance_data ----
   sc::add_task(
     sc::task_from_config(
@@ -655,6 +672,46 @@ set_tasks <- function() {
     )
   )
 
+  # ui_norsyss_mem_influensa_vk_o ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_norsyss_mem_influensa_vk_o",
+      type = "ui",
+      action = "sykdomspulsen::ui_mem_plots",
+      db_table = "results_norsyss_mem",
+      schema = NULL,
+      for_each_plan = list(tag_outcome = c("influensa_vk_o")),
+      args = list(
+        tag = "influensa_vk_o",
+        icpc2 = "R60",
+        excludeSeason = c("2009/2010"),
+        contactType = "oppmote, telefonkontakt",
+        folder_name = "mem_influensa",
+        outputs = c("charts", "county_sheet", "region_sheet", "norway_sheet")
+      )
+    )
+  )
+
+  # ui_norsyss_mem_influensa_vk_ot ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_norsyss_mem_influensa_vk_ot",
+      type = "ui",
+      action = "sykdomspulsen::ui_mem_plots",
+      db_table = "results_norsyss_mem",
+      schema = NULL,
+      for_each_plan = list(tag_outcome = c("influensa_vk_ot")),
+      args = list(
+        tag = "influensa_vk_ot",
+        icpc2 = "R80",
+        excludeSeason = c("2009/2010"),
+        contactType = "oppmote",
+        folder_name = "mem_influensa",
+        outputs = c("n_doctors_sheet")
+      )
+    )
+  )
+
 
 
 
@@ -678,43 +735,7 @@ set_tasks <- function() {
     )
   )
 
-  sc::add_task(
-    sc::task_from_config(
-      name = "ui_norsyss_mem_influensa",
-      type = "ui",
-      action = "ui_mem_plots",
-      db_table = "results_mem",
-      schema = NULL,
-      for_each_plan = list(tag_outcome = c("influensa_all")),
-      args = list(
-        tag = "influensa",
-        icpc2 = "R60",
-        contactType = "oppmote, telefonkontakt",
-        folder_name = "mem_influensa",
-        outputs = c("n_doctors_sheet")
-      ),
-      filter = "source=='data_norsyss'"
-    )
-  )
 
-  sc::add_task(
-    sc::task_from_config(
-      name = "ui_norsyss_mem_influensa_all",
-      type = "ui",
-      action = "ui_mem_plots",
-      db_table = "results_mem",
-      schema = NULL,
-      for_each_plan = list(tag_outcome = c("influensa")),
-      args = list(
-        tag = "influensa",
-        icpc2 = "R80",
-        contactType = "oppmote",
-        folder_name = "mem_influensa",
-        outputs = c("charts", "county_sheet", "region_sheet", "norway_sheet")
-      ),
-      filter = "source=='data_norsyss'"
-    )
-  )
 
   sc::add_task(
     sc::task_from_config(

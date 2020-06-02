@@ -1,5 +1,26 @@
-
+#' ui_mem_plots
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_mem_plots <- function(data, argset, schema){
+  # tm_run_task("ui_norsyss_mem_influensa_vk_o")
+  # tm_run_task("ui_norsyss_mem_influensa_vk_ot")
+
+  if(plnr::is_run_directly()){
+    sc::tm_update_plans("ui_norsyss_mem_influensa_vk_o")
+    data <- sc::tm_get_data("ui_norsyss_mem_influensa_vk_o")
+    argset <- sc::tm_get_argset("ui_norsyss_mem_influensa_vk_o")
+    schema <- sc::tm_get_schema("ui_norsyss_mem_influensa_vk_o")
+  }
+
+  if(plnr::is_run_directly()){
+    sc::tm_update_plans("ui_norsyss_mem_influensa_vk_oe")
+    data <- sc::tm_get_data("ui_norsyss_mem_influensa_vk_oe")
+    argset <- sc::tm_get_argset("ui_norsyss_mem_influensa_vk_oe")
+    schema <- sc::tm_get_schema("ui_norsyss_mem_influensa_vk_oe")
+  }
+
   outputs <- list(
     charts = create_plots,
     norway_sheet = create_norway_sheet,
@@ -7,57 +28,50 @@ ui_mem_plots <- function(data, argset, schema){
     region_sheet = create_region_sheet,
     n_doctors_sheet = create_n_doctors_sheet
   )
-  folder <- results_folder(glue::glue("{argset$folder_name}"), argset$today)
+
+  folder <- sc::path("output","sykdomspulsen_norsyss_influenza_output","{argset$folder_name}",lubridate::today(), create_dir = T)
+
   argset[["folder"]] <- folder
-  fs::dir_create(folder)
+  # conf <- argset; date <- argset$today; argset$outputs
   for (output in argset$outputs) {
     outputs[[output]](argset, argset$today)
   }
-  create_latest_folder(glue::glue("{argset$folder_name}"),argset$today )
 
 }
 
-#' create norway sheet
-#'
-#' @param conf A mem model configuration object
-#' @param date extract date
-#'
+# create norway sheet
 create_norway_sheet <- function(conf, date) {
-  current_season <- tbl("mem_results") %>%
+  current_season <- sc::tbl("results_norsyss_mem") %>%
     dplyr::summarize(season = max(season, na.rm = T)) %>%
     dplyr::collect()
   current_season <- current_season$season
 
   x_tag <- conf$tag
-  data <- tbl("mem_results") %>%
-    dplyr::filter(season == current_season & tag == x_tag) %>%
+  data <- sc::tbl("results_norsyss_mem") %>%
+    dplyr::filter(season == current_season & tag_outcome == !!x_tag) %>%
     dplyr::collect()
   setDT(data)
-  ili_out <- tbl("mem_results") %>%
-    dplyr::filter(location_code == "norge", tag == x_tag) %>%
+  ili_out <- sc::tbl("results_norsyss_mem") %>%
+    dplyr::filter(location_code == "norge", tag_outcome == !!x_tag) %>%
     dplyr::select(year,
-      year_week = yrwk, week, season, percent_ili = rate,
+      year_week = yrwk, week, season, percent_ili = rp100,
       season_week = x,
-      ili_consultations = n, total_consultations = denominator, status
+      ili_consultations = n, total_consultations = n_denominator, status=rp100_status
     ) %>%
     dplyr::collect()
   readr::write_csv(ili_out, glue::glue("{conf$folder}/ili_data.csv"))
 }
 
-#' create county sheet
-#'
-#' @param conf A mem model configuration object
-#' @param date extract date
-#'
+# create county sheet
 create_county_sheet <- function(conf, date) {
-  current_season <- tbl("mem_results") %>%
+  current_season <- sc::tbl("results_norsyss_mem") %>%
     dplyr::summarize(season = max(season, na.rm = T)) %>%
     dplyr::collect()
   current_season <- current_season$season
 
   x_tag <- conf$tag
-  data <- tbl("mem_results") %>%
-    dplyr::filter(season == current_season & tag == x_tag) %>%
+  data <- sc::tbl("results_norsyss_mem") %>%
+    dplyr::filter(season == current_season & tag_outcome == !!x_tag) %>%
     dplyr::collect()
   setDT(data)
 
@@ -65,10 +79,10 @@ create_county_sheet <- function(conf, date) {
 
   out_data <- data %>%
     dplyr::mutate(
-      rate = round(rate, 2),
+      rate = round(rp100, 2),
       loc_name = get_location_name(location_code)
     ) %>%
-    dplyr::select(yrwk, week, loc_name, rate, n, denominator)
+    dplyr::select(yrwk, week, loc_name, rate, n, denominator=n_denominator)
   setDT(out_data)
 
   overview <- dcast(out_data, yrwk + week ~ loc_name, value.var = c("rate", "n", "denominator"))
@@ -111,22 +125,23 @@ create_county_sheet <- function(conf, date) {
   xlsx::saveWorkbook(wb, glue::glue("{conf$folder}/fylke.xlsx"))
 }
 
-#' create MEM region sheet
-#'
-#' @param conf A mem model configuration object
-#' @param date extract date
-#'
+# create MEM region sheet
 create_region_sheet <- function(conf, date) {
-  current_season <- tbl("mem_results") %>%
+  current_season <- sc::tbl("results_norsyss_mem") %>%
     dplyr::summarize(season = max(season, na.rm = T)) %>%
     dplyr::collect()
   current_season <- current_season$season
 
   x_tag <- conf$tag
-  data <- tbl("mem_results") %>%
-    dplyr::filter(season == current_season & tag == x_tag) %>%
+  data <- sc::tbl("results_norsyss_mem") %>%
+    dplyr::filter(season == current_season & tag_outcome == !!x_tag) %>%
     dplyr::collect()
   setDT(data)
+  setnames(
+    data,
+    c("rp100","n_denominator"),
+    c("rate","denominator"),
+  )
 
   norway_locations <- norway_locations()[, .(region_name = min(region_name)), by = .(county_code)]
   out_data <- data[norway_locations, on = c("location_code" = "county_code")]
@@ -194,28 +209,26 @@ create_region_sheet <- function(conf, date) {
     row.names = FALSE,
     startRow = 4,
   )
-  xlsx::autoSizeColumn(sheet_info, colIndex = 1:ncol(info))
+  #xlsx::autoSizeColumn(sheet_info, colIndex = 1:ncol(info))
   xlsx::saveWorkbook(wb, glue::glue("{conf$folder}/regioner.xlsx"))
 }
 
 
-#' create MEm sheet with doctors
-#'
-#' @param conf A mem model configuration object
-#' @param date extract date
-#'
+# create MEm sheet with doctors
 create_n_doctors_sheet <- function(conf, date) {
-  current_season <- tbl("mem_results") %>%
+  current_season <- sc::tbl("results_norsyss_mem") %>%
     dplyr::summarize(season = max(season, na.rm = T)) %>%
     dplyr::collect()
   current_season <- current_season$season
   x_tag <- conf$tag
-  data <- tbl("mem_results") %>%
-    dplyr::filter(season == current_season & tag == x_tag & location_code == "norge") %>%
+
+  data <- sc::tbl("results_norsyss_mem") %>%
+    dplyr::filter(season == current_season & tag_outcome == !!x_tag & location_code == "norge") %>%
     dplyr::collect()
   setDT(data)
+  setnames(data, c("rp100","n_denominator"),c("rate","denominator"))
 
-  doctors <- fread(path("data_raw", "behandlere.txt", package = "sykdomspuls"))
+  doctors <- fread(sc::path("input", "sykdomspulsen_norsyss_input", "behandlere.txt"))
 
   doctors[, yrwk := paste(year, stringr::str_pad(week, 2, pad = "0"), sep = "-")]
 
@@ -269,27 +282,28 @@ create_n_doctors_sheet <- function(conf, date) {
     sheet_info,
     row.names = FALSE
   )
-  xlsx::autoSizeColumn(sheet_info, colIndex = 1:ncol(info))
+  #xlsx::autoSizeColumn(sheet_info, colIndex = 1:ncol(info))
   xlsx::saveWorkbook(wb, glue::glue("{conf$folder}/behandlere.xlsx"))
 }
 
 
-#' create MEM season plots
-#'
-#' @param conf A mem model configuration object
-#' @param date extract date
-#'
+# create MEM season plots
 create_plots <- function(conf, date) {
-  current_season <- tbl("mem_results") %>%
+  current_season <- sc::tbl("results_norsyss_mem") %>%
     dplyr::summarize(season = max(season, na.rm = T)) %>%
     dplyr::collect()
   current_season <- current_season$season
 
   x_tag <- conf$tag
-  data <- tbl("mem_results") %>%
-    dplyr::filter(season == current_season & tag == x_tag) %>%
+  data <- sc::tbl("results_norsyss_mem") %>%
+    dplyr::filter(season == current_season & tag_outcome == !!x_tag) %>%
     dplyr::collect()
   setDT(data)
+  setnames(
+    data,
+    c("rp100","n_denominator","rp100_baseline_thresholdu0","rp100_baseline_thresholdu1","rp100_baseline_thresholdu2","rp100_baseline_thresholdu3"),
+    c("rate","denominator", "low", "medium", "high", "very_high"),
+  )
   for (loc in unique(data[, location_code])) {
     data_location <- data[location_code == loc]
 
