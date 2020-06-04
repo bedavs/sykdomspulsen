@@ -41,7 +41,8 @@ set_config <- function() {
     )
   )
 
-  #packageStartupMessage("hi1")
+  packageStartupMessage(glue::glue("sykdomspulsen {utils::packageVersion('sykdomspulsen')}"))
+
   set_permissions()
   #packageStartupMessage("hi2")
   set_tasks()

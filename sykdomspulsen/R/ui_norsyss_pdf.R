@@ -96,7 +96,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
     rmarkdown::render(
       input = fs::path(folder,"markdown", "monthly_reportALL.Rmd"),
       output_file = glue::glue("{tag}_ALL_monthly_report.pdf"),
-      output_dir = fs::path(folder, "pdf", argset$today),
+      output_dir = fs::path(folder, "pdf"),
       params = list(
         tag = tag
       ),
@@ -120,7 +120,7 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
   data_long <- data_long[yrwk %in% yrwks]
   data_long[, location_name:=get_location_name(location_code)]
 
-  seasons <- rev(unique(data_long$season))[1:5]
+  seasons <- rev(sort(unique(data_long$season)))[1:5]
   labs <- unique(data_long[, c("week","x")])
   labs <- labs[as.numeric(week) %in% seq(2, 52, 2)]
 
@@ -196,7 +196,7 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
     )
   )]
 
-  seasons <- rev(unique(data_long$season))[1:5]
+  seasons <- rev(sort(unique(data_long$season)))[1:5]
   labs <- unique(data_long[, c("week", "x")])
   labs <- labs[as.numeric(week) %in% seq(2, 52, 4)]
 
