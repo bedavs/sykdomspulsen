@@ -375,7 +375,7 @@ set_tasks <- function() {
       upsert_at_end_of_each_plan = TRUE,
       args = list(
         train_length = 5,
-        years = c(2012:fhi::isoyear_n()),
+        years = c(2018:fhi::isoyear_n()),
         weeklyDenominatorFunction = sum,
         denominator = "consult_without_influenza",
         granularity_time = "week"
@@ -713,12 +713,13 @@ set_tasks <- function() {
     )
   )
 
+  # ui_norsyss_pdf ----
   sc::add_task(
     sc::task_from_config(
       name = "ui_norsyss_pdf",
       type = "data",
       schema=list(input=sc::config$schemas$results_norsyss_standard),
-      action="ui_norsyss_pdf",
+      action="sykdomspulsen::ui_norsyss_pdf",
       args = list(
         tags = c("gastro_vk_ot","respiratoryexternal_vk_ot"),
         name_short = config$def$norsyss$short_names,

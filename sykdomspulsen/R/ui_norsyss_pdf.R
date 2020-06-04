@@ -1,3 +1,8 @@
+#' ui_norsyss_pdf
+#' @param data a
+#' @param argset a
+#' @param schema a
+#' @export
 ui_norsyss_pdf <- function(data, argset, schema) {
   if(plnr::is_run_directly()){
     # tm_run_task("ui_norsyss_pdf")
@@ -152,16 +157,6 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
   q
 }
 
-
-sykdomspulspdf_folder <- function(folder, date, further = NULL) {
-  if (is.null(further)) {
-    retval <- sc::path("output", "norsyss_pdfs", date, folder)
-  } else {
-    retval <- sc::path("output", "norsyss_pdfs", date, folder, further)
-  }
-  return(retval)
-}
-
 sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
   data_long <- table %>%
     dplyr::filter(granularity_time == "week") %>%
@@ -171,7 +166,7 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
     dplyr::collect() %>%
     sc::latin1_to_utf8()
   # remove last 3 weeks
-  yrwks <- rev(unique(data_long$yrwk))[-c(1:3)]
+  yrwks <- rev(sort(unique(data_long$yrwk)))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]
   data_long[, location_name:=get_location_name(location_code)]
   data_long[, age := car::recode(

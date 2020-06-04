@@ -40,8 +40,12 @@ set_config <- function() {
       )
     )
   )
+
+  #packageStartupMessage("hi1")
   set_permissions()
+  #packageStartupMessage("hi2")
   set_tasks()
+  #packageStartupMessage("hi3")
 
 }
 
