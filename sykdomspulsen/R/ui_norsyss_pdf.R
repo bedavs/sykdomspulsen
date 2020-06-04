@@ -1,49 +1,53 @@
 ui_norsyss_pdf <- function(data, argset, schema) {
-  fs::dir_create(sykdomspulspdf_folder("rmarkdown", argset$today))
-  fs::dir_create(sykdomspulspdf_folder("pdf", argset$today))
-  fs::dir_create(sykdomspulspdf_folder("svg", argset$today))
+  if(plnr::is_run_directly()){
+    # tm_run_task("ui_norsyss_pdf")
+    # tm_run_task("datar_normomo_drop")
+    # tm_run_task("analysis_normomo")
+
+    sc::tm_update_plans("ui_norsyss_pdf")
+    data <- sc::tm_get_data("ui_norsyss_pdf", index_plan=1)
+    argset <- sc::tm_get_argset("ui_norsyss_pdf", index_plan=1, index_argset = 1)
+    schema <- sc::tm_get_schema("ui_norsyss_pdf")
+  }
+
+  folder <- sc::path("output", "sykdomspulsen_norsyss_restricted_output", "norsyss_pdf", argset$today, create_dir = T)
+  fs::dir_create(fs::path(folder, "svg"))
+  fs::dir_create(fs::path(folder, "markdown"))
+  fs::dir_create(fs::path(folder, "pdf"))
 
   locs <- unique(norway_locations()[, c("county_code", "county_name")])
 
   table <- schema$input$dplyr_tbl()
 
   for (tag in argset$tags) {
-    msg(glue::glue("sykdomspulspdf {tag}"), slack = T)
+    message(glue::glue("sykdomspulspdf {tag}"))
     # setup
     files <- c("monthly_report.Rmd", "monthly_reportALL.Rmd")
 
     for (f in files) {
       file.copy(
-        from = system.file("extdata", "norsyss_pdf", f, package = "sykdomspulsen"),
-        to = fs::path(sykdomspulspdf_folder("rmarkdown", argset$today), f),
-        overwrite = !config$is_production
+        from = system.file("rmd", "norsyss_pdf",f, package = "sykdomspulsen"),
+        to = fs::path(folder, "markdown", f),
+        overwrite = !sc::config$is_production
       )
     }
 
     file_before <- glue::glue("child_{tag}.Rmd")
     files_after <- glue::glue("{locs$county_code}_child_{tag}.Rmd")
     for (i in seq_along(files_after)) {
-      if (file.exists(system.file("extdata","norsyss_pdf", files_after[i], package = "sykdomspulsen"))) {
-        file.copy(
-          from = system.file("extdata", "norsyss_pdf",files_after[i], package = "sykdomspulsen"),
-          to = fs::path(sykdomspulspdf_folder("rmarkdown", argset$today), files_after[i]),
-          overwrite = !config$is_production
-        )
-      } else {
-        file.copy(
-          from = system.file("extdata", "norsyss_pdf", file_before, package = "sykdomspulsen"),
-          to = fs::path(sykdomspulspdf_folder("rmarkdown", argset$today), files_after[i]),
-          overwrite = !config$is_production
-        )
-      }
+      file.copy(
+        from = system.file("rmd", "norsyss_pdf", file_before, package = "sykdomspulsen"),
+        to = fs::path(folder, "markdown", files_after[i]),
+        overwrite = !sc::config$is_production
+      )
     }
 
-    fhi::sykdompulspdf_resources_copy(sykdomspulspdf_folder("rmarkdown", argset$today))
+    fhi::sykdompulspdf_resources_copy(fs::path(folder,"markdown"))
 
     # graphs
     q <- sykdomspulspdf_plot_total(table, location_code = "norge", x_tag = tag)
     ggsave(
-      filename = sykdomspulspdf_folder("svg",  argset$today, glue::glue("{tag} Norge alle alder {argset$today}.svg")),
+      filename = fs::path(folder, "svg", glue::glue("{tag} Norge alle alder {argset$today}.svg")),
       plot = q,
       width = 7,
       height = 4,
@@ -52,7 +56,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
 
     q <- sykdomspulspdf_plot_ages(table, location_code = "norge", x_tag = tag)
     ggsave(
-      filename = sykdomspulspdf_folder("svg", argset$today, glue::glue("{tag} Norge aldersfordelt {argset$today}.svg")),
+      filename = fs::path(folder, "svg", glue::glue("{tag} Norge aldersfordelt {argset$today}.svg")),
       plot = q,
       width = 7,
       height = 4,
@@ -62,12 +66,12 @@ ui_norsyss_pdf <- function(data, argset, schema) {
     # pdfs
 
     for (i in 1:nrow(locs)) {
-      input <- fs::path(sykdomspulspdf_folder("rmarkdown", argset$today), "monthly_report.Rmd")
-      output_dir <- sykdomspulspdf_folder("pdf", argset$today)
+      input <- fs::path(folder, "markdown", "monthly_report.Rmd")
+      output_dir <- fs::path(folder, "pdf")
       output_file <- glue::glue("{tag}_{locs$county_code[i]}_monthly_report.pdf")
       output_file_renamed <- glue::glue("{locs$county_name[i]}_{tag}.pdf")
       rmarkdown::render(
-        input = fs::path(sykdomspulspdf_folder("rmarkdown", argset$today), "monthly_report.Rmd"),
+        input = fs::path(folder, "markdown", "monthly_report.Rmd"),
         output_dir = output_dir,
         output_file = output_file,
         params = list(
@@ -85,9 +89,9 @@ ui_norsyss_pdf <- function(data, argset, schema) {
     }
 
     rmarkdown::render(
-      input = fs::path(sykdomspulspdf_folder("rmarkdown", argset$today), "monthly_reportALL.Rmd"),
+      input = fs::path(folder,"markdown", "monthly_reportALL.Rmd"),
       output_file = glue::glue("{tag}_ALL_monthly_report.pdf"),
-      output_dir = sykdomspulspdf_folder("pdf", argset$today),
+      output_dir = fs::path(folder, "pdf", argset$today),
       params = list(
         tag = tag
       ),
@@ -95,14 +99,12 @@ ui_norsyss_pdf <- function(data, argset, schema) {
       quiet = TRUE
     )
   }
-
-  create_latest_folder("norsyss_pdfs", argset$today)
 }
 
 
 sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
   data_long <- table %>%
-    dplyr::filter(granularity_time == "weekly") %>%
+    dplyr::filter(granularity_time == "week") %>%
     dplyr::filter(location_code == !!location_code) %>%
     dplyr::filter(tag_outcome == !!x_tag) %>%
     dplyr::filter(age == "total") %>%
@@ -112,10 +114,9 @@ sykdomspulspdf_plot_total <- function(table, location_code, x_tag) {
   yrwks <- rev(sort(unique(data_long$yrwk)))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]
   data_long[, location_name:=get_location_name(location_code)]
-  data_long[, season := fhi::season(yrwk)]
 
   seasons <- rev(unique(data_long$season))[1:5]
-  labs <- unique(data_long[, c("week")])
+  labs <- unique(data_long[, c("week","x")])
   labs <- labs[as.numeric(week) %in% seq(2, 52, 2)]
 
   data_long <- data_long[season %in% seasons]
@@ -163,7 +164,7 @@ sykdomspulspdf_folder <- function(folder, date, further = NULL) {
 
 sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
   data_long <- table %>%
-    dplyr::filter(granularity_time == "weekly") %>%
+    dplyr::filter(granularity_time == "week") %>%
     dplyr::filter(location_code == !!location_code) %>%
     dplyr::filter(tag_outcome == !!x_tag) %>%
     dplyr::filter(age != "total") %>%
@@ -173,7 +174,6 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
   yrwks <- rev(unique(data_long$yrwk))[-c(1:3)]
   data_long <- data_long[yrwk %in% yrwks]
   data_long[, location_name:=get_location_name(location_code)]
-  data_long[, season := fhi::season(yrwk)]
   data_long[, age := car::recode(
     age,
     glue::glue(

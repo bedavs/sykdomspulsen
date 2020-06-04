@@ -23,6 +23,7 @@ schema class description
 \item \href{#method-db_upsert_load_data_infile}{\code{Schema$db_upsert_load_data_infile()}}
 \item \href{#method-db_drop_all_rows}{\code{Schema$db_drop_all_rows()}}
 \item \href{#method-db_drop_rows_where}{\code{Schema$db_drop_rows_where()}}
+\item \href{#method-db_keep_rows_where}{\code{Schema$db_keep_rows_where()}}
 \item \href{#method-get_data}{\code{Schema$get_data()}}
 \item \href{#method-get_data_dt}{\code{Schema$get_data_dt()}}
 \item \href{#method-get_data_db}{\code{Schema$get_data_db()}}
@@ -131,7 +132,11 @@ schema class description
 \if{latex}{\out{\hypertarget{method-db_upsert_load_data_infile}{}}}
 \subsection{Method \code{db_upsert_load_data_infile()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Schema$db_upsert_load_data_infile(newdata, drop_indexes = NULL, verbose = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Schema$db_upsert_load_data_infile(
+  newdata,
+  drop_indexes = names(self$indexes),
+  verbose = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 }
@@ -150,6 +155,15 @@ schema class description
 \subsection{Method \code{db_drop_rows_where()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Schema$db_drop_rows_where(condition)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-db_keep_rows_where"></a>}}
+\if{latex}{\out{\hypertarget{method-db_keep_rows_where}{}}}
+\subsection{Method \code{db_keep_rows_where()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Schema$db_keep_rows_where(condition)}\if{html}{\out{</div>}}
 }
 
 }

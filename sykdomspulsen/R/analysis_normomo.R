@@ -57,7 +57,7 @@ analysis_normomo <-  function(data, argset, schema){
       sex = argset$sex
     )
     # only upload
-    data_clean <- data_clean[year >= argset$year_start_upload]
+    data_clean <- data_clean[year >= argset$year_start_upload & year <= argset$year_end_upload]
     schema$output$db_upsert_load_data_infile(data_clean, verbose = T)
   }
 }
@@ -135,15 +135,6 @@ analysis_normomo_plans <- function(){
     Wdrop = 01
   )
 
-  # For FHI ----
-  list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
-  list_plan[[length(list_plan)]]$add_data(name = "raw", fn=function(){
-    sc::tbl("datar_normomo") %>%
-      dplyr::filter(sex=="total") %>%
-      dplyr::collect() %>%
-      sc::latin1_to_utf8()
-  })
-
   # FHI - Norge/County ----
   for(j in c("norge",unique(norway_locations()$county_code))) for(sex in c("total")) {
     list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
@@ -163,7 +154,8 @@ analysis_normomo_plans <- function(){
         fn = analysis_normomo,
         location_code = j,
         sex = sex,
-        year_start_upload = ifelse(i==2012, 2008, i-1),
+        year_start_upload = ifelse(i==2012, 2008, i-2),
+        year_end_upload = ifelse(i==fhi::isoyear_n(date_extracted), i, i-1),
         year_end = i,
         date_extracted = date_extracted_year_specific,
         wdir = tempdir(),

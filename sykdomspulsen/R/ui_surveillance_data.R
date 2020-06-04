@@ -22,9 +22,13 @@ ui_surveillance_data <- function(data, argset, schema) {
 
   d <- schema$data_covid19_msis_by_time_location$dplyr_tbl() %>%
     dplyr::filter(granularity_time=="day") %>%
-    dplyr::filter(location_code=="norge") %>%
+    dplyr::filter(granularity_geo %in% c("nation","county")) %>%
     dplyr::collect()
   setDT(d)
+
+  setorder(d, location_code, date)
+
+  d[, location_name := get_location_name(location_code)]
 
   writexl::write_xlsx(
     d,
@@ -46,7 +50,7 @@ ui_surveillance_data <- function(data, argset, schema) {
 
   org::write_text(
     txt = glue::glue(
-      "This documentation was last updated on 2020-04-24.\n\n",
+      "This documentation was last updated on 2020-06-04.\n\n",
 
       "This is the documentation for the files:\n",
       "- data_covid19_msis_by_time_location_YYYY-MM-DD.xlsx\n",
@@ -57,8 +61,8 @@ ui_surveillance_data <- function(data, argset, schema) {
 
       "The variables available are listed below:\n",
 
-      "granularity_time: Temporal granularity\n",
-      "granularity_geo: Geographical granularity\n",
+      "granularity_time: Temporal granularity (day)\n",
+      "granularity_geo: Geographical granularity (nation, county)\n",
       "location_code: The geographical location\n",
       "border: The borders (kommunesammensl{fhi::nb$aa}ing) that location_code represents\n",
       "age: Age in years\n",
@@ -70,7 +74,11 @@ ui_surveillance_data <- function(data, argset, schema) {
       "x: Week within season\n",
       "date: Date of the data (pr{fhi::nb$oe}vetakingsdato)\n",
 
-      "n: Number of confirmed cases\n\n"
+      "n: Number of confirmed cases\n",
+
+      "location_name: The name of the geographical location\n",
+
+      "\n"
     ),
     file = fs::path(
       folder,

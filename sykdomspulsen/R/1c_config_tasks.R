@@ -375,7 +375,7 @@ set_tasks <- function() {
       upsert_at_end_of_each_plan = TRUE,
       args = list(
         train_length = 5,
-        years = c(2018, 2019, 2020),
+        years = c(2012:fhi::isoyear_n()),
         weeklyDenominatorFunction = sum,
         denominator = "consult_without_influenza",
         granularity_time = "week"
@@ -617,7 +617,8 @@ set_tasks <- function() {
       #filter = "age=='total'",
       args = list(
         folder = "sykdomspulsen_normomo_restricted_output/{argset$today}/data",
-        filename = "data_{argset$today}.xlsx"
+        filename = "data_{argset$today}.xlsx",
+        filename_public = "offentliggjort_data_{tag_location}_{argset$today}.xlsx"
       )
     )
   )
@@ -712,7 +713,19 @@ set_tasks <- function() {
     )
   )
 
-
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_norsyss_pdf",
+      type = "data",
+      schema=list(input=sc::config$schemas$results_norsyss_standard),
+      action="ui_norsyss_pdf",
+      args = list(
+        tags = c("gastro_vk_ot","respiratoryexternal_vk_ot"),
+        name_short = config$def$norsyss$short_names,
+        name_long = config$def$norsyss$long_names
+      )
+    )
+  )
 
 
 
@@ -737,19 +750,7 @@ set_tasks <- function() {
 
 
 
-  sc::add_task(
-    sc::task_from_config(
-      name = "ui_norsyss_pdf",
-      type = "data",
-      schema=list(input=sc::config$schemas$results_norsyss_standard),
-      action="ui_norsyss_pdf",
-      args = list(
-        tags = c("gastro"),
-        name_short = config[["def"]]$short_names,
-        name_long = config[["def"]]$long_names
-      )
-    )
-  )
+
   sc::add_task(
     sc::task_from_config(
       name = "ui_archive_results_norsyss_standard",

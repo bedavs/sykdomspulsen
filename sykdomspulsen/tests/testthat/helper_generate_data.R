@@ -12,7 +12,7 @@ GenFakeDataRaw <- function(xmunicipEnd = "municip5054", syndromes=c()) {
 
   m <- norway_municip_merging()
   skeleton <- unique(m[municip_code_current == xmunicipEnd & year <= lubridate::year(lubridate::today()), c("municip_code_original", "year")])
-  setnames(skeleton, "municip_code_original", "municip")
+  setnames(skeleton, "municip_code_original", "location_code")
   data <- vector("list", length = nrow(skeleton))
   for (i in 1:length(data)) {
     minDate <- as.Date(sprintf("%s-01-01", skeleton$year[i]))
@@ -25,8 +25,8 @@ GenFakeDataRaw <- function(xmunicipEnd = "municip5054", syndromes=c()) {
       stringsAsFactors = F
     )
     setDT(data[[i]])
-    data[[i]][, municip := skeleton$municip[i]]
-    data[[i]][, municip := skeleton$municip[i]]
+    data[[i]][, location_code := skeleton$location_code[i]]
+    data[[i]][, location_code := skeleton$location_code[i]]
 
     data[[i]][, consult := rpois(.N, 50)]
     for (j in syndromes) {

@@ -253,6 +253,9 @@ data_covid19_daily_report <- function(data, argset, schema){
 
   fill_in_missing(retval)
 
+  # make sure we dont include data from the future
+  retval <- retval[date <= date_max]
+
   schema$data_covid19_hospital_by_time$db_drop_table()
   schema$data_covid19_hospital_by_time$db_connect()
   schema$data_covid19_hospital_by_time$db_drop_constraint()
