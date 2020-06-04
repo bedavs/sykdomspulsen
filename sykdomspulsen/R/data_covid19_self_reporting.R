@@ -20,6 +20,7 @@ data_covid19_self_reporting <- function(data, argset, schema){
   # date max
   date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
 
+  # reading in the data
   master <- fread(file, encoding="Latin-1")
 
   setnames(master, epitrix::clean_labels(names(master)))
@@ -93,8 +94,8 @@ data_covid19_self_reporting <- function(data, argset, schema){
   master[, is_symps_yesfever_muscle_or_headache := is_symp_fever & (is_symp_muscle | is_symp_headache)]
   master[, is_symps_nofever_muscle_or_headache := !is_symp_fever & (is_symp_muscle | is_symp_headache)]
 
-  master[, is_symps_yesfever_gastro_or_taste_smell_or_other := is_symp_fever & (is_symp_breath | is_symp_taste_smell | is_symp_other)]
-  master[, is_symps_nofever_gastro_or_taste_smell_or_other := !is_symp_fever & (is_symp_breath | is_symp_taste_smell | is_symp_other)]
+  master[, is_symps_yesfever_gastro_or_taste_smell_or_other := is_symp_fever & (is_symp_gastro | is_symp_taste_smell | is_symp_other)]
+  master[, is_symps_nofever_gastro_or_taste_smell_or_other := !is_symp_fever & (is_symp_gastro | is_symp_taste_smell | is_symp_other)]
 
   # other variables
   master[, is_today_0normal := hvordan_er_formen_din == 0]
@@ -137,6 +138,7 @@ data_covid19_self_reporting <- function(data, argset, schema){
   d1[, location_code := "norge"]
   master <- rbind(d1,master)
 
+  ###
   # aggregate
   agg <- master[,.(
     n = .N,
@@ -186,6 +188,7 @@ data_covid19_self_reporting <- function(data, argset, schema){
     age
   )]
 
+  # make the skeleton
   skeleton <- expand.grid(
     date = seq.Date(date_min, date_max, by=1),
     location_code = c("norge",unique(fhidata::norway_locations_b2020$county_code)),
@@ -203,10 +206,14 @@ data_covid19_self_reporting <- function(data, argset, schema){
   )
   nrow(skeleton)
 
+  # NAs -> 0s
   for(i in names(retval)) retval[is.na(get(i)), (i):=0]
   retval[, granularity_time:="day"]
+
+  # creating the required variables for the database
   fill_in_missing(retval)
 
+  # upload to the database
   schema$output$db_drop_table()
   schema$output$db_connect()
   schema$output$db_drop_constraint()
