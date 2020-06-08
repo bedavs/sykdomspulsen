@@ -1,42 +1,28 @@
-#' ui_covid19_areas_at_risk
+#' analysis_covid19_areas_at_risk
 #' @param data a
 #' @param argset a
 #' @param schema a
 #' @export
-ui_covid19_areas_at_risk <- function(data, argset, schema) {
-  # tm_run_task("ui_covid19_areas_at_risk")
+analysis_covid19_areas_at_risk <- function(data, argset, schema) {
+  # tm_run_task("analysis_covid19_areas_at_risk")
 
   if(plnr::is_run_directly()){
-    sc::tm_update_plans("ui_covid19_areas_at_risk")
-    length(config$tasks$list_task$ui_norsyss_kht_email$plans)
+    sc::tm_update_plans("analysis_covid19_areas_at_risk")
 
     index_plan <- 1
-    data <- sc::tm_get_data("ui_covid19_areas_at_risk", index_plan=index_plan)
-    argset <- sc::tm_get_argset("ui_covid19_areas_at_risk", index_plan=index_plan, index_argset = 1)
-    schema <- sc::tm_get_schema("ui_covid19_areas_at_risk")
+    data <- sc::tm_get_data("analysis_covid19_areas_at_risk", index_plan=index_plan)
+    argset <- sc::tm_get_argset("analysis_covid19_areas_at_risk", index_plan=index_plan, index_argset = 1)
+    schema <- sc::tm_get_schema("analysis_covid19_areas_at_risk")
   }
 
-  tab <- areas_at_risk(data)
-  # render it
 
-  file <- glue::glue("covid19_areas_at_risk_{lubridate::today()}.docx")
-  folder <- sc::path("output","sykdomspulsen_norsyss_restricted_output",lubridate::today(), create_dir = T)
-  tempdir <- tempdir()
+  # this code
+  # a) only works for "total age groups" (change it to all age groups)
+  # b) it doesn't provide the output in the way we want it
+  schema$output$db_field_types
 
-  rmarkdown::render(
-    input = system.file("rmd/ui_covid19_areas_at_risk.Rmd", package="sykdomspulsen"),
-    output_dir = tempdir,
-    output_file = file,
-    intermediates_dir = tempdir
-  )
+  # start changing the data
 
-  sc::mv(
-    fs::path(tempdir, file),
-    fs::path(folder, file)
-  )
-}
-
-areas_at_risk <- function(data){
   d <- copy(data$covid19$norsyss_combined)
   if(nrow(d)==0) return(NULL)
 
@@ -135,126 +121,76 @@ areas_at_risk <- function(data){
   tab[,location_code:=factor(location_code, levels = location_codes)]
   setorder(tab,location_code,variable)
 
-
-  return(tab)
+  # this will be automatically upserted to schema = "output" because of
+  # upsert_at_end_of_each_plan = TRUE
+  return(retval)
 }
 
-areas_at_risk_ft <- function(tab){
+analysis_covid19_areas_at_risk_function_factory <- function(loc){
+  # snapshots the variable 'loc' and fixes in the following
+  # function
+  force(loc)
 
-  msis_index_hig <- which(tab$msis_n > tab$msis_threshold & tab$variable %in% 3:4)
-  norsyss_index_hig <- which(tab$norsyss_pr100 > tab$norsyss_pr100_threshold & tab$variable %in% 3:4)
-
-  ft <- flextable::flextable(
-    data.frame(
-      "Geo"=tab$location_name,
-      "Uke"=tab$yrwk,
-      "Tilfeller"=tab$pretty_msis_n,
-      "Terskel"=tab$pretty_msis_threshold,
-      "Konsultasjoner"=tab$pretty_norsyss_n,
-      "Andel"=tab$pretty_norsyss_pr100,
-      "Terskel"=tab$pretty_norsyss_pr100_threshold
-    )
-  )
-  labs <- as.list(c(
-    "Geo",
-    "Uke",
-    "Tilfeller",
-    "Terskel",
-    "Konsultasjoner",
-    "Andel",
-    "Terskel"
-  ))
-  names(labs) <- ft$col_keys
-  ft <- flextable::set_header_labels(ft,values =labs)
-  ft <- flextable::autofit(ft)
-  ft <- flextable::merge_v(ft, j = ~ Geo )
-
-  ft <- flextable::add_header_row(
-    ft,
-    values = c(
-      "",
-      "MSIS",
-      "NorSySS"
-    ),
-    colwidths = c(
-      2,
-      2,
-      3
-    )
-  )
-  ft <- flextable::theme_box(ft)
-  ft <- flextable::align(ft, align = "center", part = "all")
-
-  if (length(msis_index_hig) > 0) ft <- flextable::bg(
-    ft,
-    i = msis_index_hig,
-    j = 3,
-    bg=fhiplot::warning_color[["hig"]]
-  )
-  if (length(norsyss_index_hig) > 0) ft <- flextable::bg(
-    ft,
-    i = norsyss_index_hig,
-    j = 6,
-    bg=fhiplot::warning_color[["hig"]]
-  )
-
-  return(ft)
-}
-
-ui_covid19_areas_at_risk_function_factory <- function(yrwk){
-  force(yrwk)
   function(){
     retval <- list()
 
     retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
-      dplyr::filter(granularity_time == "week") %>%
-      dplyr::filter(yrwk %in% !!yrwk) %>%
+      dplyr::filter(location_code %in% !!loc) %>%
+      dplyr::filter(date >= "2020-03-09") %>%
+      dplyr::group_by(location_code, age, yrwk) %>%
+      dplyr::summarize(n=sum(n)) %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
 
-    retval$norsyss_combined <- sc::tbl("data_norsyss") %>%
+    retval$norsyss <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
-      dplyr::filter(age=="total") %>%
-      dplyr::filter(yrwk %in% !!yrwk) %>%
-      dplyr::filter(tag_outcome %in% "covid19_vk_ote") %>%
-      dplyr::select(location_code, yrwk, n, consult_with_influenza) %>%
-      dplyr::group_by(location_code,yrwk) %>%
-      dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
-      dplyr::collect() %>%
-      sc::latin1_to_utf8()
-
-    retval$norsyss_norge <- sc::tbl("data_norsyss") %>%
-      dplyr::filter(granularity_time=="day") %>%
-      dplyr::filter(age=="total") %>%
+      dplyr::filter(location_code %in% !!loc) %>%
       dplyr::filter(date >= "2020-03-09") %>%
       dplyr::filter(tag_outcome %in% "covid19_vk_ote") %>%
-      dplyr::filter(location_code=="norge") %>%
-      dplyr::select(location_code, yrwk, date, n, consult_with_influenza) %>%
-      dplyr::group_by(location_code,yrwk, date) %>%
+      dplyr::select(location_code, age, yrwk, n, consult_with_influenza) %>%
+      dplyr::group_by(location_code, age, yrwk) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
+
+    # make sure they both have the same yrwks
+    yrwks <- intersect(unique(retval$msis$yrwk), unique(retval$norsyss$yrwk))
+    retval$msis <- retval$msis[yrwk %in% yrwks]
+    retval$norsyss <- retval$norsyss[yrwk %in% yrwks]
+
+    # sort them
+    setorder(retval$msis, location_code, age, yrwk)
+    setorder(retval$norsyss, location_code, age, yrwk)
 
     retval
   }
 }
 
-ui_covid19_areas_at_risk_plans <- function(){
-  yrwk <- fhi::isoyearweek(lubridate::today()-seq(0,21,7)-2)
+analysis_covid19_areas_at_risk_plans <- function(){
+
+  # these are the areas we are interested in
+  locs <- norway_locations_long()$location_code
+  locs <- locs[!locs %in% "norway"]
 
   list_plan <- list()
-  list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
+  for(loc in locs){
+    # create a new plan
+    list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
 
-  list_plan[[length(list_plan)]]$add_data(
-    name = "covid19",
-    fn=ui_covid19_areas_at_risk_function_factory(
-      yrwk = yrwk
+    # add in the data
+    list_plan[[length(list_plan)]]$add_data(
+      name = "covid19",
+      fn=analysis_covid19_areas_at_risk_function_factory(
+        loc = loc
+      )
     )
-  )
-  list_plan[[length(list_plan)]]$add_analysis(
-    fn = ui_covid19_areas_at_risk,
-    yrwk = yrwk
-  )
+
+    # what do you want to do with the data?
+    list_plan[[length(list_plan)]]$add_analysis(
+      fn = analysis_covid19_areas_at_risk,
+      location_code = loc # giving us information that is available through 'argset'
+    )
+  }
 
   return(list_plan)
 }

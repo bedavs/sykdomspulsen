@@ -991,6 +991,52 @@ set_db <- function(){
     )
   )
 
+  # results_covid19_areas_at_risk ----
+  sc::add_schema(
+    name = "results_covid19_areas_at_risk",
+    schema = sc::Schema$new(
+      db_table = "results_covid19_areas_at_risk",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n_msis" = "INTEGER",
+        "n_msis_baseline_expected" = "INTEGER",
+        "n_msis_baseline_thresholdu0" = "INTEGER",
+        "n_msis_status" = "TEXT",
+
+        "n_norsyss" = "INTEGER",
+        "n_norsyss_denominator" = "INTEGER",
+        "n_norsyss_baseline_expected" = "INTEGER",
+        "n_norsyss_baseline_thresholdu0" = "INTEGER",
+        "n_norsyss_status" = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "granularity_geo",
+        "location_code",
+        "age",
+        "year",
+        "week",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   sc::add_schema(
     name = "results_simple",
     schema = sc::Schema$new(
