@@ -36,10 +36,10 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Det vil snart v{fhi::nb$ae}re mulig {fhi::nb$aa} sammenlikne data for kommuner, fylker og Norge, dette vil komme i en ny fane under covid-19 delen p{fhi::nb$aa} nettsiden.<br>",
+    "- Vi har inkludert en ny fane som heter 'sammenlikning' under covid-19 p{fhi::nb$aa} nettisden. Her kan du sammenlikne kommuner, fylker og Norge.<br>",
     "- Det er mulig {fhi::nb$aa} laste ned tallmaterialet bak noen av figurene p{fhi::nb$aa} nettsiden ved {fhi::nb$aa} bruke 'last ned tabell' knappen over figuren.",
     " Det er ogs{fhi::nb$aa} mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
-    "- Du vil innen et par uker f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
+    "- Du vil i l{fhi::nb$oe}pet av denne uken f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
     "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
 
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
