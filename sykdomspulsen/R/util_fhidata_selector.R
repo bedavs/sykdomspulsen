@@ -28,6 +28,14 @@ norway_municip_merging <- function() {
   }
 }
 
+#' norway_ward_merging
+#' @export
+norway_ward_merging <- function() {
+  if (config$border == 2020) {
+    return(fhidata::norway_ward_merging_b2020)
+  }
+}
+
 #' norway_fixing_merged_municips
 #' @export
 norway_fixing_merged_municips <- function() {
@@ -41,6 +49,14 @@ norway_locations <- function() {
     return(fhidata::norway_locations_b2019)
   } else if (config$border == 2020) {
     return(fhidata::norway_locations_b2020)
+  }
+}
+
+#' norway_locations_ward
+#' @export
+norway_locations_ward <- function() {
+  if (config$border == 2020) {
+    return(fhidata::norway_locations_ward_b2020)
   }
 }
 
@@ -60,7 +76,19 @@ norway_population <- function() {
   if (config$border == 2019) {
     return(fhidata::norway_population_b2019)
   } else if (config$border == 2020) {
-    return(fhidata::norway_population_b2020)
+    # fake bydel data
+    retval <- list()
+    retval[[1]] <- copy(fhidata::norway_population_b2020)
+    for(i in norway_locations_ward()$ward_code){
+      temp <- fhidata::norway_population_b2020[location_code=="county03"]
+      temp[,pop:=1]
+      temp[,location_code:=i]
+      temp[,level:="ward"]
+      retval[[length(retval)+1]] <- temp
+    }
+    retval <- rbindlist(retval)
+
+    return(retval)
   }
 }
 
