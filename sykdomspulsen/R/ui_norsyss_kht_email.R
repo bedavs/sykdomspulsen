@@ -37,9 +37,10 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
     "- Vi har inkludert en ny fane som heter 'sammenlikning' under covid-19 p{fhi::nb$aa} nettisden. Her kan du sammenlikne kommuner, fylker og Norge.<br>",
+    "- Bydelene i Oslo er inkludert som geografiske omr{fhi::nb$aa}der i covid-19 delen p{fhi::nb$aa} nettisden.<br>",
     "- Det er mulig {fhi::nb$aa} laste ned tallmaterialet bak noen av figurene p{fhi::nb$aa} nettsiden ved {fhi::nb$aa} bruke 'last ned tabell' knappen over figuren.",
     " Det er ogs{fhi::nb$aa} mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
-    "- Du vil i l{fhi::nb$oe}pet av denne uken f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
+    "- Du vil i l{fhi::nb$oe}pet av neste uke f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
     "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
 
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
