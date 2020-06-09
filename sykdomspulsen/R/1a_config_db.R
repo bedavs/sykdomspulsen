@@ -1020,6 +1020,11 @@ set_db <- function(){
         "n_norsyss_denominator" = "INTEGER",
         "n_norsyss_baseline_expected" = "INTEGER",
         "n_norsyss_baseline_thresholdu0" = "INTEGER",
+
+        "pr100_norsyss" = "DOUBLE",
+        "pr100_norsyss_baseline_expected" = "DOUBLE",
+        "pr100_norsyss_baseline_thresholdu0" = "DOUBLE",
+
         "n_norsyss_status" = "TEXT"
       ),
       db_load_folder = tempdir(),
