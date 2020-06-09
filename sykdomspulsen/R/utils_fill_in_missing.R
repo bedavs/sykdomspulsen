@@ -42,18 +42,28 @@ fill_in_missing <- function(d){
     d[,date:=as.Date("1900-01-01")]
   }
   if(!"yrwk" %in% names(d)){
-    d[,yrwk := fhi::isoyearweek(date)]
+    dates <- unique(d[, "date"])
+    dates[,yrwk := fhi::isoyearweek(date)]
+    d[dates,on="date",yrwk := yrwk]
   }
   if(!"season" %in% names(d)){
-    d[, season := fhi::season(yrwk)]
+    dates <- unique(d[, "yrwk"])
+    dates[,season := fhi::season(yrwk)]
+    d[dates,on="yrwk",season := season]
   }
   if(!"year" %in% names(d)){
-    d[, year := fhi::isoyear_n(date)]
+    dates <- unique(d[, "date"])
+    dates[,year := fhi::isoyear_n(date)]
+    d[dates, on="date",year := year]
   }
   if(!"week" %in% names(d)){
-    d[, week := fhi::isoweek_n(date)]
+    dates <- unique(d[, "date"])
+    dates[,week := fhi::isoweek_n(date)]
+    d[dates,on="date", week := week]
   }
   if(!"x" %in% names(d)){
-    d[, x := fhi::x(week)]
+    dates <- unique(d[, "week"])
+    dates[,x := fhi::x(week)]
+    d[dates, on="week", x := x]
   }
 }
