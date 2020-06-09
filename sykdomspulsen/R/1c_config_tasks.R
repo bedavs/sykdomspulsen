@@ -743,7 +743,22 @@ set_tasks <- function() {
   )
 
 
-
+  # ui_covid19_areas_at_risk_docx ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_covid19_areas_at_risk_docx",
+      type = "ui",
+      action = "sykdomspulsen::ui_covid19_areas_at_risk_docx",
+      db_table = "results_covid19_areas_at_risk",
+      schema = list(input=sc::config$schemas$results_covid19_areas_at_risk),
+      for_each_plan = list("border" = config$border),
+      filter = "age=='total'",
+      args = list(
+        folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
+        filename = "covid19_areas_at_risk_{argset$today}.xlsx"
+      )
+    )
+  )
 
 
 
