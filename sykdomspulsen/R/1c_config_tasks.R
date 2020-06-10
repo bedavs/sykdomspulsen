@@ -478,6 +478,19 @@ set_tasks <- function() {
     )
   )
 
+  # analysis_covid19_metrics ----
+  sc::add_task(
+    sc::Task$new(
+      name = "analysis_covid19_metrics",
+      type = "analysis",
+      update_plans_fn = analysis_covid19_metrics_plans,
+      upsert_at_end_of_each_plan = TRUE,
+      schema = c(
+        "output" = sc::config$schemas$results_covid19_metrics
+      )
+    )
+  )
+
   sc::add_task(
     sc::task_from_config(
       name = "analysis_simple_msis",
@@ -741,7 +754,6 @@ set_tasks <- function() {
       )
     )
   )
-
 
   # ui_covid19_areas_at_risk_docx ----
   sc::add_task(

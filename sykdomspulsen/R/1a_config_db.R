@@ -1042,6 +1042,46 @@ set_db <- function(){
     )
   )
 
+  # results_covid19_metrics ----
+  sc::add_schema(
+    name = "results_covid19_metrics",
+    schema = sc::Schema$new(
+      db_table = "results_covid19_metrics",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "value" = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "granularity_geo",
+        "location_code",
+        "age",
+        "year",
+        "week",
+        "date",
+
+        "tag_outcome"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   sc::add_schema(
     name = "results_simple",
     schema = sc::Schema$new(
