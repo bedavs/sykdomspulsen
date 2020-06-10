@@ -17,114 +17,101 @@ analysis_covid19_areas_at_risk <- function(data, argset, schema) {
 
 
   # this code
-  # a) only works for "total age groups" (change it to all age groups)
-  # b) it doesn't provide the output in the way we want it
-  schema$output$db_field_types
-
+  # a) only works for "total age groups" (change it to all age groups) # total & age groups?
   # start changing the data
+  # MSIS
+  d <- copy(data$covid19$msis)
 
-  d <- copy(data$covid19$norsyss_combined)
-  if(nrow(d)==0) return(NULL)
+  d[, n_lag1 := shift(n, type="lag")]
+  d[, n_lag2 := shift(n, n=2L, type="lag")]
 
-  setorder(d,location_code,yrwk)
-  d[,pr100:=100*n/consult_with_influenza]
-  d[is.nan(pr100), pr100:=0]
-  d[,yrwk_id := paste0("yrwk",1:.N), by=.(location_code)]
 
   yrwks <- unique(d$yrwk)
 
-  d_wide <- dcast.data.table(d, location_code ~ yrwk_id, value.var = c("n","consult_with_influenza","pr100"))
+  d[,baseline := pmax(1,round((n_lag1+n_lag2)/2))]
+  d[,threshold := qpois(0.975, lambda = baseline)]
 
-  d_wide[,baseline := pmax(0.01,100*(n_yrwk1+n_yrwk2)/(consult_with_influenza_yrwk1+consult_with_influenza_yrwk2))]
+  d[,n_msis_status:=ifelse(n > threshold,"high","normal")]
 
-  d_wide[,threshold_yrwk_1 := 0]
-  d_wide[,threshold_yrwk_2 := 0]
+  d_msis <- d[,c("location_code","yrwk","age", "n","baseline","threshold","n_msis_status" )]
+  setnames(d_msis, c("n",
+                     "baseline",
+                     "threshold"),
+           c("n_msis",
+             "n_msis_baseline_expected",
+             "n_msis_baseline_thresholdu0"))
 
-  d_wide[,threshold_yrwk_3 := 100*qpois(0.975, lambda=baseline*consult_with_influenza_yrwk3/100)/consult_with_influenza_yrwk3]
-  d_wide[is.nan(threshold_yrwk_3),threshold_yrwk_3:=0]
 
-  d_wide[,threshold_yrwk_4 := 100*qpois(0.975, lambda=baseline*consult_with_influenza_yrwk4/100)/consult_with_influenza_yrwk4]
-  d_wide[is.nan(threshold_yrwk_4),threshold_yrwk_4:=0]
 
-  d_wide_norsyss <- d_wide
+  # NORSYSS
+  d <- copy(data$covid19$norsyss)
+    d[,pr100:=100*n/consult_with_influenza]
 
-  location_code_norsyss <- d_wide_norsyss[pr100_yrwk3 > threshold_yrwk_3 | pr100_yrwk4 > threshold_yrwk_4]$location_code
+    d[is.nan(pr100), pr100:=0]
+    d[, n_lag1 := shift(n, type="lag"), by=age]
+    d[, n_lag2 := shift(n, n=2L, type="lag"), by=age]
+    d[, consult_with_influenza_lag1 := shift(consult_with_influenza, type="lag"), by=age]
+    d[, consult_with_influenza_lag2 := shift(consult_with_influenza, n=2L, type="lag"), by=age]
 
-  d <- copy(data$covid19$msis)
-  setorder(d,location_code,yrwk)
-  d[,yrwk_id := paste0("yrwk",1:.N), by=.(location_code)]
 
-  d_wide <- dcast.data.table(d, location_code ~ yrwk_id, value.var = "n")
-  d_wide[,baseline := pmax(1,round((yrwk1+yrwk2)/2))]
-  d_wide[,threshold := qpois(0.975, lambda = baseline)]
+    d[,pr100_baseline := pmax(0.01,100*(n_lag1+n_lag2)/
+                               (consult_with_influenza_lag1+consult_with_influenza_lag2))]
+    d[, n_norsyss_baseline_expected := round(pr100_baseline*consult_with_influenza/100)]
 
-  d_wide_msis <- d_wide
-  location_code_msis <- d_wide_msis[yrwk3 > threshold | yrwk4 > threshold]$location_code
+    d[,n_threshold := qpois(0.975, lambda=n_norsyss_baseline_expected)]
+    d[,pr100_threshold := 100*n_threshold/consult_with_influenza]
+    d[is.nan(pr100_threshold),pr100_threshold:=0]
 
-  location_codes <- unique(c(location_code_norsyss, location_code_msis))
 
-  tab_norsyss <- melt.data.table(
-    d_wide_norsyss[location_code %in% location_codes],
-    id="location_code",
-    measure = patterns("^n_", "^pr100_","^threshold_"),
-    value.name = c("norsyss_n","norsyss_pr100","norsyss_pr100_threshold")
+
+    d[,n_norsyss_status:=ifelse(pr100 > pr100_threshold,"high","normal")]
+
+    d_norsyss <- d[,c("location_code",
+                      "yrwk",
+                      "age",
+                      "n",
+                      "consult_with_influenza",
+                      "n_norsyss_baseline_expected",
+                      "n_threshold",
+                      "pr100",
+                      "pr100_baseline",
+                      "pr100_threshold",
+                      "n_norsyss_status")]
+
+    setnames(d_norsyss,
+             c("n",
+               "consult_with_influenza",
+               "n_threshold",
+               "pr100",
+               "pr100_baseline",
+               "pr100_threshold"),
+             c("n_norsyss",
+               "n_norsyss_denominator",
+               "n_norsyss_baseline_thresholdu0",
+               "pr100_norsyss",
+               "pr100_norsyss_baseline_expected",
+               "pr100_norsyss_baseline_thresholdu0"))
+
+
+
+  retval <- merge(
+    d_msis,
+    d_norsyss,
+    by=c("location_code","yrwk", "age"),
+    all=T
   )
 
-  tab_norsyss
+  retval[, granularity_time := "week"]
 
-  tab_msis <- melt.data.table(
-    d_wide_msis[location_code %in% location_codes],
-    id.vars =c("location_code","threshold"),
-    measure.vars = c("yrwk1","yrwk2","yrwk3","yrwk4")
-  )
-  levels(tab_msis$variable) <- 1:4
+  #############################
+  # b) it doesn't provide the output in the way we want it
+  schema$output$db_field_types
 
-  tab <- merge(
-    tab_msis,
-    tab_norsyss,
-    by=c("location_code","variable")
-  )
-
-  setnames(tab,c("threshold","value"),c("msis_threshold","msis_n"))
-
-  tab[, pretty_msis_threshold:=fhiplot::format_nor(msis_threshold)]
-  tab[, pretty_msis_n:=fhiplot::format_nor(msis_n)]
-  tab[, pretty_norsyss_n:=fhiplot::format_nor(norsyss_n)]
-  tab[, pretty_norsyss_pr100:=fhiplot::format_nor_perc_1(norsyss_pr100)]
-  tab[, pretty_norsyss_pr100_threshold:=fhiplot::format_nor_perc_1(norsyss_pr100_threshold)]
-
-  tab[variable %in% 1:2, pretty_msis_threshold:=""]
-  tab[variable %in% 1:2, pretty_norsyss_pr100_threshold:=""]
-
-  tab[,location_name := get_location_name(location_code)]
-  tab[location_name=="Bergen"]
-
-  tab[variable %in% 3:4,msis_difference := msis_n-msis_threshold]
-  tab[variable %in% 3:4,norsyss_difference := norsyss_pr100-norsyss_pr100_threshold]
-
-  tab[, yrwk := variable]
-  levels(tab$yrwk) <- yrwks
-
-  # get the ordering of locations right
-  ordering_msis <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
-  setorder(ordering_msis, -msis_difference, -norsyss_difference)
-  ordering_msis <- unique(ordering_msis$location_code)
-
-  ordering_norsyss <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
-  setorder(ordering_norsyss, -norsyss_difference, -msis_difference)
-  ordering_norsyss <- unique(ordering_norsyss$location_code)
-
-  location_codes_1 <- ordering_msis[ordering_msis %in% location_code_msis]
-  location_codes_2 <- ordering_norsyss[!ordering_norsyss %in% location_code_msis]
-  location_codes <- c(location_codes_1, location_codes_2)
-
-  tab[,location_code:=factor(location_code, levels = location_codes)]
-  setorder(tab,location_code,variable)
-
-  # this will be automatically upserted to schema = "output" because of
-  # upsert_at_end_of_each_plan = TRUE
-  return(retval)
+  # this will fill in a lot of standard columns
+    fill_in_missing(retval)
+    return(retval)
 }
+
 
 analysis_covid19_areas_at_risk_function_factory <- function(loc){
   # snapshots the variable 'loc' and fixes in the following
@@ -134,7 +121,7 @@ analysis_covid19_areas_at_risk_function_factory <- function(loc){
   function(){
     retval <- list()
 
-    retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
+    retval$msis <- sc::tbl("prelim_data_covid19_msis_by_time_location") %>%
       dplyr::filter(location_code %in% !!loc) %>%
       dplyr::filter(date >= "2020-03-09") %>%
       dplyr::group_by(location_code, age, yrwk) %>%
@@ -171,6 +158,7 @@ analysis_covid19_areas_at_risk_plans <- function(){
   # these are the areas we are interested in
   locs <- norway_locations_long()$location_code
   locs <- locs[!locs %in% "norway"]
+  locs <- locs[!stringr::str_detect(locs,"^ward")]
 
   list_plan <- list()
   for(loc in locs){

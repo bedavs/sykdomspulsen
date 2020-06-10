@@ -469,6 +469,7 @@ set_tasks <- function() {
     sc::Task$new(
       name = "analysis_covid19_areas_at_risk",
       type = "analysis",
+      cores = min(7, parallel::detectCores()),
       update_plans_fn = analysis_covid19_areas_at_risk_plans,
       upsert_at_end_of_each_plan = TRUE,
       schema = c(
@@ -742,7 +743,21 @@ set_tasks <- function() {
   )
 
 
-
+  # ui_covid19_areas_at_risk_docx ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_covid19_areas_at_risk_docx",
+      type = "ui",
+      action = "sykdomspulsen::ui_covid19_areas_at_risk_docx",
+      db_table = "results_covid19_areas_at_risk",
+      schema = list(input=sc::config$schemas$results_covid19_areas_at_risk),
+      for_each_plan = list("border" = config$border),
+      args = list(
+        folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
+        filename = "covid19_areas_at_risk_{argset$today}.docx"
+      )
+    )
+  )
 
 
 
