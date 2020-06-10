@@ -19,7 +19,8 @@ ui_covid19_areas_at_risk_docx <- function(data, argset, schema) {
   # figure out which location_codes have alerts in the last *2* weeks
   # pull ou tthe last 4 weeks of data for these location codes
   # and then make it look like the word document
-  tab <- areas_at_risk(data)
+  tab1 <- areas_at_risk_msis_norsyss(data)
+  tab2 <- areas_at_risk_norsyss(data)
   # render it
 
   file <- glue::glue(argset$file)
@@ -40,9 +41,10 @@ ui_covid19_areas_at_risk_docx <- function(data, argset, schema) {
   )
 }
 
-areas_at_risk <- function(data){
+areas_at_risk_msis_norsyss <- function(data){
   d <- copy(data$data)
   if(nrow(d)==0) return(NULL)
+  d <- d[age=="total"]
 
   yrwks <- rev(sort(unique(d$yrwk)))[1:4]
   yrwks_alert <- yrwks[1:2]
@@ -75,18 +77,18 @@ areas_at_risk <- function(data){
 
 
 
-  tab[,variable:=1:.N, by=c("location_code")]
+  tab[,uke:=1:.N, by=c("location_code")]
 
-  #tab[variable %in% 1:2, pretty_msis_threshold:=""]
-  #tab[variable %in% 1:2, pretty_norsyss_pr100_threshold:=""]
+  #tab[uke %in% 1:2, pretty_msis_threshold:=""]
+  #tab[uke %in% 1:2, pretty_norsyss_pr100_threshold:=""]
 
   tab[,location_name := get_location_name(location_code)]
   tab[location_name=="Bergen"]
 
-  tab[variable %in% 3:4,msis_difference := n_msis-n_msis_baseline_thresholdu0]
-  tab[variable %in% 3:4,norsyss_difference := pr100_norsyss-pr100_norsyss_baseline_thresholdu0]
+  tab[uke %in% 3:4,msis_difference := n_msis-n_msis_baseline_thresholdu0]
+  tab[uke %in% 3:4,norsyss_difference := pr100_norsyss-pr100_norsyss_baseline_thresholdu0]
 
-  tab[, yrwk := variable]
+  #tab[, yrwk := uke]
   levels(tab$yrwk) <- yrwks
 
   # get the ordering of locations right
@@ -103,13 +105,65 @@ areas_at_risk <- function(data){
   location_codes <- c(location_codes_1, location_codes_2)
 
   tab[,location_code:=factor(location_code, levels = location_codes)]
-  setorder(tab,location_code,variable)
+  setorder(tab,location_code,yrwk)
 
 
 
   return(tab)
 }
 
+areas_at_risk_norsyss <- function(data){
+  d <- copy(data$data)
+  if(nrow(d)==0) return(NULL)
+  d <- d[age!="total"]
+
+  yrwks <- rev(sort(unique(d$yrwk)))[1:4]
+  yrwks_alert <- yrwks[1:2]
+
+  # alerts, later 2 weeks
+  location_codes <- unique(d[yrwk %in% yrwks_alert & n_norsyss_status=="high"]$location_code)
+
+  ## last 4 weeks
+
+  retval <- d[yrwk %in% yrwks & location_code %in% location_codes]
+
+  tab <- retval[,c("location_code",
+                   "yrwk",
+                   "age",
+                   "n_norsyss",
+                   "pr100_norsyss",
+                   "pr100_norsyss_baseline_thresholdu0",
+                   "n_norsyss_status")]
+
+  tab[, pretty_norsyss_n:=fhiplot::format_nor(n_norsyss)]
+  tab[, pretty_norsyss_pr100:=fhiplot::format_nor_perc_1(pr100_norsyss)]
+  tab[, pretty_norsyss_pr100_threshold:=fhiplot::format_nor_perc_1(pr100_norsyss_baseline_thresholdu0)]
+
+
+  tab[,uke:=1:.N, by=c("location_code")]
+
+  #tab[uke %in% 1:2, pretty_msis_threshold:=""]
+  #tab[uke %in% 1:2, pretty_norsyss_pr100_threshold:=""]
+
+  tab[,location_name := get_location_name(location_code)]
+
+  tab[uke %in% 3:4,norsyss_difference := pr100_norsyss-pr100_norsyss_baseline_thresholdu0]
+
+  #tab[, yrwk := uke]
+  levels(tab$yrwk) <- yrwks
+
+  # get the ordering of locations right
+  ordering_norsyss <- na.omit(tab[,c("location_name","location_code","norsyss_difference")])
+  setorder(ordering_norsyss, -norsyss_difference)
+  location_codes <- unique(ordering_norsyss$location_code)
+
+  tab[,location_code:=factor(location_code, levels = location_codes)]
+  setorder(tab,location_code,yrwk, age)
+
+
+
+  return(tab)
+}
 
 areas_at_risk_ft <- function(tab){
   msis_index_hig <-which(tab$n_msis_status=="high")
@@ -171,3 +225,54 @@ areas_at_risk_ft <- function(tab){
 
   return(ft)
 }
+
+areas_at_risk_norsyss_ft <- function(tab){
+  norsyss_index_hig <- which(tab$n_norsyss_status=="high")
+
+  ft <- flextable::flextable(
+    data.frame(
+      "Geo"=tab$location_name,
+      "Uke"=tab$yrwk,
+      "Alder"=tab$age,
+      "Konsultasjoner"=tab$pretty_norsyss_n,
+      "Andel"=tab$pretty_norsyss_pr100,
+      "Terskel"=tab$pretty_norsyss_pr100_threshold
+    )
+  )
+  labs <- as.list(c(
+    "Geo",
+    "Uke",
+    "Alder",
+    "Konsultasjoner",
+    "Andel",
+    "Terskel"
+  ))
+  names(labs) <- ft$col_keys
+  ft <- flextable::set_header_labels(ft,values =labs)
+  ft <- flextable::autofit(ft)
+  ft <- flextable::merge_v(ft, j = ~ Geo )
+
+  ft <- flextable::add_header_row(
+    ft,
+    values = c(
+      "",
+      "NorSySS"
+    ),
+    colwidths = c(
+      3,
+      3
+    )
+  )
+  ft <- flextable::theme_box(ft)
+  ft <- flextable::align(ft, align = "center", part = "all")
+
+  if (length(norsyss_index_hig) > 0) ft <- flextable::bg(
+    ft,
+    i = norsyss_index_hig,
+    j = 5,
+    bg=fhiplot::warning_color[["hig"]]
+  )
+
+  return(ft)
+}
+

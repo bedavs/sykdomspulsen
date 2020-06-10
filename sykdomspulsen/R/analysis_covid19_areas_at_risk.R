@@ -121,7 +121,7 @@ analysis_covid19_areas_at_risk_function_factory <- function(loc){
   function(){
     retval <- list()
 
-    retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
+    retval$msis <- sc::tbl("prelim_data_covid19_msis_by_time_location") %>%
       dplyr::filter(location_code %in% !!loc) %>%
       dplyr::filter(date >= "2020-03-09") %>%
       dplyr::group_by(location_code, age, yrwk) %>%

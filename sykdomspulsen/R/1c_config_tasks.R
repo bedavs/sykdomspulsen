@@ -752,10 +752,9 @@ set_tasks <- function() {
       db_table = "results_covid19_areas_at_risk",
       schema = list(input=sc::config$schemas$results_covid19_areas_at_risk),
       for_each_plan = list("border" = config$border),
-      filter = "age=='total'",
       args = list(
         folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
-        filename = "covid19_areas_at_risk_{argset$today}.xlsx"
+        filename = "covid19_areas_at_risk_{argset$today}.docx"
       )
     )
   )

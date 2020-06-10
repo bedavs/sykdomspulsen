@@ -8,8 +8,14 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Alerts
+## Alerts MSIS and Norsyss
 
-```{r tabmsis, results="asis", echo=F}
-areas_at_risk_ft(tab = tab)
+```{r tabmsis_norsyss, results="asis", echo=F}
+areas_at_risk_ft(tab = tab1)
+```
+
+## Alerts Norsyss by age
+
+```{r tabnorsyss, results="asis", echo=F}
+areas_at_risk_ft(tab = tab2)
 ```
