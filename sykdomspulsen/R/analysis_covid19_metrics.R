@@ -86,10 +86,10 @@ analysis_covid19_metrics_function_factory <- function(loc){
     d <- sc::tbl("data_covid19_msis_by_time_location") %>%
       dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(location_code== !!loc) %>%
-      dplyr::select(yrwk, n) %>%
+      dplyr::select(yrwk, n_msis=n) %>%
       dplyr::collect()
     setDT(d)
-    d[, n := fhiplot::format_nor(n)]
+    d[, n_msis := fhiplot::format_nor(n_msis)]
     retval$d_cases <- d
 
     # tested ----
