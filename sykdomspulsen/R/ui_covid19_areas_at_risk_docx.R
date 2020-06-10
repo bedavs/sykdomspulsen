@@ -73,33 +73,37 @@ areas_at_risk <- function(data){
   tab[, pretty_norsyss_pr100:=fhiplot::format_nor_perc_1(pr100_norsyss)]
   tab[, pretty_norsyss_pr100_threshold:=fhiplot::format_nor_perc_1(pr100_norsyss_baseline_thresholdu0)]
 
+
+
+  tab[,variable:=1:.N, by=c("location_code")]
+
   #tab[variable %in% 1:2, pretty_msis_threshold:=""]
   #tab[variable %in% 1:2, pretty_norsyss_pr100_threshold:=""]
 
   tab[,location_name := get_location_name(location_code)]
   tab[location_name=="Bergen"]
 
-  #tab[variable %in% 3:4,msis_difference := msis_n-msis_threshold]
-  #tab[variable %in% 3:4,norsyss_difference := norsyss_pr100-norsyss_pr100_threshold]
+  tab[variable %in% 3:4,msis_difference := n_msis-n_msis_baseline_thresholdu0]
+  tab[variable %in% 3:4,norsyss_difference := pr100_norsyss-pr100_norsyss_baseline_thresholdu0]
 
-  #tab[, yrwk := variable]
-  #levels(tab$yrwk) <- yrwks
+  tab[, yrwk := variable]
+  levels(tab$yrwk) <- yrwks
 
   # get the ordering of locations right
-  #ordering_msis <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
-  #setorder(ordering_msis, -msis_difference, -norsyss_difference)
-  #ordering_msis <- unique(ordering_msis$location_code)
+  ordering_msis <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
+  setorder(ordering_msis, -msis_difference, -norsyss_difference)
+  ordering_msis <- unique(ordering_msis$location_code)
 
-  #ordering_norsyss <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
-  #setorder(ordering_norsyss, -norsyss_difference, -msis_difference)
-  #ordering_norsyss <- unique(ordering_norsyss$location_code)
+  ordering_norsyss <- na.omit(tab[,c("location_name","location_code","msis_difference","norsyss_difference")])
+  setorder(ordering_norsyss, -norsyss_difference, -msis_difference)
+  ordering_norsyss <- unique(ordering_norsyss$location_code)
 
-  #location_codes_1 <- ordering_msis[ordering_msis %in% location_code_msis]
-  #location_codes_2 <- ordering_norsyss[!ordering_norsyss %in% location_code_msis]
-  #location_codes <- c(location_codes_1, location_codes_2)
+  location_codes_1 <- ordering_msis[ordering_msis %in% alerts_msis]
+  location_codes_2 <- ordering_norsyss[!ordering_norsyss %in% alerts_msis]
+  location_codes <- c(location_codes_1, location_codes_2)
 
-  #tab[,location_code:=factor(location_code, levels = location_codes)]
-  #setorder(tab,location_code,variable)
+  tab[,location_code:=factor(location_code, levels = location_codes)]
+  setorder(tab,location_code,variable)
 
 
 

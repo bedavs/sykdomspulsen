@@ -158,7 +158,7 @@ analysis_covid19_areas_at_risk_plans <- function(){
   # these are the areas we are interested in
   locs <- norway_locations_long()$location_code
   locs <- locs[!locs %in% "norway"]
-  locs <- locs[!stringr::str_detect("^ward")]
+  locs <- locs[!stringr::str_detect(locs,"^ward")]
 
   list_plan <- list()
   for(loc in locs){
