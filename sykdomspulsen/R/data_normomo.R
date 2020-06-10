@@ -18,12 +18,14 @@ data_pre_normomo <- function(data, argset, schema){
     cat(data_grab, file = data_grab_txt)
 
     cmd <- glue::glue(
-      'sshpass -p{Sys.getenv("NORMOMO_EVRY_PW")} ',
+      'sshpass -p {Sys.getenv("NORMOMO_EVRY_PW")} ',
       'sftp -o StrictHostKeyChecking=no -oBatchMode=no -b {data_grab_txt} {Sys.getenv("NORMOMO_EVRY_USER")}; ',
       'mv {folder}ut/* {folder}; ',
       'rmdir {folder}ut'
     )
     system(cmd)
+    file <- fs::path(folder,glue::glue("FHIDOD2_{format.Date(lubridate::today(),'%Y%m%d')}.txt"))
+    if(!fs::file_exists(file)) stop("download did not work")
   }
 }
 
