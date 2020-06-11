@@ -28,7 +28,7 @@ analysis_covid19_areas_at_risk <- function(data, argset, schema) {
 
   yrwks <- unique(d$yrwk)
 
-  d[,baseline := pmax(1,round((n_lag1+n_lag2)/2))]
+  d[,baseline := pmax(1,ceiling((n_lag1+n_lag2)/2))]
   d[,threshold := qpois(0.975, lambda = baseline)]
 
   d[,n_msis_status:=ifelse(n > threshold,"high","normal")]
@@ -45,52 +45,51 @@ analysis_covid19_areas_at_risk <- function(data, argset, schema) {
 
   # NORSYSS
   d <- copy(data$covid19$norsyss)
-    d[,pr100:=100*n/consult_with_influenza]
+  d[,pr100:=100*n/consult_with_influenza]
 
-    d[is.nan(pr100), pr100:=0]
-    d[, n_lag1 := shift(n, type="lag"), by=age]
-    d[, n_lag2 := shift(n, n=2L, type="lag"), by=age]
-    d[, consult_with_influenza_lag1 := shift(consult_with_influenza, type="lag"), by=age]
-    d[, consult_with_influenza_lag2 := shift(consult_with_influenza, n=2L, type="lag"), by=age]
-
-
-    d[,pr100_baseline := pmax(0.01,100*(n_lag1+n_lag2)/
-                               (consult_with_influenza_lag1+consult_with_influenza_lag2))]
-    d[, n_norsyss_baseline_expected := round(pr100_baseline*consult_with_influenza/100)]
-
-    d[,n_threshold := qpois(0.975, lambda=n_norsyss_baseline_expected)]
-    d[,pr100_threshold := 100*n_threshold/consult_with_influenza]
-    d[is.nan(pr100_threshold),pr100_threshold:=0]
+  d[is.nan(pr100), pr100:=0]
+  d[, n_lag1 := shift(n, type="lag"), by=age]
+  d[, n_lag2 := shift(n, n=2L, type="lag"), by=age]
+  d[, consult_with_influenza_lag1 := shift(consult_with_influenza, type="lag"), by=age]
+  d[, consult_with_influenza_lag2 := shift(consult_with_influenza, n=2L, type="lag"), by=age]
 
 
+  d[,pr100_baseline := pmax(0.01,100*(n_lag1+n_lag2)/
+                             (consult_with_influenza_lag1+consult_with_influenza_lag2))]
+  d[, n_norsyss_baseline_expected := ceiling(pr100_baseline*consult_with_influenza/100)]
 
-    d[,n_norsyss_status:=ifelse(pr100 > pr100_threshold,"high","normal")]
+  d[,n_threshold := qpois(0.975, lambda=n_norsyss_baseline_expected)]
+  d[,pr100_threshold := 100*n_threshold/consult_with_influenza]
+  d[is.nan(pr100_threshold),pr100_threshold:=0]
+  d[pr100_threshold>100,pr100_threshold:=100]
 
-    d_norsyss <- d[,c("location_code",
-                      "yrwk",
-                      "age",
-                      "n",
-                      "consult_with_influenza",
-                      "n_norsyss_baseline_expected",
-                      "n_threshold",
-                      "pr100",
-                      "pr100_baseline",
-                      "pr100_threshold",
-                      "n_norsyss_status")]
+  d[,n_norsyss_status:=ifelse(pr100 > pr100_threshold,"high","normal")]
 
-    setnames(d_norsyss,
-             c("n",
-               "consult_with_influenza",
-               "n_threshold",
-               "pr100",
-               "pr100_baseline",
-               "pr100_threshold"),
-             c("n_norsyss",
-               "n_norsyss_denominator",
-               "n_norsyss_baseline_thresholdu0",
-               "pr100_norsyss",
-               "pr100_norsyss_baseline_expected",
-               "pr100_norsyss_baseline_thresholdu0"))
+  d_norsyss <- d[,c("location_code",
+                    "yrwk",
+                    "age",
+                    "n",
+                    "consult_with_influenza",
+                    "n_norsyss_baseline_expected",
+                    "n_threshold",
+                    "pr100",
+                    "pr100_baseline",
+                    "pr100_threshold",
+                    "n_norsyss_status")]
+
+  setnames(d_norsyss,
+           c("n",
+             "consult_with_influenza",
+             "n_threshold",
+             "pr100",
+             "pr100_baseline",
+             "pr100_threshold"),
+           c("n_norsyss",
+             "n_norsyss_denominator",
+             "n_norsyss_baseline_thresholdu0",
+             "pr100_norsyss",
+             "pr100_norsyss_baseline_expected",
+             "pr100_norsyss_baseline_thresholdu0"))
 
 
 

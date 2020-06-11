@@ -11,11 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Alerts MSIS and Norsyss
 
 ```{r tabmsis_norsyss, results="asis", echo=F}
-areas_at_risk_ft(tab = tab1)
+areas_at_risk_norsyss_msis_ft(tab = tab_norsyss_msis)
 ```
 
 ## Alerts Norsyss by age
 
 ```{r tabnorsyss, results="asis", echo=F}
-areas_at_risk_ft(tab = tab2)
+areas_at_risk_norsyss_ft(tab = tab_norsyss)
 ```

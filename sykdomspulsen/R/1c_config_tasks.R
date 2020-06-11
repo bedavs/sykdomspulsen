@@ -687,19 +687,6 @@ set_tasks <- function() {
     )
   )
 
-  # ui_covid19_areas_at_risk ----
-  sc::add_task(
-    sc::Task$new(
-      name = "ui_covid19_areas_at_risk",
-      type = "ui",
-      update_plans_fn = ui_covid19_areas_at_risk_plans,
-      schema = c(
-        "norsyss" = sc::config$schemas$data_norsyss,
-        "covid" = sc::config$schemas$results_norsyss_standard
-        )
-    )
-  )
-
   # ui_norsyss_mem_influensa_vk_o ----
   sc::add_task(
     sc::task_from_config(
@@ -764,6 +751,7 @@ set_tasks <- function() {
       db_table = "results_covid19_areas_at_risk",
       schema = list(input=sc::config$schemas$results_covid19_areas_at_risk),
       for_each_plan = list("border" = config$border),
+      filter = "location_code != 'municip0301'",
       args = list(
         folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
         filename = "covid19_areas_at_risk_{argset$today}.docx"
