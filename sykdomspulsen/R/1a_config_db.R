@@ -1063,7 +1063,9 @@ set_db <- function(){
         "date" = "DATE",
 
         "tag_outcome" = "TEXT",
-        "value" = "TEXT"
+        "value" = "DOUBLE",
+        "formatted" = "TEXT",
+        "censor" = "BOOLEAN"
       ),
       db_load_folder = tempdir(),
       keys =  c(

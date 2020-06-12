@@ -4,6 +4,7 @@ fill_in_missing <- function(d){
       stringr::str_detect(location_code,"municip") ~ "municip",
       stringr::str_detect(location_code,"county") ~ "county",
       stringr::str_detect(location_code,"norge") ~ "nation",
+      stringr::str_detect(location_code,"ward") ~ "ward"
     )]
   }
   if(!"border" %in% names(d)){

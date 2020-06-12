@@ -1,3 +1,7 @@
+# sc 2020.6.12
+
+* validator_field_contents_sykdomspulsen is more verbose when it fails
+
 # sc 2020.5.28
 
 * Including index functionality in Schema class

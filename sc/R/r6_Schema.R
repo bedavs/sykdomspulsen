@@ -54,7 +54,11 @@ validator_field_contents_sykdomspulsen <- function(data){
     "day",
     "hour",
     "minute"
-  ))>0) return(FALSE)
+  ))>0){
+    retval <- FALSE
+    attr(retval, "var") <- "granularity_time"
+    return(retval)
+  }
 
   if(sum(!unique(data$granularity_geo) %in% c(
     "nation",
@@ -62,19 +66,35 @@ validator_field_contents_sykdomspulsen <- function(data){
     "municip",
     "ward",
     "station"
-  ))>0) return(FALSE)
+  ))>0){
+    retval <- FALSE
+    attr(retval, "var") <- "granularity_geo"
+    return(retval)
+  }
 
   if(sum(!unique(data$border) %in% c(
     "2020"
-  ))>0) return(FALSE)
+  ))>0){
+    retval <- FALSE
+    attr(retval, "var") <- "border"
+    return(retval)
+  }
 
   if(sum(!unique(data$sex) %in% c(
     "male",
     "female",
     "total"
-  ))>0) return(FALSE)
+  ))>0){
+    retval <- FALSE
+    attr(retval, "var") <- "sex"
+    return(retval)
+  }
 
-  if(!inherits(data$date,"Date")) return(FALSE)
+  if(!inherits(data$date,"Date")){
+    retval <- FALSE
+    attr(retval, "var") <- "date"
+    return(retval)
+  }
 
   return(TRUE)
 }
@@ -191,7 +211,8 @@ Schema <- R6Class("Schema",
                       return(retval)
                     },
                     db_load_data_infile = function(newdata, verbose = TRUE) {
-                      if(!self$validator_field_contents(newdata)) stop(glue::glue("db_load_data_infile not validated in {self$db_table}"))
+                      validated <- self$validator_field_contents(newdata)
+                      if(!validated) stop(glue::glue("db_load_data_infile not validated in {self$db_table}. {attr(validated,'var')}"))
 
                       infile <- random_file(self$db_load_folder)
                       load_data_infile(
@@ -203,7 +224,8 @@ Schema <- R6Class("Schema",
                       )
                     },
                     db_upsert_load_data_infile = function(newdata, drop_indexes = names(self$indexes), verbose = TRUE) {
-                      if(!self$validator_field_contents(newdata)) stop(glue::glue("db_upsert_load_data_infile not validated in {self$db_table}"))
+                      validated <- self$validator_field_contents(newdata)
+                      if(!validated) stop(glue::glue("db_upsert_load_data_infile not validated in {self$db_table}. {attr(validated,'var')}"))
 
                       infile <- random_file(self$db_load_folder)
                       upsert_load_data_infile(
