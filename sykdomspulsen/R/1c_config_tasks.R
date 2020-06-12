@@ -484,7 +484,6 @@ set_tasks <- function() {
       name = "analysis_covid19_metrics",
       type = "analysis",
       update_plans_fn = analysis_covid19_metrics_plans,
-      upsert_at_end_of_each_plan = TRUE,
       schema = c(
         "output" = sc::config$schemas$results_covid19_metrics
       )

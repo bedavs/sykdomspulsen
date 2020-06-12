@@ -11,7 +11,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
 
     index_plan <- 1
     data <- sc::tm_get_data("analysis_covid19_metrics", index_plan=index_plan)
-    argset <- sc::tm_get_argset("analysis_covid19_metrics", index_plan=index_plan, index_argset = 1)
+    argset <- sc::tm_get_argset("analysis_covid19_metrics", index_plan=index_plan, index_argset = 2)
     schema <- sc::tm_get_schema("analysis_covid19_metrics")
   }
 
@@ -154,7 +154,8 @@ analysis_covid19_metrics <- function(data, argset, schema) {
 
   fill_in_missing(skeleton)
 
-  return(skeleton)
+  schema$output$db_upsert_load_data_infile(skeleton)
+  #return(skeleton)
 }
 
 
@@ -222,6 +223,7 @@ analysis_covid19_metrics_plans <- function(){
 
   # these are the areas we are interested in
   locs <- norway_locations_long()$location_code
+  #locs <- "municip0301"
 
   list_plan <- list()
   list_plan[[length(list_plan)+1]] <- plnr::Plan$new()
