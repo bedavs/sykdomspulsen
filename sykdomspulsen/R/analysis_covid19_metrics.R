@@ -24,7 +24,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
   d <- d[, .(
     value_n_hospital_main_cause = sum(n_hospital_main_cause)
   ), keyby=.(location_code, yrwk)]
-  d[, formatted_n_hospital_main_cause := fhiplot::format_nor(sum(value_n_hospital_main_cause))]
+  d[, formatted_n_hospital_main_cause := fhiplot::format_nor(value_n_hospital_main_cause)]
   d <- melt.data.table(
     d,
     id.vars = c("location_code", "yrwk"),
