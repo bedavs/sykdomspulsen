@@ -12,7 +12,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
 
     index_plan <- 1
     data <- sc::tm_get_data("analysis_covid19_metrics", index_plan=index_plan)
-    argset <- sc::tm_get_argset("analysis_covid19_metrics", index_plan=index_plan, index_argset = 2)
+    argset <- sc::tm_get_argset("analysis_covid19_metrics", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("analysis_covid19_metrics")
   }
 
@@ -56,7 +56,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
     value_pr100_lab_pos = (100*sum(n_pos)/sum(n_neg+n_pos))
   ), keyby=.(location_code, yrwk)]
   d[, formatted_n_lab_tested := fhiplot::format_nor(value_n_lab_tested)]
-  d[, formatted_pr100_lab_pos := fhiplot::format_nor(value_pr100_lab_pos)]
+  d[, formatted_pr100_lab_pos := fhiplot::format_nor_perc_1(value_pr100_lab_pos)]
 
   d <- melt.data.table(
     d,
@@ -64,7 +64,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
     measure = patterns("^value", "^formatted"), value.name = c("value", "formatted"),
     variable.name = "tag_outcome"
   )
-  levels(d$tag_outcome) <- c("pr100_lab_pos", "n_lab_tested")
+  levels(d$tag_outcome) <- c("n_lab_tested", "pr100_lab_pos")
   d[, tag_outcome := as.character(tag_outcome)]
 
   d[, censor := FALSE]
