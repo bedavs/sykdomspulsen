@@ -58,7 +58,8 @@ write_data_infile <- function(
   colnames=T,
   eol="\n",
   quote = "auto",
-  na = "\\N"
+  na = "\\N",
+  sep=","
   ) {
   fwrite(dt,
     file = file,
@@ -66,7 +67,8 @@ write_data_infile <- function(
     na = na,
     col.names=colnames,
     eol=eol,
-    quote = quote
+    quote = quote,
+    sep = sep
   )
 }
 
@@ -144,8 +146,9 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     file = file,
     colnames=F,
     eol = "\n",
-    quote = F,
-    na="")
+    quote = FALSE,
+    na="",
+    sep="\t")
   on.exit(fs::file_delete(file), add = T)
 
   format_file <- tempfile()
@@ -157,7 +160,7 @@ load_data_infile.default <- function(conn = NULL, db_config = NULL, table, dt = 
     "nul",
     "-q",
     "-c",
-    "-t,",
+    #"-t,",
     "-f",
     format_file,
     "-S",

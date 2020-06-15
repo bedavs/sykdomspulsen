@@ -5,6 +5,7 @@
 #' @export
 analysis_covid19_metrics <- function(data, argset, schema) {
   # tm_run_task("analysis_covid19_metrics")
+  # d <- sc::tbl("results_covid19_metrics") %>% dplyr::collect()
 
   if(plnr::is_run_directly()){
     sc::tm_update_plans("analysis_covid19_metrics")
@@ -28,9 +29,10 @@ analysis_covid19_metrics <- function(data, argset, schema) {
     d,
     id.vars = c("location_code", "yrwk"),
     measure = patterns("^value", "^formatted"), value.name = c("value", "formatted"),
-    variable.name = "tag_outcome"
+    variable.name = "tag_outcome",
   )
   levels(d$tag_outcome) <- "n_hospital_main_cause"
+  d[, tag_outcome := as.character(tag_outcome)]
 
   d[, censor := FALSE]
 
@@ -63,6 +65,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
     variable.name = "tag_outcome"
   )
   levels(d$tag_outcome) <- c("pr100_lab_pos", "n_lab_tested")
+  d[, tag_outcome := as.character(tag_outcome)]
 
   d[, censor := FALSE]
 
@@ -87,6 +90,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
     variable.name = "tag_outcome"
   )
   levels(d$tag_outcome) <- c("n_norsyss", "pr100_norsyss")
+  d[, tag_outcome := as.character(tag_outcome)]
 
   retval[[length(retval)+1]] <- d
 
@@ -104,6 +108,8 @@ analysis_covid19_metrics <- function(data, argset, schema) {
   d[is.na(value_pr100_sr_symptoms), formatted_pr100_sr_symptoms:=NA]
 
   d[, tag_outcome := "pr100_sr_symptoms"]
+  d[, tag_outcome := as.character(tag_outcome)]
+
   setnames(
     d,
     c(
