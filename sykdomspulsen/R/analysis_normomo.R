@@ -10,8 +10,8 @@ analysis_normomo <-  function(data, argset, schema){
     # tm_run_task("analysis_normomo")
 
     sc::tm_update_plans("analysis_normomo")
-    data <- sc::tm_get_data("analysis_normomo", index_plan=4)
-    argset <- sc::tm_get_argset("analysis_normomo", index_plan=2, index_argset = 1)
+    data <- sc::tm_get_data("analysis_normomo", index_plan=2)
+    argset <- sc::tm_get_argset("analysis_normomo", index_plan=2, index_argset = 9)
     schema <- sc::tm_get_schema("analysis_normomo")
   }
 
@@ -50,15 +50,100 @@ analysis_normomo <-  function(data, argset, schema){
   })
 
   if(argset$upload){
+    # upload results
     data_dirty <- rbindlist(MOMO::dataExport$toSave, fill = TRUE)
     data_clean <- clean_exported_momo_data(
       data_dirty,
       location_code = argset$location_code,
       sex = argset$sex
     )
-    # only upload
+    # only upload the requested parts
     data_clean <- data_clean[year >= argset$year_start_upload & year <= argset$year_end_upload]
     schema$output$db_upsert_load_data_infile(data_clean, verbose = T)
+
+    # upload daily data
+    temp <- list()
+    for(i in seq_along(argset$momo_groups)){
+      txt <- glue::glue("data$raw[{argset$momo_groups[[i]]}]")
+      temp[[i]] <- eval(parse(text = txt))
+      temp[[i]][, age := NULL]
+      temp[[i]][ , GROUP := names(argset$momo_groups)[i]]
+    }
+    temp <- rbindlist(temp)
+    temp[,
+      age := dplyr::case_when(
+        GROUP == "0to4" ~ "0-4",
+        GROUP == "5to14" ~ "5-14",
+        GROUP == "15to64" ~ "15-64",
+        GROUP == "65to74" ~ "65-74",
+        GROUP == "75to84" ~ "75-84",
+        GROUP == "85P" ~ "85+",
+        GROUP == "Total" ~ "total",
+        GROUP == "65P" ~ "65+"
+      )
+    ]
+    setnames(temp, "DoD", "date")
+
+    d <- temp[,.(
+      n_obs = .N
+    ), keyby=.(
+      age, location_code, sex, date
+    )]
+
+    skeleton <- expand.grid(
+      location_code = unique(temp$location_code),
+      sex = unique(temp$sex),
+      age = unique(temp$age),
+      date = seq.Date(
+        from = fhidata::days[year==argset$year_start_upload]$mon[1],
+        to = max(data_clean$date),
+        by = 1
+      ),
+      stringsAsFactors = F
+    )
+    setDT(skeleton)
+    skeleton[, date:=data.table::as.IDate(date)]
+    skeleton[
+      d,
+      on=c("location_code","sex","age","date"),
+      n_obs := n_obs
+    ]
+    skeleton[is.na(n_obs),n_obs := 0]
+    skeleton[
+      data_clean,
+      on=c("location_code","sex","age","date"),
+      ncor_est := as.double(ncor_est)
+    ]
+    skeleton[
+      data_clean,
+      on=c("location_code","sex","age","date"),
+      forecast := forecast
+    ]
+    skeleton[, yrwk := fhi::isoyearweek(date)]
+    skeleton[, forecast := as.logical(max(forecast, na.rm=T)), by=.(location_code, sex, age, yrwk)]
+    skeleton[, n_wk := sum(n_obs), by=.(location_code, sex, age, yrwk)]
+    skeleton[, ncor_est := mean(ncor_est, na.rm=T), by=.(location_code, sex, age, yrwk)]
+    skeleton[, multiplier := ncor_est/n_wk]
+    skeleton[is.infinite(multiplier) | is.nan(multiplier), multiplier := 1]
+    skeleton[, ncor_est := as.double(n_obs)]
+    skeleton[forecast==T, ncor_est := n_obs * multiplier]
+    skeleton[, granularity_time := "day"]
+
+    skeleton_week <- skeleton[,.(
+      n_obs = sum(n_obs),
+      ncor_est = sum(ncor_est)
+    ),keyby=.(
+      location_code,
+      sex,
+      age,
+      yrwk
+    )]
+    skeleton_week[, granularity_time := "week"]
+    fill_in_missing(skeleton_week)
+    schema$data_normomo$db_upsert_load_data_infile(skeleton_week)
+
+    fill_in_missing(skeleton)
+    schema$data_normomo$db_upsert_load_data_infile(skeleton)
   }
 }
 
