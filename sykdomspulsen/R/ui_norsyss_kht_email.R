@@ -20,7 +20,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     argset <- sc::tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
 
-    argset$email <- "grmg@fhi.no"
+    argset$email <- "beva@fhi.no"
+    #argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -538,6 +539,14 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::select(tag_outcome, location_code, yrwk, n, consult_with_influenza) %>%
       dplyr::group_by(tag_outcome, location_code,yrwk) %>%
       dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
+      dplyr::collect() %>%
+      sc::latin1_to_utf8()
+
+    retval$alerts <- sc::tbl("results_covid19_areas_at_risk") %>%
+      dplyr::filter(granularity_time=="week") %>%
+      dplyr::filter(location_code %in% !!location_codes) %>%
+      dplyr::filter(age=="total") %>%
+      dplyr::filter(yrwk %in% !!yrwk) %>%
       dplyr::collect() %>%
       sc::latin1_to_utf8()
 
