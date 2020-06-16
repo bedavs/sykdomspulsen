@@ -1011,26 +1011,22 @@ set_db <- function(){
         "x" = "DOUBLE",
         "date" = "DATE",
 
-        "n_msis" = "INTEGER",
-        "n_msis_baseline_expected" = "INTEGER",
-        "n_msis_baseline_thresholdu0" = "INTEGER",
-        "n_msis_status" = "TEXT",
+        "tag_outcome"= "TEXT",
+        "n" =  "INTEGER",
+        "n_denominator" = "INTEGER",
+        "n_baseline_expected" = "INTEGER",
+        "n_baseline_thresholdu0" = "INTEGER",
+        "pr100" = "DOUBLE",
+        "pr100_baseline_expected" = "DOUBLE",
+        "pr100_baseline_thresholdu0" = "DOUBLE",
+        "n_status" = "TEXT"
 
-        "n_norsyss" = "INTEGER",
-        "n_norsyss_denominator" = "INTEGER",
-        "n_norsyss_baseline_expected" = "INTEGER",
-        "n_norsyss_baseline_thresholdu0" = "INTEGER",
-
-        "pr100_norsyss" = "DOUBLE",
-        "pr100_norsyss_baseline_expected" = "DOUBLE",
-        "pr100_norsyss_baseline_thresholdu0" = "DOUBLE",
-
-        "n_norsyss_status" = "TEXT"
       ),
       db_load_folder = tempdir(),
       keys =  c(
         "granularity_time",
         "granularity_geo",
+        "tag_outcome",
         "location_code",
         "age",
         "year",

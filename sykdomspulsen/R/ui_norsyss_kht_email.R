@@ -123,20 +123,20 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   # covid19 alerts
   email_text <- paste0(email_text, "<br><hr width='60%' size='5px' noshade><br>\n")
 
-  email_text <- paste0(
-    email_text,
-    glue::glue(
-      "<h2>NorSySS + MSIS: Signaler for covid-19</h2>",
-
-      "Dersom du ser en tabell under, er det",
-      " en eller flere uker med en {fhi::nb$oe}kning som er statistisk signifikant i det geografiske omr{fhi::nb$aa}det du har valgt.<br>",
-      "Vi bruker her gjennomsnittet med 95% konfidensintervall av uke ",
-      "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
-      "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
-      "{fhi::isoyearweek(lubridate::today()-7-1)} og {fhi::isoyearweek(lubridate::today()-0-1)}.<br><br>",
-    ),
-    norsyss_kht_covid19_obs_table(data = data)
-  )
+  # email_text <- paste0(
+  #   email_text,
+  #   glue::glue(
+  #     "<h2>NorSySS + MSIS: Signaler for covid-19</h2>",
+  #
+  #     "Dersom du ser en tabell under, er det",
+  #     " en eller flere uker med en {fhi::nb$oe}kning som er statistisk signifikant i det geografiske omr{fhi::nb$aa}det du har valgt.<br>",
+  #     "Vi bruker her gjennomsnittet med 95% konfidensintervall av uke ",
+  #     "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
+  #     "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
+  #     "{fhi::isoyearweek(lubridate::today()-7-1)} og {fhi::isoyearweek(lubridate::today()-0-1)}.<br><br>",
+  #   ),
+  #   norsyss_kht_covid19_obs_table(data = data)
+  # )
 
   # general norsyss alerts
   email_text <- paste0(email_text, "<br><hr width='60%' size='5px' noshade><br>\n")
@@ -286,6 +286,8 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
 }
 
 norsyss_kht_covid19_overview_table <- function(data){
+  # table 1
+
   tab <- copy(data$covid19$norsyss_separate)
   setnames(tab, "n", "n_norsyss")
 
@@ -394,6 +396,162 @@ norsyss_kht_covid19_overview_table <- function(data){
 
   return(huxtable::to_html(ht))
 }
+
+
+norsyss_kht_covid19_overview_table <- function(data){
+  # table 1
+  alert <- copy(data$covid19$alerts)
+  alert <- alert[age=="total"]
+
+  msis_alert <-alert[tag_outcome=="msis", c("location_code","yrwk","n_status")]
+  setnames(msis_alert, "n_status", "msis_status")
+
+  norsyss_covid19_r991_alert <-alert[tag_outcome=="covid19_r991_vk_ote", c("location_code","yrwk","n_status","n_status")]
+  setnames(norsyss_covid19_r991_alert, "n_status", "covid19_r991_status")
+  setnames(norsyss_covid19_r991_alert, "n_status", "covid19_r991_status%")
+
+  norsyss_covid19_r992_alert <-alert[tag_outcome=="covid19_r992_vk_ote", c("location_code","yrwk","n_status","n_status")]
+  setnames(norsyss_covid19_r992_alert, "n_status", "covid19_r992_status")
+  setnames(norsyss_covid19_r992_alert, "n_status", "covid19_r992_status%")
+
+
+  #####
+  tab <- copy(data$covid19$norsyss_separate)
+  setnames(tab, "n", "n_norsyss")
+
+  tab[,pr100_norsyss := fhiplot::format_nor_perc_1(100*n_norsyss/consult_with_influenza)]
+  tab[consult_with_influenza==0, pr100_norsyss := "0,0%"]
+  tab[,n_norsyss:=fhiplot::format_nor(n_norsyss)]
+
+  tab <- dcast.data.table(
+    tab,
+    location_code + yrwk ~ tag_outcome,
+    value.var = c("pr100_norsyss", "n_norsyss")
+  )
+  tab
+
+  tab[
+    data$covid19$msis,
+    on=c("location_code","yrwk"),
+    n_msis := fhiplot::format_nor(n)
+    ]
+
+  setorder(tab,location_code,yrwk)
+  tab[,week_id := 1:.N,by=.(location_code)]
+  ####
+  tab <- merge(tab, msis_alert, by=c("location_code", "yrwk"), all=T)
+  tab <- merge(tab, norsyss_covid19_r991_alert, by=c("location_code", "yrwk"), all=T)
+  tab <- merge(tab, norsyss_covid19_r992_alert, by=c("location_code", "yrwk"), all=T)
+  ###
+
+  tab_wide <- dcast.data.table(
+    tab,
+    location_code ~ week_id,
+    value.var = c(
+      "n_norsyss_covid19_r991_vk_ote",
+      "pr100_norsyss_covid19_r991_vk_ote",
+      "n_norsyss_covid19_r992_vk_ote",
+      "pr100_norsyss_covid19_r992_vk_ote",
+      "n_msis",
+      "covid19_r991_status",
+      "covid19_r991_status%",
+      "covid19_r992_status",
+      "covid19_r992_status%",
+
+      "msis_status"
+
+    )
+  )
+
+  tab_wide <- rbind(tab_wide[location_code=="norge"],tab_wide[location_code!="norge"])
+  tab_wide[,location_name := get_location_name(location_code)]
+  tab_wide[, location_code := NULL]
+  tab_wide <- unique(tab_wide)
+  setcolorder(tab_wide, "location_name")
+
+  yrwks <- unique(tab[, c("week_id", "yrwk")])
+  setorder(yrwks, week_id)
+
+  cols <- grep("status", names(tab_wide), value=T)
+  tab_high <- tab_wide[, cols, with=FALSE]
+  tab_values <- tab_wide[, -cols, with=FALSE]
+
+
+
+  ht <- huxtable::as_hux(tab_values) %>%
+    huxtable::add_colnames() %>%
+    fhiplot::huxtable_theme_fhi_basic()
+
+  ht[1, ] <- c(
+    "Geografisk omr\u00E5de",
+    yrwks$yrwk,
+    yrwks$yrwk,
+    yrwks$yrwk,
+    yrwks$yrwk,
+    yrwks$yrwk
+  )
+
+  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
+  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
+
+  huxtable::escape_contents(ht)[1:2, ] <- FALSE
+
+  ht <- huxtable::merge_cells(ht, 1:3, 1)
+
+  # top row
+  ht <- huxtable::merge_cells(ht, 1, 2:9)
+  ht[1, 2] <- "NorSySS Konsultasjoner R991: Covid-19 (mistenkt/sannsynlig)<sup>1</sup>"
+
+  ht <- huxtable::merge_cells(ht, 1, 10:17)
+  ht[1, 10] <- "NorSySS Konsultasjoner R992: Covid-19 (bekreftet) <sup>1</sup>"
+
+  ht <- huxtable::merge_cells(ht, 1, 18:21)
+  ht[1, 18] <- "MSIS Tilfeller"
+
+  # second row
+  ht <- huxtable::merge_cells(ht, 2, 2:5)
+  ht[2, 2] <- "Antall"
+  ht <- huxtable::merge_cells(ht, 2, 6:9)
+  ht[2, 6] <- "Andel<sup>2</sup>"
+
+  ht <- huxtable::merge_cells(ht, 2, 10:13)
+  ht[2, 10] <- "Antall"
+  ht <- huxtable::merge_cells(ht, 2, 14:17)
+  ht[2, 14] <- "Andel<sup>2</sup>"
+
+  ht <- huxtable::merge_cells(ht, 2, 18:21)
+  ht[2, 18] <- "Antall"
+
+  # border styles
+  huxtable::left_border(ht)[, seq(2,21,4)] <- 5
+  huxtable::left_border_style(ht)[, seq(2,21,4)] <- "double"
+
+  huxtable::align(ht) <- "center"
+
+  nr0 <- nrow(ht) + 1
+  ht <- huxtable::add_footnote(ht, glue::glue(
+    "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt med ICPC-2 kodene R991 og R992.<br>",
+    "<sup>2</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
+  ), border = 0)
+  nr1 <- nrow(ht)
+
+  huxtable::escape_contents(ht)[1, ] <- F
+  huxtable::escape_contents(ht)[nr0:nr1, ] <- F
+
+  huxtable::left_padding(ht) <-  5
+  huxtable::right_padding(ht) <-  5
+
+
+  for (col in 1:(ncol(tab_values)-1)) {
+    index <- which(tab_high[,..col]=="high")
+    if(length(index)==0) next()
+
+    huxtable::background_color(ht)[-1, col] <- fhiplot::warning_color["hig"]
+  }
+
+  return(huxtable::to_html(ht))
+}
+
 
 norsyss_kht_covid19_obs_table <- function(data){
   tab <- areas_at_risk(data)
@@ -509,21 +667,21 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
       dplyr::collect() %>%
       sc::latin1_to_utf8()
 
-    retval$norsyss_combined <- sc::tbl("data_norsyss") %>%
-      dplyr::filter(granularity_time=="day") %>%
-      dplyr::filter(location_code %in% !!location_codes) %>%
-      dplyr::filter(age=="total") %>%
-      dplyr::filter(yrwk %in% !!yrwk) %>%
-      dplyr::filter(
-        tag_outcome %in% c(
-          "covid19_vk_ote"
-        )
-      )%>%
-      dplyr::select(tag_outcome, location_code, yrwk, n, consult_with_influenza) %>%
-      dplyr::group_by(tag_outcome, location_code,yrwk) %>%
-      dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
-      dplyr::collect() %>%
-      sc::latin1_to_utf8()
+    # retval$norsyss_combined <- sc::tbl("data_norsyss") %>%
+    #   dplyr::filter(granularity_time=="day") %>%
+    #   dplyr::filter(location_code %in% !!location_codes) %>%
+    #   dplyr::filter(age=="total") %>%
+    #   dplyr::filter(yrwk %in% !!yrwk) %>%
+    #   dplyr::filter(
+    #     tag_outcome %in% c(
+    #       "covid19_vk_ote"
+    #     )
+    #   )%>%
+    #   dplyr::select(tag_outcome, location_code, yrwk, n, consult_with_influenza) %>%
+    #   dplyr::group_by(tag_outcome, location_code,yrwk) %>%
+    #   dplyr::summarize(n=sum(n), consult_with_influenza=sum(consult_with_influenza)) %>%
+    #   dplyr::collect() %>%
+    #   sc::latin1_to_utf8()
 
     retval$norsyss_separate <- sc::tbl("data_norsyss") %>%
       dplyr::filter(granularity_time=="day") %>%
