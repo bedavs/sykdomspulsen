@@ -20,8 +20,9 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     argset <- sc::tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
 
-    argset$email <- "beva@fhi.no"
-    #argset$email <- "grmg@fhi.no"
+    argset$email <- "riwh@fhi.no"
+    #argset$email <- "beva@fhi.no"
+    argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -37,11 +38,12 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
+    "- Vi har tatt bort tabellen som het 'NorSySS + MSIS: Signaler for covid-19' i denne mailen.<br>",
+    "- Vi har inkludert signalene i 'NorSySS + MSIS: Covid-19 oversikt' tabellen slik at det kommer opp r{fhi::nb$oe}de felt ved en {fhi::nb$oe}kning i disse dataene. Se mer informasjon om dette nederst i mailen. <br>",
+    "- Vi har inkludert en oversiktstabell med indikatorere for covid-19 p{fhi::nb$aa} nettisden.<br>",
     "- Vi har inkludert en ny fane som heter 'sammenlikning' under covid-19 p{fhi::nb$aa} nettisden. Her kan du sammenlikne kommuner, fylker og Norge.<br>",
     "- Bydelene i Oslo er inkludert som geografiske omr{fhi::nb$aa}der i covid-19 delen p{fhi::nb$aa} nettisden.<br>",
-    "- Det er mulig {fhi::nb$aa} laste ned tallmaterialet bak noen av figurene p{fhi::nb$aa} nettsiden ved {fhi::nb$aa} bruke 'last ned tabell' knappen over figuren.",
-    " Det er ogs{fhi::nb$aa} mulig {fhi::nb$aa} kopiere figurene ved {fhi::nb$aa} h{fhi::nb$oe}yreklikke p{fhi::nb$aa} bildet og velge 'kopier'.<br>",
-    "- Du vil i l{fhi::nb$oe}pet av neste uke f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
+    "- Du vil i l{fhi::nb$oe}pet av denne uken f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
     "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
 
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
@@ -49,7 +51,6 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Dersom dere har problemer med p{fhi::nb$aa}loggingen eller andre sp\u00F8rsm\u00E5l, vennligst send en mail til sykdomspulsen@fhi.no<br>"
 
   )
-
   email_text_bottom <- glue::glue(
 
     "<u>Tabellen med covid-19 viser</u> antall konsultasjoner hos lege og legevakt (NorSySS) ",
@@ -61,8 +62,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
     "flere ganger hvis personen kontakter legen flere ganger.<br>",
 
-    "For covid-19 signaler har vi valgt {fhi::nb$aa} holde R991 og R992 samlet for {fhi::nb$aa} f{fhi::nb$aa} mest",
-    "mulig enhetlig data for hele tidsperioden. Vi vurderer {fhi::nb$aa} endre dette etterhvert.<br>",
+    "Som et signalsystem For covid-19 vil det bli farget r{fhi::nb$oe}dt i feltene som har en {fhi::nb$oe}kning av antall konsultasjoner eller tilfeller.<br>",
     "Signalsystemet bruker gjennomsnittet med 95% konfidensintervall av uke ",
     "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
     "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
@@ -121,8 +121,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   )
 
   # covid19 alerts
-  email_text <- paste0(email_text, "<br><hr width='60%' size='5px' noshade><br>\n")
-
+  # email_text <- paste0(email_text, "<br><hr width='60%' size='5px' noshade><br>\n")
+  #
   # email_text <- paste0(
   #   email_text,
   #   glue::glue(
@@ -287,119 +287,6 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
 
 norsyss_kht_covid19_overview_table <- function(data){
   # table 1
-
-  tab <- copy(data$covid19$norsyss_separate)
-  setnames(tab, "n", "n_norsyss")
-
-  tab[,pr100_norsyss := fhiplot::format_nor_perc_1(100*n_norsyss/consult_with_influenza)]
-  tab[consult_with_influenza==0, pr100_norsyss := "0,0%"]
-  tab[,n_norsyss:=fhiplot::format_nor(n_norsyss)]
-
-  tab <- dcast.data.table(
-    tab,
-    location_code + yrwk ~ tag_outcome,
-    value.var = c("pr100_norsyss", "n_norsyss")
-  )
-  tab
-
-  tab[
-    data$covid19$msis,
-    on=c("location_code","yrwk"),
-    n_msis := fhiplot::format_nor(n)
-    ]
-
-  setorder(tab,location_code,yrwk)
-  tab[,week_id := 1:.N,by=.(location_code)]
-
-  tab_wide <- dcast.data.table(
-    tab,
-    location_code ~ week_id,
-    value.var = c(
-      "n_norsyss_covid19_r991_vk_ote",
-      "pr100_norsyss_covid19_r991_vk_ote",
-      "n_norsyss_covid19_r992_vk_ote",
-      "pr100_norsyss_covid19_r992_vk_ote",
-      "n_msis"
-    )
-  )
-  tab_wide <- rbind(tab_wide[location_code=="norge"],tab_wide[location_code!="norge"])
-  tab_wide[,location_name := get_location_name(location_code)]
-  tab_wide[, location_code := NULL]
-  tab_wide <- unique(tab_wide)
-  setcolorder(tab_wide, "location_name")
-
-  yrwks <- unique(tab[, c("week_id", "yrwk")])
-  setorder(yrwks, week_id)
-
-  ht <- huxtable::as_hux(tab_wide) %>%
-    huxtable::add_colnames() %>%
-    fhiplot::huxtable_theme_fhi_basic()
-
-  ht[1, ] <- c(
-    "Geografisk omr\u00E5de",
-    yrwks$yrwk,
-    yrwks$yrwk,
-    yrwks$yrwk,
-    yrwks$yrwk,
-    yrwks$yrwk
-  )
-
-  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
-  ht <- huxtable::add_rows(ht, ht[1, ], after = 0)
-
-  huxtable::escape_contents(ht)[1:2, ] <- FALSE
-
-  ht <- huxtable::merge_cells(ht, 1:3, 1)
-
-  # top row
-  ht <- huxtable::merge_cells(ht, 1, 2:9)
-  ht[1, 2] <- "NorSySS Konsultasjoner R991: Covid-19 (mistenkt/sannsynlig)<sup>1</sup>"
-
-  ht <- huxtable::merge_cells(ht, 1, 10:17)
-  ht[1, 10] <- "NorSySS Konsultasjoner R992: Covid-19 (bekreftet) <sup>1</sup>"
-
-  ht <- huxtable::merge_cells(ht, 1, 18:21)
-  ht[1, 18] <- "MSIS Tilfeller"
-
-  # second row
-  ht <- huxtable::merge_cells(ht, 2, 2:5)
-  ht[2, 2] <- "Antall"
-  ht <- huxtable::merge_cells(ht, 2, 6:9)
-  ht[2, 6] <- "Andel<sup>2</sup>"
-
-  ht <- huxtable::merge_cells(ht, 2, 10:13)
-  ht[2, 10] <- "Antall"
-  ht <- huxtable::merge_cells(ht, 2, 14:17)
-  ht[2, 14] <- "Andel<sup>2</sup>"
-
-  ht <- huxtable::merge_cells(ht, 2, 18:21)
-  ht[2, 18] <- "Antall"
-
-  # border styles
-  huxtable::left_border(ht)[, seq(2,21,4)] <- 5
-  huxtable::left_border_style(ht)[, seq(2,21,4)] <- "double"
-
-  huxtable::align(ht) <- "center"
-
-  nr0 <- nrow(ht) + 1
-  ht <- huxtable::add_footnote(ht, glue::glue(
-    "<sup>1</sup>NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt med ICPC-2 kodene R991 og R992.<br>",
-    "<sup>2</sup>Nevneren til andelen er totalt antall konsultasjoner i det samme geografiske omr{fhi::nb$aa}det.<br>",
-  ), border = 0)
-  nr1 <- nrow(ht)
-
-  huxtable::escape_contents(ht)[1, ] <- F
-  huxtable::escape_contents(ht)[nr0:nr1, ] <- F
-
-  huxtable::left_padding(ht) <-  5
-  huxtable::right_padding(ht) <-  5
-
-  return(huxtable::to_html(ht))
-}
-
-
-norsyss_kht_covid19_overview_table <- function(data){
-  # table 1
   alert <- copy(data$covid19$alerts)
   alert <- alert[age=="total"]
 
@@ -546,7 +433,7 @@ norsyss_kht_covid19_overview_table <- function(data){
     index <- which(tab_high[,..col]=="high")
     if(length(index)==0) next()
 
-    huxtable::background_color(ht)[-1, col] <- fhiplot::warning_color["hig"]
+    huxtable::background_color(ht)[index+3, col+1] <- fhiplot::warning_color["hig"]
   }
 
   return(huxtable::to_html(ht))
