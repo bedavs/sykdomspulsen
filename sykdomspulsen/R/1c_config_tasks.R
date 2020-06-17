@@ -347,7 +347,10 @@ set_tasks <- function() {
       name = "analysis_normomo",
       type = "analysis",
       update_plans_fn = analysis_normomo_plans,
-      schema = c("output" = sc::config$schemas$results_normomo_standard),
+      schema = c(
+        "output" = sc::config$schemas$results_normomo_standard,
+        "data_normomo" = sc::config$schemas$data_normomo
+        ),
       cores = min(6, parallel::detectCores())
     )
   )
