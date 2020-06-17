@@ -22,7 +22,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     argset$email <- "riwh@fhi.no"
     #argset$email <- "beva@fhi.no"
-    argset$email <- "grmg@fhi.no"
+    #argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -62,10 +62,10 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "flere ganger hvis personen kontakter legen flere ganger.<br>",
 
     "Som et signalsystem For covid-19 vil det i tabellen bli farget r{fhi::nb$oe}dt i feltene som har en {fhi::nb$oe}kning av antall konsultasjoner eller tilfeller.<br>",
-    "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foregående ukene som en terskel for et signal. For eksempel uke ",
-    "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
+    "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foreg{fhi::nb$aa}ende ukene som en terskel for et signal. For eksempel uke ",
+    "{fhi::isoyearweek(lubridate::today()-14-1)} og {fhi::isoyearweek(lubridate::today()-7-1)} ",
     "brukes som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
-    "{fhi::isoyearweek(lubridate::today()-7-1)} og {fhi::isoyearweek(lubridate::today()-0-1)}.<br>",
+    "{fhi::isoyearweek(lubridate::today()-0-1)}.<br>",
     "Dette er kun et signal og trenger ikke {fhi::nb$aa} v{fhi::nb$ae}re noe man m{fhi::nb$aa} gj{fhi::nb$oe}re noe med,",
     " men det kan v{fhi::nb$ae}re en fordel {fhi::nb$aa} sjekke nettsiden og f{fhi::nb$oe}lge med.<br><br>",
 
@@ -115,7 +115,12 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
   email_text <- paste0(
     email_text,
-    "<h2>NorSySS + MSIS: Covid-19 oversikt</h2>",
+    glue::glue(
+      "<h2>NorSySS + MSIS: Covid-19 oversikt</h2>",
+
+      "R{fhi::nb$oe}de ruter betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
+    ),
+
     norsyss_kht_covid19_overview_table(data = data)
   )
 
@@ -546,7 +551,7 @@ ui_norsyss_kht_email_covid19_function_factory <- function(location_codes, yrwk){
   function(){
     retval <- list()
 
-    retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
+    retval$msis <- sc::tbl("prelim_data_covid19_msis_by_time_location") %>%
       dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(location_code %in% !!location_codes) %>%
       dplyr::filter(yrwk %in% !!yrwk) %>%
