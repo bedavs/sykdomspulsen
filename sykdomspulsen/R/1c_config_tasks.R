@@ -378,7 +378,7 @@ set_tasks <- function() {
       upsert_at_end_of_each_plan = TRUE,
       args = list(
         train_length = 5,
-        years = c(2018:fhi::isoyear_n()),
+        years = c(2015:fhi::isoyear_n()),
         weeklyDenominatorFunction = sum,
         denominator = "consult_without_influenza",
         granularity_time = "week"

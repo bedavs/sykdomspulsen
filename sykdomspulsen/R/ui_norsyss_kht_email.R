@@ -38,8 +38,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Vi har tatt bort tabellen som het 'NorSySS + MSIS: Signaler for covid-19' i denne mailen.<br>",
-    "- Vi har inkludert signalene i 'NorSySS + MSIS: Covid-19 oversikt' tabellen slik at det kommer opp r{fhi::nb$oe}de felt ved en {fhi::nb$oe}kning i disse dataene. Se mer informasjon om dette nederst i mailen. <br>",
+    "- Vi har inkludert signaler i 'NorSySS + MSIS: Covid-19 oversikt' tabellen i denne e-posten slik at det kommer opp r{fhi::nb$oe}de felt ved en {fhi::nb$oe}kning i disse dataene. Se mer informasjon om dette nederst i mailen. <br>",
     "- Vi har inkludert en oversiktstabell med indikatorere for covid-19 p{fhi::nb$aa} nettisden.<br>",
     "- Vi har inkludert en ny fane som heter 'sammenlikning' under covid-19 p{fhi::nb$aa} nettisden. Her kan du sammenlikne kommuner, fylker og Norge.<br>",
     "- Bydelene i Oslo er inkludert som geografiske omr{fhi::nb$aa}der i covid-19 delen p{fhi::nb$aa} nettisden.<br>",
