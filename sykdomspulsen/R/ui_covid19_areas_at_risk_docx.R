@@ -181,7 +181,10 @@ areas_at_risk_norsyss <- function(data){
                  "pr100_norsyss_baseline_thresholdu0",
                  "n_norsyss_status"))
 
-  d <- d_norsyss
+  index_age <- cbind(age=unique(d_norsyss$age),index_age=c(c(1,3,4,5,2,6)))
+  d <- merge( d_norsyss, index_age, by="age")
+
+
   yrwks <- rev(sort(unique(d$yrwk)))[1:4]
   yrwks_alert <- yrwks[1:2]
 
@@ -209,7 +212,8 @@ areas_at_risk_norsyss <- function(data){
                    "n_norsyss",
                    "pr100_norsyss",
                    "pr100_norsyss_baseline_thresholdu0",
-                   "n_norsyss_status")]
+                   "n_norsyss_status",
+                   "index_age")]
 
   tab[, pretty_norsyss_n:=fhiplot::format_nor(n_norsyss)]
   tab[, pretty_norsyss_pr100:=fhiplot::format_nor_perc_1(pr100_norsyss)]
@@ -222,13 +226,15 @@ areas_at_risk_norsyss <- function(data){
 
   tab[uke %in% 3:4,norsyss_difference := pr100_norsyss-pr100_norsyss_baseline_thresholdu0]
 
+
   # get the ordering of locations right
   ordering_norsyss <- na.omit(tab[,c("location_name","location_code","norsyss_difference")])
   setorder(ordering_norsyss, -norsyss_difference)
+
   location_codes <- unique(ordering_norsyss$location_code)
 
   tab[,location_code:=factor(location_code, levels = location_codes)]
-  setorder(tab,location_code,age,yrwk )
+  setorderv(tab, c("location_code","index_age","yrwk"),c(1,1,1))
 
   return(tab)
 }
