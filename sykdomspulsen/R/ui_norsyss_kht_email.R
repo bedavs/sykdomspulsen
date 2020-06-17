@@ -38,8 +38,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
 
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Vi har tatt bort tabellen som het 'NorSySS + MSIS: Signaler for covid-19' i denne mailen.<br>",
-    "- Vi har inkludert signalene i 'NorSySS + MSIS: Covid-19 oversikt' tabellen slik at det kommer opp r{fhi::nb$oe}de felt ved en {fhi::nb$oe}kning i disse dataene. Se mer informasjon om dette nederst i mailen. <br>",
+    "- Vi har inkludert signaler i 'NorSySS + MSIS: Covid-19 oversikt' tabellen i denne e-posten slik at det kommer opp r{fhi::nb$oe}de felt ved en {fhi::nb$oe}kning i disse dataene. Se mer informasjon om dette nederst i mailen. <br>",
     "- Vi har inkludert en oversiktstabell med indikatorere for covid-19 p{fhi::nb$aa} nettisden.<br>",
     "- Vi har inkludert en ny fane som heter 'sammenlikning' under covid-19 p{fhi::nb$aa} nettisden. Her kan du sammenlikne kommuner, fylker og Norge.<br>",
     "- Bydelene i Oslo er inkludert som geografiske omr{fhi::nb$aa}der i covid-19 delen p{fhi::nb$aa} nettisden.<br>",
@@ -62,10 +61,10 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
     "flere ganger hvis personen kontakter legen flere ganger.<br>",
 
-    "Som et signalsystem For covid-19 vil det bli farget r{fhi::nb$oe}dt i feltene som har en {fhi::nb$oe}kning av antall konsultasjoner eller tilfeller.<br>",
-    "Signalsystemet bruker gjennomsnittet med 95% konfidensintervall av uke ",
+    "Som et signalsystem For covid-19 vil det i tabellen bli farget r{fhi::nb$oe}dt i feltene som har en {fhi::nb$oe}kning av antall konsultasjoner eller tilfeller.<br>",
+    "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foregående ukene som en terskel for et signal. For eksempel uke ",
     "{fhi::isoyearweek(lubridate::today()-21-1)} og {fhi::isoyearweek(lubridate::today()-14-1)} ",
-    "som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
+    "brukes som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
     "{fhi::isoyearweek(lubridate::today()-7-1)} og {fhi::isoyearweek(lubridate::today()-0-1)}.<br>",
     "Dette er kun et signal og trenger ikke {fhi::nb$aa} v{fhi::nb$ae}re noe man m{fhi::nb$aa} gj{fhi::nb$oe}re noe med,",
     " men det kan v{fhi::nb$ae}re en fordel {fhi::nb$aa} sjekke nettsiden og f{fhi::nb$oe}lge med.<br><br>",
