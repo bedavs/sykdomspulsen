@@ -42,9 +42,52 @@ ui_covid19_areas_at_risk_docx <- function(data, argset, schema) {
 }
 
 areas_at_risk_norsyss_msis <- function(data){
-  d <- copy(data$data)
+d <- copy(data$data)
   if(nrow(d)==0) return(NULL)
-  d <- d[age=="total"]
+
+d <- d[age=="total"]
+
+d_msis <- d[tag_outcome=="msis", c("location_code",
+                                     "yrwk",
+                                     "age",
+                                     "n",
+                                     "n_baseline_expected",
+                                     "n_baseline_thresholdu0",
+                                     "n_status"
+                                     )]
+setnames(d_msis, old =c("n",
+                        "n_baseline_expected",
+                        "n_baseline_thresholdu0",
+                        "n_status"),
+                    new=c("n_msis",
+                        "n_msis_baseline_expected",
+                        "n_msis_baseline_thresholdu0",
+                        "n_msis_status"))
+
+d_norsyss <- d[tag_outcome=="covid19_vk_ote", c("location_code",
+                                                  "yrwk",
+                                                  "age",
+                                                  "n",
+                                                  "pr100",
+                                                  "pr100_baseline_expected",
+                                                  "pr100_baseline_thresholdu0",
+                                                  "n_status"
+                                                  )]
+
+setnames(d_norsyss, old =c("n",
+                          "pr100",
+                          "pr100_baseline_expected",
+                          "pr100_baseline_thresholdu0",
+                          "n_status"),
+                      new=c("n_norsyss",
+                            "pr100_norsyss",
+                            "pr100_norsyss_baseline_expected",
+                            "pr100_norsyss_baseline_thresholdu0",
+                            "n_norsyss_status"))
+
+
+d <- merge(d_msis, d_norsyss, by=c("location_code", "yrwk", "age"), all=T)
+
 
   yrwks <- rev(sort(unique(d$yrwk)))[1:4]
   yrwks_alert <- yrwks[1:2]
@@ -114,10 +157,35 @@ areas_at_risk_norsyss_msis <- function(data){
 areas_at_risk_norsyss <- function(data){
   d <- copy(data$data)
   if(nrow(d)==0) return(NULL)
+
   d <- d[age!="total"]
 
+  d_norsyss <- d[tag_outcome=="covid19_vk_ote", c("location_code",
+                                                  "yrwk",
+                                                  "age",
+                                                  "n",
+                                                  "pr100",
+                                                  "pr100_baseline_expected",
+                                                  "pr100_baseline_thresholdu0",
+                                                  "n_status"
+                                                  )]
+
+  setnames(d_norsyss, old =c("n",
+                             "pr100",
+                             "pr100_baseline_expected",
+                             "pr100_baseline_thresholdu0",
+                             "n_status"),
+           new=c("n_norsyss",
+                 "pr100_norsyss",
+                 "pr100_norsyss_baseline_expected",
+                 "pr100_norsyss_baseline_thresholdu0",
+                 "n_norsyss_status"))
+
+  d <- d_norsyss
   yrwks <- rev(sort(unique(d$yrwk)))[1:4]
   yrwks_alert <- yrwks[1:2]
+
+
 
   # alerts, later 2 weeks
   location_codes <- unique(
@@ -161,8 +229,6 @@ areas_at_risk_norsyss <- function(data){
 
   tab[,location_code:=factor(location_code, levels = location_codes)]
   setorder(tab,location_code,age,yrwk )
-
-
 
   return(tab)
 }
