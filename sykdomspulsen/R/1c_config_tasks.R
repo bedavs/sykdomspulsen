@@ -762,6 +762,21 @@ set_tasks <- function() {
   )
 
 
+  # ui_covid19_areas_at_risk_utbrudd_email ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_covid19_areas_at_risk_utbrudd_email",
+      type = "single",
+      action = "sykdomspulsen::ui_covid19_areas_at_risk_utbrudd_email",
+      schema = list(input=sc::config$schemas$results_normomo_standard),
+      args = list(
+        folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
+        filename = "covid19_areas_at_risk_{argset$today}.docx"
+      )
+    )
+  )
+
+
 
   sc::add_task(
     sc::task_from_config(
