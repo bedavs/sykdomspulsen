@@ -1,5 +1,26 @@
 set_tasks <- function() {
   # **** covid19 **** ----
+
+  # data_pre_covid19_nordic ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "data_pre_covid19_nordic",
+      type = "data",
+      action = "sykdomspulsen::data_pre_covid19_nordic",
+      schema = list(output = sc::config$schemas$data_covid19_nordic)
+    )
+  )
+
+  # data_covid19_nordic ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "data_covid19_nordic",
+      type = "data",
+      action = "sykdomspulsen::data_covid19_nordic",
+      schema = list(output = sc::config$schemas$data_covid19_nordic)
+    )
+  )
+
   # data_covid19_model ----
   sc::add_task(
     sc::task_from_config(

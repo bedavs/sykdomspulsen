@@ -19,6 +19,46 @@ set_db <- function(){
   )
 
   # covid19 ----
+  # data_covid19_nordic ----
+  sc::add_schema(
+    name = "data_covid19_nordic",
+    schema = sc::Schema$new(
+      db_table = "data_covid19_nordic",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "pop" = "INTEGER",
+
+        "n_cases" = "INTEGER",
+        "pr100000_cases" = "DOUBLE",
+        "n_tests" = "INTEGER",
+        "pr100_tests" = "DOUBLE",
+        "n_icu" = "INTEGER",
+        "pr100000_icu" = "DOUBLE"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   # results_covid19_model ----
   sc::add_schema(
     name = "results_covid19_model",
