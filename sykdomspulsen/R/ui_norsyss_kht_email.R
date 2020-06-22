@@ -22,7 +22,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     argset$email <- "riwh@fhi.no"
     argset$email <- "beva@fhi.no"
-    #argset$email <- "grmg@fhi.no"
+    argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -31,8 +31,9 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_subject <- glue::glue("Ukentlig oversikt, FHI data {lubridate::today()}")
 
   email_text_top <- glue::glue(
-    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br><br>",
-    "Under ser du tabeller med oversikt over covid-19 med år-ukenummer som kolonnenavn.<br><br>",
+    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br>",
+    " Under ser du tabeller med de geografiske områdene du har valgt med informasjon om de siste tre ukene og denne uken (år-ukenummer).",
+    " Den siste uken som vises i tabellen er den nåværende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
 
      "<u>Nytt fra Sykdomspulsen:</u><br>",
     "- Vi har n{fhi::nb$aa} inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
@@ -79,6 +80,10 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "av slike signaler har vi n{fhi::nb$aa} lagt inn en nedre grense for gult signal p{fhi::nb$aa} p{fhi::nb$aa} minst tre konsultasjoner og en nedre grense for ",
     "r{fhi::nb$oe}dt signal p{fhi::nb$aa} minst fire konsultasjoner.<br><br>",
 
+    "<u>Kommunen(e) og fylkene du ser</u> i tabellene er basert på det du har valgt i nettsiden.",
+    " Du kan endre de geografiske områdene ved å gå til 'Geografisk område' i nettsiden.<br><br>",
+
+
     "Vi vet at det er mange som ikke liker v{fhi::nb$aa}r p{fhi::nb$aa}loggingsl{fhi::nb$oe}sning med egen ",
     "kommune(over)lege(n) e-postadresse. Vi synes dette er synd, men ser ingen annen utvei s{fhi::nb$aa} lenge ",
     "det ikke finnes et nasjonalt autorisert register over kommuneleger/kommuneoverleger som fortl{fhi::nb$oe}pende ",
@@ -113,7 +118,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     glue::glue(
       "<h2>Covid-19 oversikt (NorSySS + MSIS)</h2>",
 
-      "Antall konsultasjoner (NorSySS) og positive tilfeller (MSIS) for covid-19 de siste ukene (kolonnenavn er år-ukenummer). R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
+      "Antall konsultasjoner (NorSySS) og positive tilfeller (MSIS) for covid-19 de siste ukene (år-ukenummer). R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
     ),
 
     norsyss_kht_covid19_overview_table(data = data)
