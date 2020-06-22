@@ -31,12 +31,13 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_subject <- glue::glue("Ukentlig oversikt, FHI data {lubridate::today()}")
 
   email_text_top <- glue::glue(
-    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.<b><br>",
-    #"<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br>",
-    "<u>Nytt fra Sykdomspulsen:</u><br>",
+    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br><br>",
+    "Under ser du tabeller med oversikt over covid-19 med år-ukenummer som kolonnenavn.<br><br>",
+
+     "<u>Nytt fra Sykdomspulsen:</u><br>",
     "- Vi har n{fhi::nb$aa} inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
 
-    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>"
+    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a>.<br><br>"
 
 
   )
@@ -56,7 +57,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "04.05.2020 til R991: covid-19 (mistenkt/sannsynlig) og R992: covid-19 (bekreftet). ",
     "- Sykdomspulsen har data for konsultasjoner,",
     "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
-    "flere ganger hvis personen kontakter legen flere ganger.<br>",
+    "flere ganger hvis personen kontakter legen flere ganger.<br><br>",
 
 
     "<u>Varsel om mage-tarminfeksjoner og luftveisinfeksjoner tabellen</u> inkluderer kun NorSySS data (konsultasjoner på legekontor og legevakt)<br>",
@@ -97,7 +98,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Hilsen:<br><br>",
 
     "Sykdomspulsen teamet (Gry, Richard, Beatriz, Gunnar og Yusman)",
-    "Folkehelseinstituttet<br>"
+    " ved Folkehelseinstituttet<br>"
 
   )
 
@@ -112,7 +113,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     glue::glue(
       "<h2>Covid-19 oversikt (NorSySS + MSIS)</h2>",
 
-      "R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
+      "Antall konsultasjoner (NorSySS) og positive tilfeller (MSIS) for covid-19 de siste ukene (kolonnenavn er år-ukenummer). R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
     ),
 
     norsyss_kht_covid19_overview_table(data = data)
