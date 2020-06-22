@@ -31,52 +31,45 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_subject <- glue::glue("Ukentlig oversikt, FHI data {lubridate::today()}")
 
   email_text_top <- glue::glue(
-    "<b>Dette er en ukentlig oversikt over FHI data fra Sykdomspulsen for kommunehelsetjenesten</b><br>",
-    "Under ser du tabeller med de geografiske omr{fhi::nb$aa}dene du har valgt med informasjon ",
-    "om de siste tre ukene og denne uken ({fhi::nb$aa}r-ukenummer).<br>",
-    "Du kan endre det geografiske omr{fhi::nb$aa}de ved {fhi::nb$aa} g{fhi::nb$aa} til 'Geografisk omr{fhi::nb$aa}de' i nettsiden.<br>",
-    "Den siste uken som vises i tabellen er den n{fhi::nb$aa}v{fhi::nb$ae}rende uken og har derfor kun data fra mandag og tirsdag.<br><br>",
-
+    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.<b><br>",
+    #"<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br>",
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Vi har inkludert signaler i 'NorSySS + MSIS: Covid-19 oversikt' tabellen i denne e-posten slik at det kommer opp r{fhi::nb$oe}de felt ved en {fhi::nb$oe}kning i disse dataene. Se mer informasjon om dette nederst i mailen. <br>",
-    "- Vi har inkludert en oversiktstabell med indikatorere for covid-19 p{fhi::nb$aa} nettisden.<br>",
-    "- Vi har inkludert en ny fane som heter 'sammenlikning' under covid-19 p{fhi::nb$aa} nettisden. Her kan du sammenlikne kommuner, fylker og Norge.<br>",
-    "- Bydelene i Oslo er inkludert som geografiske omr{fhi::nb$aa}der i covid-19 delen p{fhi::nb$aa} nettisden.<br>",
-    "- Du vil i l{fhi::nb$oe}pet av denne uken f{fhi::nb$aa} en sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelse fra Sykdomspulsen for kommunehelsetjenesten om nettsiden og de ukentlige mailene.",
-    "Vi setter stor pris p{fhi::nb$aa} om du kan svare p{fhi::nb$aa} denne.<br><br>",
+    "- Vi har n{fhi::nb$aa} inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
 
-    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>",
+    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>"
 
-    "Dersom dere har problemer med p{fhi::nb$aa}loggingen eller andre sp\u00F8rsm\u00E5l, vennligst send en mail til sykdomspulsen@fhi.no<br>"
 
   )
   email_text_bottom <- glue::glue(
 
-    "<u>Tabellen med covid-19 viser</u> antall konsultasjoner hos lege og legevakt (NorSySS) ",
+    "<u>Covid-19 oversikt (NorSySS + MSIS) tabellen</u> viser antall konsultasjoner hos lege og legevakt (NorSySS) ",
     "og antall bekreftede tilfeller registrert i MSIS.<br>",
-    "For NorSySS data ble diagnosekoden R991: covid-19 (mistenkt eller bekreftet) ",
-    "brukt mellom 06.03.2020 til 03.05.2020. Det ble en endring i covid-19 ICPC-2 diagnosekodene ",
-    "04.05.2020 til R991: covid-19 (mistenkt/sannsynlig) og R992: covid-19 (bekreftet). ",
-    "Sykdomspulsen har data for konsultasjoner,",
-    "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
-    "flere ganger hvis personen kontakter legen flere ganger.<br>",
-
-    "Som et signalsystem For covid-19 vil det i tabellen bli farget r{fhi::nb$oe}dt i feltene som har en {fhi::nb$oe}kning av antall konsultasjoner eller tilfeller.<br>",
+     "- Som et signalsystem For covid-19 vil det i tabellen bli farget r{fhi::nb$oe}dt i feltene som har en {fhi::nb$oe}kning av antall konsultasjoner eller tilfeller.<br>",
     "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foreg{fhi::nb$aa}ende ukene som en terskel for et signal. For eksempel uke ",
     "{fhi::isoyearweek(lubridate::today()-14-1)} og {fhi::isoyearweek(lubridate::today()-7-1)} ",
     "brukes som en basis for {fhi::nb$aa} beregne terskelverdi for uke ",
     "{fhi::isoyearweek(lubridate::today()-0-1)}.<br>",
     "Dette er kun et signal og trenger ikke {fhi::nb$aa} v{fhi::nb$ae}re noe man m{fhi::nb$aa} gj{fhi::nb$oe}re noe med,",
     " men det kan v{fhi::nb$ae}re en fordel {fhi::nb$aa} sjekke nettsiden og f{fhi::nb$oe}lge med.<br><br>",
+    "- For NorSySS data ble diagnosekoden R991: covid-19 (mistenkt eller bekreftet) ",
+    "brukt mellom 06.03.2020 til 03.05.2020. Det ble en endring i covid-19 ICPC-2 diagnosekodene ",
+    "04.05.2020 til R991: covid-19 (mistenkt/sannsynlig) og R992: covid-19 (bekreftet). ",
+    "- Sykdomspulsen har data for konsultasjoner,",
+    "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
+    "flere ganger hvis personen kontakter legen flere ganger.<br>",
 
-    "<u>Tabellene med mage-tarminfeksjoner og luftveisinfeksjoner har kun NorSySS data og viser disse verdiene:</u><br>",
-    "Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
+
+    "<u>Varsel om mage-tarminfeksjoner og luftveisinfeksjoner tabellen</u> inkluderer kun NorSySS data (konsultasjoner på legekontor og legevakt)<br>",
+    "- Luftveisinfeksjoner består her av diagnosekodene R05-Hoste, R74-Akutt Øvre Luftveisinfeksjon, R78-Bronkitt/Bronkiolitt og R83-Luftveisinfeksjon IKA.<br>",
+    "- Mage-tarminfeksjoner består her av diagnosekodene D11-Diare, D70-Tarminfeksjon og D73-Tarminfeksjon antatt infeksiøs.<br>",
+    "- Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
     "g{fhi::nb$aa}r til legen flere ganger.<br>",
-    "Flere enn normalt: Differansen mellom antall registrerte og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
-    "Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner.<br>",
+    "- Signalsystem:<br> ",
     "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
     "Gult felt: Antall konsultasjoner er h{fhi::nb$oe}yere enn forventet (Z-verdi mellom 2 og 4 og minst 3 konsultasjoner)<br>",
     "R{fhi::nb$oe}dt felt: Antall konsultasjoner er betydelig h{fhi::nb$oe}yere enn forventet (Z-verdi >= 4 og minst 4 konsultasjoner)<br>",
+    "Flere enn normalt: Differansen mellom antall registrerte og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
+    "Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner.<br>",
     "Varselet er en informasjon om at det kan v{fhi::nb$ae}re noe som b{fhi::nb$oe}r f{fhi::nb$oe}lges opp i din kommune eller i et fylke. ",
     "Det anbefales {fhi::nb$aa} g{fhi::nb$aa} inn i Sykdomspulsen nettsiden og sjekke det ut. Varselet beh{fhi::nb$oe}ver ikke {fhi::nb$aa} bety noe alvorlig.<br><br>",
 
@@ -103,7 +96,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     "Hilsen:<br><br>",
 
-    "Sykdomspulsen ved Folkehelseinstituttet<br>"
+    "Sykdomspulsen teamet (Gry, Richard, Beatriz, Gunnar og Yusman)",
+    "Folkehelseinstituttet<br>"
 
   )
 
@@ -116,9 +110,9 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_text <- paste0(
     email_text,
     glue::glue(
-      "<h2>NorSySS + MSIS: Covid-19 oversikt</h2>",
+      "<h2>Covid-19 oversikt (NorSySS + MSIS)</h2>",
 
-      "R{fhi::nb$oe}de ruter betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
+      "R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
     ),
 
     norsyss_kht_covid19_overview_table(data = data)
@@ -130,7 +124,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   # email_text <- paste0(
   #   email_text,
   #   glue::glue(
-  #     "<h2>NorSySS + MSIS: Signaler for covid-19</h2>",
+  #     "<h2>Signaler for covid-19 (NorSyss + MSIS)</h2>",
   #
   #     "Dersom du ser en tabell under, er det",
   #     " en eller flere uker med en {fhi::nb$oe}kning som er statistisk signifikant i det geografiske omr{fhi::nb$aa}det du har valgt.<br>",
@@ -148,7 +142,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   for(tag_outcome in argset$tag_outcome){
     email_text <- paste0(
       email_text,
-      "<h2>NorSySS: Varsler om ",stringr::str_to_lower(config$def$norsyss$long_names[[tag_outcome]]),"</h2>",
+      "<h2>Varsler om ",stringr::str_to_lower(config$def$norsyss$long_names[[tag_outcome]])," (NorSySS)</h2>",
       norsyss_kht_obs_table(
         results = data$alert[[tag_outcome]],
         tag_outcome = tag_outcome
@@ -271,6 +265,8 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
 
   nr0 <- nrow(tab) + 1
   tab <- huxtable::add_footnote(tab, glue::glue(
+    "NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt",
+    "med ICPC-2 kodene R05-Hoste, R74-Akutt øvre luftveisinfksjon, R78-Bronkitt/Bronkiolitt og R83-Luftveisinfeksjon IKA.<br>",
     "<sup>1</sup>Differansen mellom antall registrete og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
     "<sup>2</sup>Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner<br>",
     "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",
