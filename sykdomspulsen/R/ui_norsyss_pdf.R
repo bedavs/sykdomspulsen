@@ -25,6 +25,13 @@ ui_norsyss_pdf <- function(data, argset, schema) {
   table <- schema$input$dplyr_tbl()
 
   for (tag in argset$tags) {
+    if (tag=="gastro_vk_ot"){
+      tag_name_pdf <- "mage_tarm"
+
+    } else if (tag=="respiratoryexternal_vk_ot"){
+      tag_name_pdf <- "luftvei"
+    }
+
     message(glue::glue("sykdomspulspdf {tag}"))
     # setup
     files <- c("monthly_report.Rmd", "monthly_reportALL.Rmd")
@@ -74,7 +81,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
       input <- fs::path(folder, "markdown", "monthly_report.Rmd")
       output_dir <- fs::path(folder, "pdf")
       output_file <- glue::glue("{tag}_{locs$county_code[i]}_monthly_report.pdf")
-      output_file_renamed <- glue::glue("{locs$county_name[i]}_{tag}.pdf")
+      output_file_renamed <- glue::glue("{locs$county_name[i]}_{tag_name_pdf}.pdf")
       rmarkdown::render(
         input = fs::path(folder, "markdown", "monthly_report.Rmd"),
         output_dir = output_dir,
