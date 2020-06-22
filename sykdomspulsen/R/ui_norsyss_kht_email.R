@@ -21,7 +21,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
 
     argset$email <- "riwh@fhi.no"
-    #argset$email <- "beva@fhi.no"
+    argset$email <- "beva@fhi.no"
     #argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
@@ -363,7 +363,7 @@ norsyss_kht_covid19_overview_table <- function(data){
   tab_high <- tab_wide[, cols, with=FALSE]
   tab_values <- tab_wide[, -cols, with=FALSE]
 
-
+  names(tab_values) <-rep("",21)
 
   ht <- huxtable::as_hux(tab_values) %>%
     huxtable::add_colnames() %>%
