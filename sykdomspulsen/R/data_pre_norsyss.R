@@ -41,13 +41,59 @@ data_pre_norsyss <- function(data, argset, schema){
   }
 
   message(glue::glue("Downloading from {argset$date_from}"))
-  norsyss_fetch_raw_data_and_aggregate(
-    date_from = argset$date_from,
-    date_to = lubridate::today()-1,
-    folder = sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE),
-    overwrite_file=FALSE,
-    diags = argset$diags
-  )
+  date_from <- argset$date_from
+  date_to <- lubridate::today()-1
+  folder <- sc::path("input", "sykdomspulsen_norsyss_input", create_dir = TRUE)
+  overwrite_file <- FALSE
+  diags = argset$diags
+
+  file_name <- glue::glue("norsyss_{lubridate::today()}.txt")
+  file_temp <- fs::path(fhi::temp_dir(), file_name)
+  file_permanent <- fs::path(folder, file_name)
+
+  if (overwrite_file == FALSE) {
+    if (file.exists(file_permanent)) {
+      x <- fread(file_permanent)
+      max_date <- as.Date(max(x$date, na.rm = T))
+      # as long as last date in the file is within 2 days of the requested date
+      if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
+        message("file already exists! exiting...")
+        return()
+      }
+    }
+  }
+
+  db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
+
+  # calculate dates
+  datesToExtract <- data.table(from = seq(as.Date(date_from), by = "month", length.out = 300), to = seq(as.Date(date_from), by = "month", length.out = 301)[-1] - 1)
+  # Remove future dates
+  datesToExtract <- datesToExtract[from <= date_to]
+
+  for (i in 1:nrow(datesToExtract)) {
+    cat(i, "/", nrow(datesToExtract), "\n")
+
+    command <- paste0(
+      "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
+      datesToExtract[i]$from,
+      "' AND Konsultasjonsdato <= '",
+      datesToExtract[i]$to,
+      "'"
+    )
+    d <- RODBC::sqlQuery(db, command)
+    d <- data.table(d)
+    # taskt 1be should only apply to R991
+    d <- d[!(Diagnose!="R991" & Takst=="1be")]
+    d <- norsyss_aggregate_raw_data(d, diags = diags)
+    if (i == 1) {
+      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
+    } else {
+      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
+    }
+  }
+  #pb$terminate()
+  system(glue::glue("mv {file_temp} {file_permanent}"))
+
   get_n_doctors(sc::path("input", "sykdomspulsen_norsyss_input"))
   return(TRUE)
 }
@@ -144,63 +190,6 @@ nav_to_freg_bydel <- data.table(
   nav= as.numeric(names(nav_to_freg_bydel)),
   freg = nav_to_freg_bydel
 )
-
-
-# norsyss_fetch_raw_data_and_aggregate
-norsyss_fetch_raw_data_and_aggregate <- function(
-  date_from = "2018-01-01",
-  date_to = lubridate::today(),
-  folder,
-  overwrite_file = FALSE,
-  diags,
-  ...) {
-  file_name <- glue::glue("norsyss_{lubridate::today()}.txt")
-  file_temp <- fs::path(fhi::temp_dir(), file_name)
-  file_permanent <- fs::path(folder, file_name)
-
-  if (overwrite_file == FALSE) {
-    if (file.exists(file_permanent)) {
-      x <- fread(file_permanent)
-      max_date <- as.Date(max(x$date, na.rm = T))
-      # as long as last date in the file is within 2 days of the requested date
-      if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
-        message("file already exists! exiting...")
-        return()
-      }
-    }
-  }
-
-  db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
-
-  # calculate dates
-  datesToExtract <- data.table(from = seq(as.Date(date_from), by = "month", length.out = 300), to = seq(as.Date(date_from), by = "month", length.out = 301)[-1] - 1)
-  # Remove future dates
-  datesToExtract <- datesToExtract[from <= date_to]
-
-  for (i in 1:nrow(datesToExtract)) {
-    cat(i, "/", nrow(datesToExtract), "\n")
-
-    command <- paste0(
-      "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
-      datesToExtract[i]$from,
-      "' AND Konsultasjonsdato <= '",
-      datesToExtract[i]$to,
-      "'"
-    )
-    d <- RODBC::sqlQuery(db, command)
-    d <- data.table(d)
-    # taskt 1be should only apply to R991
-    d <- d[!(Diagnose!="R991" & Takst=="1be")]
-    d <- norsyss_aggregate_raw_data(d, diags = diags)
-    if (i == 1) {
-      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
-    } else {
-      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
-    }
-  }
-  #pb$terminate()
-  system(glue::glue("mv {file_temp} {file_permanent}"))
-}
 
 norsyss_aggregate_raw_data <- function(d, diags) {
   . <- BehandlerKommune <- Diagnose <- Id <-

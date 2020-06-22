@@ -11,7 +11,7 @@ Denne rapporten baseres på Sykdomspulsen som er et overvåkningssystem som innh
 
 Luftveisinfeksjoner er en samlebetegnelse for diagnosekodene (ICPC-2) R05-Hoste, R74-Akutt øvre luftveisinfeksjon, R78-Bronkitt/bronkiolitt og R83-Luftveisinfeksjon IKA.  
 
-En økning av luftveisinfeksjoner er vanlig på vinterstid, spesielt hos barn og unge. I aldersgruppen 5-19 år ser vi en stor økning av luftveisinfeksjoner fra sesongen 2016/2017. Dette skyldes hovedsakelig de nye fraværsreglene som ble innført i den videregående skole fra høsten 2016.  
+En økning av luftveisinfeksjoner er vanlig på vinterstid, spesielt hos barn og unge. I aldersgruppen 5-19 år ser vi en økning av luftveisinfeksjon konsultasjoner fra sesongen 2016/2017. Dette skyldes hovedsakelig de nye fraværsreglene som ble innført i den videregående skole fra høsten 2016. Fra påsken i år er det en nedgang i antall konsultasjoner for luftveisinfeksjoner i alle aldersgrupper og i alle fylker. Dette skyldes antakelig koronavirusutbruddet som har ført til endrede vaner i befolkningen med invirkning på smittespredning og legekonsultasjoner. Dataene i denne rapporten inkluderer telefonkonsultasjoner og oppmøte på legekontor, en endring til mer bruk av e-konsultasjon vil derfor også ha en innvirkning på disse tallene.
 
 Vil du vite mer om Sykdomspulsen kan du gå tilbake til hovedsiden til Sykdomspulsen og klikke på «Om Sykdomspulsen».
 \endgroup
