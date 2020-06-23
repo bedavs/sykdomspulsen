@@ -11,27 +11,32 @@ huxtable_to_png <- function(tab, file) {
   file_dvi <- fs::path(dir_tmp, glue::glue("{name}.dvi"))
   file_ <- fs::path(dir_tmp, glue::glue("{name}"))
 
-  output <- glue::glue("
-\\documentclass{{standalone}}
-\\usepackage{{booktabs}}
-\\usepackage{{array}}
-\\usepackage{{caption}}
-\\usepackage{{graphicx}}
-\\usepackage{{siunitx}}
-\\usepackage{{colortbl}}
-\\usepackage{{multirow}}
-\\usepackage{{hhline}}
-\\usepackage{{calc}}
-\\usepackage{{tabularx}}
-\\usepackage{{threeparttable}}
-\\usepackage{{wrapfig}}
+#   output <- glue::glue("
+# \\documentclass{{standalone}}
+# \\usepackage{{booktabs}}
+# \\usepackage{{array}}
+# \\usepackage{{caption}}
+# \\usepackage{{graphicx}}
+# \\usepackage{{siunitx}}
+# \\usepackage{{ulem}}
+# \\usepackage{{colortbl}}
+# \\usepackage{{multirow}}
+# \\usepackage{{hhline}}
+# \\usepackage{{calc}}
+# \\usepackage{{tabularx}}
+# \\usepackage{{threeparttable}}
+# \\usepackage{{wrapfig}}
+# \\usepackage{{adjustbox}}
+#
+# \\begin{{document}}
+# {huxtable::to_latex(tab,tabular_only=T)}
+# \\end{{document}}")
+#   cat(output, file = file_tex)
 
-\\begin{{document}}
-{huxtable::to_latex(tab,tabular_only=T)}
-\\end{{document}}")
-  cat(output, file = file_tex)
+  huxtable::quick_latex(tab, file=file_tex, open=FALSE)
+  #print(3)
 
-  withr::with_dir(dir_tmp, tools::texi2dvi(file = file_tex))
+  withr::with_dir(dir_tmp, tools::texi2dvi(file = file_tex, quiet=F))
 
   cmd <- paste("cd", shQuote(dir_tmp), "; dvipng -T tight -D 1200 -z 9", shQuote(file_dvi))
   invisible(system(cmd))
