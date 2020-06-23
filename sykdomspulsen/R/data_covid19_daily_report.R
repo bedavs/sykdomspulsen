@@ -7,6 +7,8 @@ data_covid19_daily_report <- function(data, argset, schema){
   # tm_run_task("data_covid19_daily_report")
   # tm_run_task("prelim_data_covid19_daily_report")
 
+  # sc::tbl("data_covid19_lab_by_time")
+
   if(plnr::is_run_directly()){
     data <- sc::tm_get_data("data_covid19_daily_report")
     argset <- sc::tm_get_argset("data_covid19_daily_report")
@@ -30,6 +32,9 @@ data_covid19_daily_report <- function(data, argset, schema){
 
   date_max <- as.Date(stringr::str_extract(file,"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))-1
   date_min_msis <- min(master$data_covid19_msis_by_time_location_nation$date)
+  date_min_lab <- min(master$data_covid19_lab_by_time_location$date_pr)
+
+
 
   names(schema)
   names(master)
@@ -243,6 +248,124 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_lab_by_time$db_load_data_infile(retval)
   schema$data_covid19_lab_by_time$db_add_constraint()
 
+
+  # data_covid19_lab_by_time_location ----
+
+  locs <-  norway_locations()
+
+  retval <- copy(master$data_covid19_lab_by_time_location)
+  retval <-retval[!is.na(bostedskommunenr)]
+  retval[, location_code:=paste0("municip",formatC(bostedskommunenr, flag="0", width=4))]
+  retval[, isoyearweek := NULL]
+  #retval[, location_code:="norge"]
+
+  # retval <- merge(
+  #   locs,
+  #   retval,
+  #   by="municip_code",
+  #   all.x = T
+  # )
+  setnames(retval,"date_pr", "date")
+
+
+  # municip
+  skeleton <- expand.grid(
+    location_code = norway_locations()$municip_code,
+    date = seq.Date(
+      date_min_lab,
+      date_max,
+      by = 1
+    ),
+    stringsAsFactors = FALSE
+  )
+  setDT(skeleton)
+
+  d_municip <- merge(
+    skeleton,
+    retval,
+    by=c("location_code","date"),
+    all.x = T
+  )
+  # now we have all of the rows we *really* wanted
+  # so we can add in all of the structural data
+  d_municip[is.na(antall_testede), antall_testede:=0]
+  d_municip[is.na(antall_positive), antall_positive:=0]
+
+  # add in county data
+
+
+
+  d_municip[, granularity_geo := "municip"]
+
+  d_municip <- d_municip[, c("location_code",
+               "date",
+               "antall_testede",
+               "antall_positive") ]
+
+  d_municip[
+    norway_locations(),
+    on="location_code==municip_code",
+    county_code := county_code
+  ]
+
+  # county
+
+  d_county <- d_municip[,.(
+    antall_testede = sum(antall_testede),
+    antall_positive = sum(antall_positive)
+  ),keyby=.(location_code, date)]
+  d_municip[, county_code := NULL]
+
+
+
+  # norge
+
+  d_norway <- data.table(master$data_covid19_lab_by_time)
+  d_norway <- d_norway[,.(
+    antall_testede = n_neg + n_pos,
+    antall_positive = n_pos,
+    location_code = "norge",
+    date
+  )]
+
+  d <- rbind(
+    d_municip,
+    d_county,
+    d_norway
+  )
+
+  fill_in_missing(d)
+
+  setnames(d, c("antall_testede",
+                "antall_positive"), c("n","n_pos"))
+
+  # create all the stuff we actually want
+  d[,n_neg:=n-n_pos]
+  d[,pr100_pos:=(n_pos*100)/n]
+
+  d <- d[,.(n=n,
+           n_pos=n_pos,
+           n_neg=n_neg,
+           pr100_pos=pr100_pos,
+           cum_n_tested=cumsum(n),
+           date=date),
+         keyby=.(granularity_geo,location_code)]
+
+
+  ## fill in missing
+
+  d[, granularity_time := "day"]
+  fill_in_missing(d)
+  d
+
+  schema$data_covid19_lab_by_time_location$db_drop_table()
+  schema$data_covid19_lab_by_time_location$db_connect()
+  schema$data_covid19_lab_by_time_location$db_drop_constraint()
+  schema$data_covid19_lab_by_time_location$db_load_data_infile(d)
+  schema$data_covid19_lab_by_time_location$db_add_constraint()
+
+
+
   # data_covid19_hospital_by_time ----
   master$data_covid19_hospital_by_time
 
@@ -292,6 +415,9 @@ data_covid19_daily_report <- function(data, argset, schema){
   schema$data_covid19_demographics$db_drop_constraint()
   schema$data_covid19_demographics$db_load_data_infile(retval)
   schema$data_covid19_demographics$db_add_constraint()
+
+
+
 }
 
 
