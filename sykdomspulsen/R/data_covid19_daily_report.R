@@ -251,7 +251,6 @@ data_covid19_daily_report <- function(data, argset, schema){
 
   # data_covid19_lab_by_time_location ----
 
-  locs <-  norway_locations()
 
   retval <- copy(master$data_covid19_lab_by_time_location)
   retval <-retval[!is.na(bostedskommunenr)]
@@ -308,14 +307,16 @@ data_covid19_daily_report <- function(data, argset, schema){
     county_code := county_code
   ]
 
+  d_municip[,granularity_geo:="municip"]
   # county
 
   d_county <- d_municip[,.(
     antall_testede = sum(antall_testede),
     antall_positive = sum(antall_positive)
-  ),keyby=.(location_code, date)]
+  ),keyby=.(county_code, date)]
   d_municip[, county_code := NULL]
-
+setnames(d_county,"county_code", "location_code")
+d_county[,granularity_geo:="county"]
 
 
   # norge
@@ -328,13 +329,15 @@ data_covid19_daily_report <- function(data, argset, schema){
     date
   )]
 
+  d_norway[,granularity_geo:="nation"]
+
+
   d <- rbind(
     d_municip,
     d_county,
     d_norway
   )
 
-  fill_in_missing(d)
 
   setnames(d, c("antall_testede",
                 "antall_positive"), c("n","n_pos"))
