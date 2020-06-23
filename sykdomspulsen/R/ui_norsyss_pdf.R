@@ -46,9 +46,28 @@ ui_norsyss_pdf <- function(data, argset, schema) {
 
     file_before <- glue::glue("child_{tag}.Rmd")
     files_after <- glue::glue("{locs$county_code}_child_{tag}.Rmd")
+
+    templates <- cbind(locations=locs,
+                       tag=rep(tag, dim(locs)[1]),
+                       out=files_after)
+
+
+    index <- grep("_child", dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen")))
+    files <- dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen"))[files]
+
+    extra_tag <-grep(tag,files)
+    if (length(extra_tag)>0) {
+      extra_locs <- cbind(locations.county_code=substr(files,1, 8),inrmd=files[extra_tag])
+    }
+    template <-merge(templates,extra_locs,by="locations.county_code", all=T)
+    template[is.na(inrmd),inrmd:=file_before]
+
+    template <- template[!is.na(locations.county_name)]
+
+    file_before <- template[,inrmd]
     for (i in seq_along(files_after)) {
       file.copy(
-        from = system.file("rmd", "norsyss_pdf", file_before, package = "sykdomspulsen"),
+        from = system.file("rmd", "norsyss_pdf", file_before[i], package = "sykdomspulsen"),
         to = fs::path(folder, "markdown", files_after[i]),
         overwrite = !sc::config$is_production
       )
