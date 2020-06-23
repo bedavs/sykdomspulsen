@@ -514,6 +514,18 @@ set_tasks <- function() {
     )
   )
 
+  # analysis_covid19_nordic ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "analysis_covid19_nordic",
+      type = "analysis",
+      db_table = "data_covid19_nordic",
+      action = "sykdomspulsen::analysis_covid19_nordic",
+      schema = list(output = sc::config$schemas$results_covid19_nordic),
+      for_each_plan = list("border" = "all")
+    )
+  )
+
   sc::add_task(
     sc::task_from_config(
       name = "analysis_simple_msis",
@@ -537,7 +549,11 @@ set_tasks <- function() {
       type = "single",
       action = "sykdomspulsen::ui_surveillance_data",
       schema = list(
-        data_covid19_msis_by_time_location=sc::config$schemas$data_covid19_msis_by_time_location
+        data_covid19_msis_by_time_location=sc::config$schemas$data_covid19_msis_by_time_location,
+        data_covid19_msis_by_time_sex_age = sc::config$schemas$data_covid19_msis_by_time_sex_age,
+        data_covid19_lab_by_time = sc::config$schemas$data_covid19_lab_by_time,
+        data_covid19_hospital_by_time = sc::config$schemas$data_covid19_hospital_by_time,
+        data_covid19_deaths = sc::config$schemas$data_covid19_deaths
       )
     )
   )
@@ -782,7 +798,6 @@ set_tasks <- function() {
     )
   )
 
-
   # ui_covid19_areas_at_risk_utbrudd_email ----
   sc::add_task(
     sc::task_from_config(
@@ -793,6 +808,22 @@ set_tasks <- function() {
       args = list(
         folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
         filename = "covid19_areas_at_risk_{argset$today}.docx"
+      )
+    )
+  )
+
+  # ui_covid19_nordic ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "ui_covid19_nordic",
+      type = "ui",
+      action = "sykdomspulsen::ui_covid19_nordic",
+      schema = list(input=sc::config$schemas$results_covid19_nordic),
+      db_table = "results_covid19_nordic",
+      for_each_plan = list("border" = config$border),
+      args = list(
+        folder = "sykdomspulsen_covid19_nordic_output/{argset$today}",
+        filename = "covid19_nordic_{argset$today}.xlsx"
       )
     )
   )

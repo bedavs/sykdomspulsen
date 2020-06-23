@@ -12,7 +12,7 @@ data_pre_covid19_nordic <- function(data, argset, schema){
     schema <- sc::tm_get_schema("data_pre_covid19_nordic")
   }
 
-  folder_base <- sc::path("input","sykdomspulsen_covid19_dagsrapport_input", "nordic", "input", create_dir = T)
+  folder_base <- sc::path("input","sykdomspulsen_covid19_nordic_input", create_dir = T)
   folder_denmark <- fs::path(folder_base, "denmark")
   if(!fs::dir_exists(folder_denmark)) fs::dir_create(folder_denmark)
   folder_sweden <- fs::path(folder_base, "sweden", lubridate::today())
@@ -142,8 +142,9 @@ data_covid19_nordic <- function(data, argset, schema){
 
     schema$output$db_field_types
   }
+  schema$output$db_drop_all_rows()
 
-  folder_base <- sc::path("input","sykdomspulsen_covid19_dagsrapport_input", "nordic", "input", create_dir = T)
+  folder_base <- sc::path("input","sykdomspulsen_covid19_nordic_input", create_dir = T)
 
   # denmark ----
   folder_denmark <- fs::path(folder_base, "denmark")
@@ -168,6 +169,43 @@ data_covid19_nordic <- function(data, argset, schema){
   retval[, n_tests := n_tests - shift(n_tests), by=.(Region)]
   retval[, n_cases := n_cases - shift(n_cases), by=.(Region)]
 
+  retval[
+    fhidata::denmark_locations_long_b2020,
+    on="Region==location_name",
+    location_code := location_code
+  ]
+  retval[Region=="I alt i Danmark", location_code := "DK"]
+
+  retval[, yrwk := fhi::isoyearweek(date)]
+  retval <- retval[, .(
+    cases = sum(n_cases),
+    tests = sum(n_tests)
+  ), keyby=.(
+    location_code, yrwk
+  )]
+  retval <- retval[!is.na(cases)]
+
+  retval <- melt.data.table(
+    retval,
+    id.vars = c("location_code", "yrwk"),
+    variable.name = "tag_outcome",
+    variable.factor = FALSE,
+    value.name = "n"
+  )
+
+  retval[
+    fhidata::population_denmark_b2020[age=="total"],
+    on="location_code",
+    pop := pop
+  ]
+  retval[, pr100000 := 100000*n/pop]
+  retval[, pr100 := 100*n/pop]
+  retval[, granularity_time := "week"]
+  retval[,manual_extraction:=FALSE]
+  fill_in_missing(retval)
+
+  schema$output$db_upsert_load_data_infile(retval)
+
   # finland cases ----
   folder_finland <- fs::path(folder_base, "finland")
 
@@ -175,10 +213,95 @@ data_covid19_nordic <- function(data, argset, schema){
   folder_finland <- max(folder_finland)
 
   d <- fread(fs::path(folder_finland, "cases.csv"))
+  d <- d[!is.na(val)]
+  d[, yrwk := paste0(
+    stringr::str_extract(Time,"[0-9][0-9][0-9][0-9]"),
+    "-",
+    stringr::str_extract(Time,"[0-9][0-9]$")
+    )
+  ]
+  d <- d[yrwk != "NA-NA"]
 
-  d <- fread(fs::path(folder_finland, "tests.csv"))
+  d[
+    fhidata::finland_locations_long_b2020,
+    on="Area==location_name",
+    location_code := location_code
+  ]
+  d[Area=="All areas", location_code := "FI"]
 
-  # sweden ----
+  d <- d[,.(
+    location_code,
+    yrwk,
+    n = val
+  )]
+
+  d[
+    fhidata::population_finland_b2020[age=="total"],
+    on="location_code",
+    pop := pop
+  ]
+  d[, tag_outcome := "cases"]
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=FALSE]
+  fill_in_missing(d)
+
+  schema$output$db_upsert_load_data_infile(d)
+
+
+  # finland tests ----
+  folder_finland <- fs::path(folder_base, "finland")
+
+  files <- fs::dir_ls(folder_finland, regexp="[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+  min_val <- fs::path(folder_finland, "2020-05-25")
+  files <- files[files >= min_val]
+  retval <- vector("list", length=length(files))
+  for(i in seq_along(files)){
+    x_date <- stringr::str_extract(files[i], "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+    d <- fread(
+      fs::path(files[i], "tests.csv"),
+      dec=","
+    )
+    d[, date := as.Date(x_date)]
+    retval[[i]] <- d
+  }
+  retval <- rbindlist(retval)
+  retval <- retval[Time=="Time"]
+  setorder(retval, Area, date)
+  setnames(retval, "val", "n_tests")
+  retval[, n_tests := n_tests - shift(n_tests), by=.(Area)]
+  retval <- retval[!is.na(n_tests)]
+
+  retval[
+    fhidata::finland_locations_long_b2020,
+    on="Area==location_name",
+    location_code := location_code
+  ]
+  retval[Area=="All areas", location_code := "FI"]
+
+  retval[, yrwk := fhi::isoyearweek(date)]
+  d <- retval[yrwk >= "2020-26", .(
+    n = sum(n_tests)
+  ), keyby=.(
+    location_code, yrwk
+  )]
+
+  d[
+    fhidata::population_finland_b2020[age=="total"],
+    on="location_code",
+    pop := pop
+  ]
+  d[, tag_outcome := "tests"]
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=FALSE]
+  fill_in_missing(d)
+
+  schema$output$db_upsert_load_data_infile(d)
+
+  # sweden cases ----
   folder_sweden <- fs::path(folder_base, "sweden")
 
   folder_sweden <- fs::dir_ls(folder_sweden, regexp="[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
@@ -190,19 +313,327 @@ data_covid19_nordic <- function(data, argset, schema){
     fs::path(folder_sweden,"sweden.xlsx"),
     sheet = "Antal per dag region"
   )
+  setDT(d)
+  d <- melt.data.table(
+    d,
+    id.vars = "Statistikdatum",
+    variable.factor = F
+  )
+  d[variable==glue::glue("J{fhidata::se$ae}mtland_H{fhidata::se$ae}rjedalen"),
+    variable := glue::glue("J{fhidata::se$ae}mtland")]
+  d[,variable := stringr::str_replace_all(variable, "_", " ")]
+  d[, yrwk := fhi::isoyearweek(Statistikdatum)]
+  d[
+    fhidata::sweden_locations_long_b2020,
+    on="variable==location_name",
+    location_code := location_code
+  ]
+  d[variable=="Totalt antal fall", location_code := "SE"]
+  d[variable==glue::glue("S{fhidata::se$oe}rmland"), location_code := "SE122"]
+  d <- d[,.(
+    n = sum(value)
+  ),keyby=.(
+    location_code,
+    yrwk
+  )]
 
+  d[
+    fhidata::population_sweden_b2020[age=="total"],
+    on="location_code",
+    pop := pop
+  ]
+  d[, tag_outcome := "cases"]
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=FALSE]
+  fill_in_missing(d)
+
+  schema$output$db_upsert_load_data_infile(d)
+
+  # sweden icu ----
   d <- readxl::read_excel(
     fs::path(folder_sweden,"sweden.xlsx"),
     sheet = glue::glue("Antal intensivv{fhidata::nb$aa}rdade per dag")
   )
   setDT(d)
+  setnames(d, glue::glue("Datum_v{fhidata::nb$aa}rdstart"), "date")
+  setnames(d, glue::glue("Antal_intensivv{fhidata::nb$aa}rdade"), "n_icu")
+  d[, location_code := "SE"]
+  d[, yrwk := fhi::isoyearweek(date)]
+  d <- d[,.(
+    n = sum(n_icu)
+  ),keyby=.(
+    location_code,
+    yrwk
+  )]
+
+  d[
+    fhidata::population_sweden_b2020[age=="total"],
+    on="location_code",
+    pop := pop
+  ]
+  d[, tag_outcome := "icu"]
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=FALSE]
+  fill_in_missing(d)
+
+  schema$output$db_upsert_load_data_infile(d)
 
   # sweden tests ----
+  folder_sweden <- fs::path(folder_base, "sweden")
+
+  files <- fs::dir_ls(folder_sweden, regexp="[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+  retval <- vector("list", length=length(files))
+  for(i in seq_along(files)){
+    x_date <- stringr::str_extract(files[i], "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+    d <- readxl::read_excel(
+      fs::path(files[i], "tests.xlsx")
+    )
+    setDT(d)
+    wk <- stringr::str_extract(names(d)[2], "[0-9][0-9]$")
+    setnames(d, c("Region", "x_n_tests", "x"))
+    d[,x:=NULL]
+    d[,yrwk := paste0("2020-",wk)]
+    retval[[i]] <- d
+  }
+  retval <- rbindlist(retval)
+  retval <- unique(retval)
+  retval[, n_tests := as.numeric(stringr::str_remove_all(x_n_tests, " "))]
+  retval[, x_n_tests := NULL]
+
+  retval[Region==glue::glue("J{fhidata::se$ae}mtland/H{fhidata::se$ae}rjedalen"),
+    Region := glue::glue("J{fhidata::se$ae}mtland")]
+
+  retval[
+    fhidata::sweden_locations_long_b2020,
+    on="Region==location_name",
+    location_code := location_code
+  ]
+  retval[Region==glue::glue("S{fhidata::se$oe}rmland"), location_code := "SE122"]
+
+  retval_se <- retval[,.(
+    location_code="SE",
+    n_tests=sum(n_tests)
+  ),keyby=.(yrwk)]
+  retval[,Region := NULL ]
+  d <- na.omit(rbind(retval, retval_se))
+
+  setnames(d, "n_tests", "n")
+
+  d[
+    fhidata::population_sweden_b2020[age=="total"],
+    on="location_code",
+    pop := pop
+  ]
+  d[, tag_outcome := "tests"]
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=FALSE]
+  fill_in_missing(d)
+
+  schema$output$db_upsert_load_data_infile(d)
+
+  # manual cases ----
+
   d <- readxl::read_excel(
-    fs::path(folder_sweden,"tests.xlsx")
+    fs::path(folder_base, "Manual data collection.xlsx"),
+    sheet = "Cases",
+    skip = 1
   )
   setDT(d)
 
+  d <- d[!is.na(location_code)]
+  d[, Country := NULL]
+  d[, Region := NULL]
+  d <- melt.data.table(
+    d,
+    id.vars = "location_code",
+    variable.factor = FALSE,
+    variable.name = "yrwk",
+    value.name = "n"
+  )
+  d <- d[!is.na(n)]
+  d[, tag_outcome := "cases"]
+  d[, granularity_time := "week"]
+
+  pops <- rbind(
+    fhidata::population_denmark_b2020,
+    fhidata::population_sweden_b2020,
+    fhidata::population_finland_b2020,
+    fhidata::population_iceland_b2020
+  )
+
+  fill_in_missing(d)
+
+  d[
+    pops[age=="total"],
+    on=c("year","location_code"),
+    pop := pop
+  ]
+
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=TRUE]
+
+  schema$output$db_upsert_load_data_infile(d)
+
+  # manual tests ----
+
+  d <- readxl::read_excel(
+    fs::path(folder_base, "Manual data collection.xlsx"),
+    sheet = "Tests",
+    skip = 1
+  )
+  setDT(d)
+
+  d <- d[!is.na(location_code)]
+  d[, Country := NULL]
+  d[, Region := NULL]
+  d <- melt.data.table(
+    d,
+    id.vars = "location_code",
+    variable.factor = FALSE,
+    variable.name = "yrwk",
+    value.name = "n"
+  )
+  d <- d[!is.na(n)]
+  d[, tag_outcome := "tests"]
+  d[, granularity_time := "week"]
+
+  pops <- rbind(
+    fhidata::population_denmark_b2020,
+    fhidata::population_sweden_b2020,
+    fhidata::population_finland_b2020,
+    fhidata::population_iceland_b2020
+  )
+
+  fill_in_missing(d)
+
+  d[
+    pops[age=="total"],
+    on=c("year","location_code"),
+    pop := pop
+  ]
+
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=TRUE]
+
+  schema$output$db_upsert_load_data_infile(d)
+
+  # manual icu ----
+
+  d <- readxl::read_excel(
+    fs::path(folder_base, "Manual data collection.xlsx"),
+    sheet = "ICU",
+    skip = 1
+  )
+  setDT(d)
+
+  d <- d[!is.na(location_code)]
+  d[, Country := NULL]
+  d[, Region := NULL]
+  d <- melt.data.table(
+    d,
+    id.vars = "location_code",
+    variable.factor = FALSE,
+    variable.name = "yrwk",
+    value.name = "n"
+  )
+  d <- d[!is.na(n)]
+  d[, tag_outcome := "icu"]
+  d[, granularity_time := "week"]
+
+  pops <- rbind(
+    fhidata::population_denmark_b2020,
+    fhidata::population_sweden_b2020,
+    fhidata::population_finland_b2020,
+    fhidata::population_iceland_b2020
+  )
+
+  fill_in_missing(d)
+
+  d[
+    pops[age=="total"],
+    on=c("year","location_code"),
+    pop := pop
+  ]
+
+  d[, pr100000 := 100000*n/pop]
+  d[, pr100 := 100*n/pop]
+  d[, granularity_time := "week"]
+  d[,manual_extraction:=TRUE]
+
+  schema$output$db_upsert_load_data_infile(d)
+
+  # filling in the blanks ----
+  d <- schema$output$dplyr_tbl() %>%
+    dplyr::collect()
+  setDT(d)
+
+  skeleton <- expand.grid(
+    location_code = unique(d$location_code),
+    yrwk = unique(d$yrwk),
+    tag_outcome = c("cases", "tests", "icu"),
+    stringsAsFactors = FALSE
+  )
+  setDT(skeleton)
+
+  skeleton[
+    d,
+    on=c("location_code", "yrwk", "tag_outcome"),
+    n := n
+  ]
+
+  skeleton[
+    d,
+    on=c("location_code", "yrwk", "tag_outcome"),
+    manual_extraction := manual_extraction
+  ]
+  skeleton[is.na(n), n := NA]
+  skeleton[is.na(manual_extraction), manual_extraction := FALSE]
+
+  skeleton[, granularity_time := "week"]
+  fill_in_missing(skeleton)
+
+  skeleton[
+    pops[age=="total"],
+    on=c("year","location_code"),
+    pop := pop
+  ]
+
+  skeleton[
+    tag_outcome %in% c(
+      "cases",
+      "icu"
+    ), pr100000 := 100000*n/pop]
+
+  skeleton[
+    skeleton[tag_outcome=="cases"],
+    on=c("location_code","yrwk"),
+    pr100 := 100*i.n/n
+  ]
+
+  skeleton[tag_outcome != "tests", pr100 := NA]
+
+  schema$output$db_upsert_load_data_infile(skeleton)
 
 }
+
+
+
+
+
+
+
+
+
+
+
 

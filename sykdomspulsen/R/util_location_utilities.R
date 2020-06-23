@@ -34,3 +34,20 @@ get_municips_county <- function(x_county_code){
   return(norway_locations()[county_code == x_county_code, municip_code])
 
 }
+
+nordic_locations <- function(){
+  locs <- rbind(
+    fhidata::denmark_locations_long_b2020,
+    fhidata::finland_locations_long_b2020,
+    fhidata::sweden_locations_long_b2020,
+    fhidata::iceland_locations_long_b2020
+  )
+
+  return(locs)
+}
+
+get_nordic_location_name <- function(location_code) {
+  location_name <- NULL
+  locs <- nordic_locations()
+  return(locs[location_code, on = "location_code", location_name])
+}
