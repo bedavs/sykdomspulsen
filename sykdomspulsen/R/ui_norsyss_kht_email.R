@@ -15,13 +15,13 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     sc::tm_update_plans("ui_norsyss_kht_email")
     length(sc::config$tasks$list_task$ui_norsyss_kht_email$plans)
 
-    index_plan <- 1
+    index_plan <- 2
     data <- sc::tm_get_data("ui_norsyss_kht_email", index_plan=index_plan)
     argset <- sc::tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
 
     argset$email <- "riwh@fhi.no"
-    argset$email <- "beva@fhi.no"
+    #argset$email <- "beva@fhi.no"
     #argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
@@ -31,12 +31,13 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
   email_subject <- glue::glue("Ukentlig oversikt, FHI data {lubridate::today()}")
 
   email_text_top <- glue::glue(
+
     "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.<b><br>",
     #"<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br>",
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Vi har n{fhi::nb$aa} inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
+    "- Vi vil i l{fhi::nb$oe}pet av uka inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
 
-    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a><br><br>"
+    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a>.<br><br>"
 
 
   )
@@ -56,7 +57,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "04.05.2020 til R991: covid-19 (mistenkt/sannsynlig) og R992: covid-19 (bekreftet). ",
     "- Sykdomspulsen har data for konsultasjoner,",
     "ikke personer s{fhi::nb$aa} for eksempel en person med bekreftet diagnose kan telles",
-    "flere ganger hvis personen kontakter legen flere ganger.<br>",
+    "flere ganger hvis personen kontakter legen flere ganger.<br><br>",
 
 
     "<u>Varsel om mage-tarminfeksjoner og luftveisinfeksjoner tabellen</u> inkluderer kun NorSySS data (konsultasjoner på legekontor og legevakt)<br>",
@@ -78,6 +79,10 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "av slike signaler har vi n{fhi::nb$aa} lagt inn en nedre grense for gult signal p{fhi::nb$aa} p{fhi::nb$aa} minst tre konsultasjoner og en nedre grense for ",
     "r{fhi::nb$oe}dt signal p{fhi::nb$aa} minst fire konsultasjoner.<br><br>",
 
+    "<u>Kommunen(e) og fylkene du ser</u> i tabellene er basert på det du har valgt i nettsiden.",
+    " Du kan endre de geografiske områdene ved å gå til 'Geografisk område' i nettsiden.<br><br>",
+
+
     "Vi vet at det er mange som ikke liker v{fhi::nb$aa}r p{fhi::nb$aa}loggingsl{fhi::nb$oe}sning med egen ",
     "kommune(over)lege(n) e-postadresse. Vi synes dette er synd, men ser ingen annen utvei s{fhi::nb$aa} lenge ",
     "det ikke finnes et nasjonalt autorisert register over kommuneleger/kommuneoverleger som fortl{fhi::nb$oe}pende ",
@@ -97,7 +102,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "Hilsen:<br><br>",
 
     "Sykdomspulsen teamet (Gry, Richard, Beatriz, Gunnar og Yusman)",
-    "Folkehelseinstituttet<br>"
+    " ved Folkehelseinstituttet<br>"
 
   )
 
@@ -112,7 +117,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     glue::glue(
       "<h2>Covid-19 oversikt (NorSySS + MSIS)</h2>",
 
-      "R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
+      "Antall konsultasjoner (NorSySS) og positive tilfeller (MSIS) for covid-19 de siste ukene (år-ukenummer). R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
     ),
 
     norsyss_kht_covid19_overview_table(data = data)
@@ -218,7 +223,6 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
     `zscore_3` = r_wide$zscorep_3,
     `zscore_4` = r_wide$zscorep_4
   ) %>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
 
   # coloring in
@@ -301,8 +305,6 @@ norsyss_kht_covid19_overview_table <- function(data){
   setnames(norsyss_covid19_r992_alert, "n_status", "covid19_r992_status")
   setnames(norsyss_covid19_r992_alert, "n_status", "covid19_r992_status%")
 
-
-  #####
   tab <- copy(data$covid19$norsyss_separate)
   setnames(tab, "n", "n_norsyss")
 
@@ -363,10 +365,7 @@ norsyss_kht_covid19_overview_table <- function(data){
   tab_high <- tab_wide[, cols, with=FALSE]
   tab_values <- tab_wide[, -cols, with=FALSE]
 
-  names(tab_values) <-rep("",21)
-
   ht <- huxtable::as_hux(tab_values) %>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
 
   ht[1, ] <- c(
@@ -465,7 +464,6 @@ areas_at_risk_ht <- function(tab){
     "Andel<sup>3</sup>"=tab$pretty_norsyss_pr100,
     "Terskel"=tab$pretty_norsyss_pr100_threshold
   )%>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
   ht <- huxtable::set_background_color(ht, huxtable::evens, huxtable::everywhere, "#FFFFFF")
 

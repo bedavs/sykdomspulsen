@@ -39,19 +39,20 @@ datar_norsyss_kht_email <- function(data, argset, schema){
   )]
   d <- unique(d)
 
+  extra <- data.table(
+    location_code = norway_locations_long()$location_code,
+    email = "sykdomspulsen@fhi.no"
+  )
+  d <- rbind(d, extra)
+
   if(!sc::config$is_production){
     d <- d[
       email %in% c(
-        "richardaubrey.white@fhi.no"
+        "richardaubrey.white@fhi.no",
+        "sykdomspulsen@fhi.no"
       )
     ]
   } else {
-    extra <- data.table(
-      location_code = norway_locations_long()$location_code,
-      email = "sykdomspulsen@fhi.no"
-    )
-    d <- rbind(d, extra)
-
     extra <- data.table(
       location_code = norway_locations_long()$location_code,
       email = "utbrudd@fhi.no"
