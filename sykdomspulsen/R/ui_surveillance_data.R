@@ -394,9 +394,9 @@ ui_surveillance_data <- function(data, argset, schema) {
     header = NULL
   )
 
-  # data_covid19_deaths ----
+  # data_covid19_demographics ----
 
-  d <- schema$data_covid19_deaths$dplyr_tbl() %>%
+  d <- schema$data_covid19_demographics$dplyr_tbl() %>%
     dplyr::filter(granularity_time=="total") %>%
     dplyr::filter(granularity_geo=="nation") %>%
     dplyr::collect()
@@ -407,7 +407,7 @@ ui_surveillance_data <- function(data, argset, schema) {
     fs::path(
       folder,
       "covid19",
-      glue::glue("data_covid19_deaths_{lubridate::today()}.xlsx")
+      glue::glue("data_covid19_demographics_{lubridate::today()}.xlsx")
     )
   )
 
@@ -416,19 +416,19 @@ ui_surveillance_data <- function(data, argset, schema) {
     fs::path(
       folder,
       "covid19",
-      glue::glue("data_covid19_deaths_{lubridate::today()}.csv")
+      glue::glue("data_covid19_demographics_{lubridate::today()}.csv")
     )
   )
 
   org::write_text(
     txt = glue::glue(
-      "This documentation was last updated on 2020-06-23.\n\n",
+      "This documentation was last updated on 2020-06-24.\n\n",
 
       "This is the documentation for the files:\n",
-      "- data_covid19_deaths_YYYY-MM-DD.xlsx\n",
-      "- data_covid19_deaths_YYYY-MM-DD.csv\n\n",
+      "- data_covid19_demographics_YYYY-MM-DD.xlsx\n",
+      "- data_covid19_demographics_YYYY-MM-DD.csv\n\n",
 
-      "These files contain total numbers of people who died due to COVID-19 in Norway\n\n",
+      "These files contain demographic numbers related to COVID-19 in Norway\n\n",
 
       "If something does not appear to be correct, or more documentation is needed in a particular area, or you have suggestions about the way the data is presented/formatted, please email RichardAubrey.White@fhi.no\n\n",
       "These files are generated automatically each day through an extraction from databases.\n\n",
@@ -448,7 +448,25 @@ ui_surveillance_data <- function(data, argset, schema) {
       "x: N/A\n",
       "date: N/A\n",
 
-      "cum_n: Total number of deaths\n",
+      "tag_outcome: The outcome that is being described (deaths)\n",
+
+      "n: Total number of people corresponding to this location_code/age/sex/tag_outcome combination\n",
+
+      "\n"
+    ),
+    file = fs::path(
+      folder,
+      "covid19",
+      "_DOCUMENTATION_data_covid19_demographics.txt"
+    ),
+    header = NULL
+  )
+
+  org::write_text(
+    txt = glue::glue(
+      "This documentation was last updated on 2020-06-24.\n\n",
+
+      "Please see file _DOCUMENTATION_data_covid19_demographics.txt\n",
 
       "\n"
     ),
@@ -459,6 +477,7 @@ ui_surveillance_data <- function(data, argset, schema) {
     ),
     header = NULL
   )
+
 
   # finish up ----
 

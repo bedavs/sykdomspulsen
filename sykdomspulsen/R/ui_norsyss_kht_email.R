@@ -15,14 +15,14 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     sc::tm_update_plans("ui_norsyss_kht_email")
     length(sc::config$tasks$list_task$ui_norsyss_kht_email$plans)
 
-    index_plan <- 1
+    index_plan <- 2
     data <- sc::tm_get_data("ui_norsyss_kht_email", index_plan=index_plan)
     argset <- sc::tm_get_argset("ui_norsyss_kht_email", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
 
     argset$email <- "riwh@fhi.no"
-    argset$email <- "beva@fhi.no"
-    argset$email <- "grmg@fhi.no"
+    #argset$email <- "beva@fhi.no"
+    #argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -218,7 +218,6 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
     `zscore_3` = r_wide$zscorep_3,
     `zscore_4` = r_wide$zscorep_4
   ) %>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
 
   # coloring in
@@ -301,8 +300,6 @@ norsyss_kht_covid19_overview_table <- function(data){
   setnames(norsyss_covid19_r992_alert, "n_status", "covid19_r992_status")
   setnames(norsyss_covid19_r992_alert, "n_status", "covid19_r992_status%")
 
-
-  #####
   tab <- copy(data$covid19$norsyss_separate)
   setnames(tab, "n", "n_norsyss")
 
@@ -363,10 +360,7 @@ norsyss_kht_covid19_overview_table <- function(data){
   tab_high <- tab_wide[, cols, with=FALSE]
   tab_values <- tab_wide[, -cols, with=FALSE]
 
-  names(tab_values) <-rep("",21)
-
   ht <- huxtable::as_hux(tab_values) %>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
 
   ht[1, ] <- c(
@@ -465,7 +459,6 @@ areas_at_risk_ht <- function(tab){
     "Andel<sup>3</sup>"=tab$pretty_norsyss_pr100,
     "Terskel"=tab$pretty_norsyss_pr100_threshold
   )%>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic()
   ht <- huxtable::set_background_color(ht, huxtable::evens, huxtable::everywhere, "#FFFFFF")
 
