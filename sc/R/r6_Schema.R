@@ -62,6 +62,8 @@ validator_field_contents_sykdomspulsen <- function(data){
 
   if(sum(!unique(data$granularity_geo) %in% c(
     "nation",
+    "region",
+    "hospitaldistrict",
     "county",
     "municip",
     "ward",

@@ -4,7 +4,7 @@
 #' @param schema a
 #' @export
 ui_normomo_table_excess_only <- function(data, argset, schema) {
-  if(FALSE){
+  if(plnr::is_run_directly()){
     sc::tm_update_plans("ui_normomo_table_excess_only_sort_location")
 
     data <- sc::tm_get_data("ui_normomo_table_excess_only_sort_location", index_plan=1)
@@ -86,7 +86,6 @@ ui_normomo_table_excess_only <- function(data, argset, schema) {
   }
 
   tab %<>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic() %>%
     huxtable::set_align(huxtable::everywhere, huxtable::everywhere, "center") %>%
     huxtable::set_top_padding(huxtable::everywhere, huxtable::everywhere, 0.1) %>%
@@ -123,9 +122,8 @@ ui_normomo_table_excess_only <- function(data, argset, schema) {
 
   # first column
   tab <- huxtable::merge_repeated_rows(tab, huxtable::everywhere, 1)
-  tab <- huxtable::merge_repeated_rows(tab, huxtable::everywhere, 2)
+  #tab <- huxtable::merge_repeated_rows(tab, huxtable::everywhere, 2)
 
-  huxtable::width(tab) <- 0.9
 
   nr0 <- nrow(tab) + 1
   tab <- huxtable::add_footnote(tab, glue::glue(
@@ -145,8 +143,23 @@ ui_normomo_table_excess_only <- function(data, argset, schema) {
   huxtable::left_border_style(tab)[1:(nr0), 7] <- "double"
   huxtable::left_border_style(tab)[1:(nr0), 8] <- "double"
 
+  # width
+  huxtable::width(tab) <- 1
+  huxtable::col_width(tab) <- c(
+    0.13,
+    0.12,
+    0.2,
+    0.2,
+    0.2,
+    0.2,
+    0.28,
+    0.2,
+    0.2,
+    0.2
+  )
+
   # add a header
-  tab <- huxtable::insert_row(tab, glue::glue(""), fill = "", colspan = ncol(tab))
+  #tab <- huxtable::insert_row(tab, glue::glue(""), fill = "", colspan = ncol(tab))
 
   # tab
   huxtable_to_png(tab, file = filepath)

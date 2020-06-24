@@ -41,18 +41,18 @@ set_db <- function(){
 
         "pop" = "INTEGER",
 
-        "n_cases" = "INTEGER",
-        "pr100000_cases" = "DOUBLE",
-        "n_tests" = "INTEGER",
-        "pr100_tests" = "DOUBLE",
-        "n_icu" = "INTEGER",
-        "pr100000_icu" = "DOUBLE"
+        "tag_outcome" = "TEXT",
+        "n" = "INTEGER",
+        "pr100" = "DOUBLE",
+        "pr100000" = "DOUBLE",
+        "manual_extraction" = "BOOLEAN"
       ),
       db_load_folder = tempdir(),
       keys =  c(
         "granularity_time",
         "location_code",
-        "date"
+        "date",
+        "tag_outcome"
       ),
       validator_field_types = sc::validator_field_types_sykdomspulsen,
       validator_field_contents = sc::validator_field_contents_sykdomspulsen
@@ -1149,6 +1149,47 @@ set_db <- function(){
         "week",
         "date",
 
+        "tag_outcome"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  # results_covid19_nordic ----
+  sc::add_schema(
+    name = "results_covid19_nordic",
+    schema = sc::Schema$new(
+      db_table = "results_covid19_nordic",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "pop" = "INTEGER",
+
+        "tag_outcome" = "TEXT",
+        "n" = "INTEGER",
+        "pr100" = "DOUBLE",
+        "pr100000" = "DOUBLE",
+        "manual_extraction" = "BOOLEAN",
+        "n_status" = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date",
         "tag_outcome"
       ),
       validator_field_types = sc::validator_field_types_sykdomspulsen,

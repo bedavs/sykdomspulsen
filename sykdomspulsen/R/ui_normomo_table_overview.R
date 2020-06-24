@@ -5,7 +5,7 @@
 #' @param schema a
 #' @export
 ui_normomo_table_overview <- function(data, argset, schema) {
-  if(FALSE){
+  if(plnr::is_run_directly()){
     sc::tm_update_plans("ui_normomo_table_overview")
 
     data <- sc::tm_get_data("ui_normomo_table_overview", index_plan=1)
@@ -44,7 +44,6 @@ ui_normomo_table_overview <- function(data, argset, schema) {
     "Forh\u00F8yet" = glue::glue("{round(d$ncor_baseline_thresholdu0)} - {round(d$ncor_baseline_thresholdu1)}"),
     "Betydelig forh\u00F8yet" = glue::glue(">{round(d$ncor_baseline_thresholdu1)}")
   ) %>%
-    huxtable::add_colnames() %>%
     fhiplot::huxtable_theme_fhi_basic() %>%
     huxtable::set_align(huxtable::everywhere, huxtable::everywhere, "center") %>%
     huxtable::set_top_padding(huxtable::everywhere, huxtable::everywhere, 0.1) %>%
@@ -97,7 +96,18 @@ ui_normomo_table_overview <- function(data, argset, schema) {
   huxtable::top_border_style(tab)[31, ] <- "double"
   huxtable::top_border_style(tab)[35, ] <- "double"
 
-  huxtable::width(tab) <- 0.9
+  huxtable::width(tab) <- 1
+  huxtable::col_width(tab) <- c(
+    0.1,
+    0.12,
+    0.2,
+    0.2,
+    0.2,
+    0.25,
+    0.2,
+    0.2,
+    0.2
+  )
 
   nr0 <- nrow(tab) + 1
   tab <- huxtable::add_footnote(tab, glue::glue(
@@ -109,6 +119,7 @@ ui_normomo_table_overview <- function(data, argset, schema) {
   ), border = 0)
   nr1 <- nrow(tab)
 
+
   huxtable::escape_contents(tab)[nr0:nr1, ] <- F
   huxtable::escape_contents(tab)[1:2, ] <- F
 
@@ -118,7 +129,8 @@ ui_normomo_table_overview <- function(data, argset, schema) {
   huxtable::left_border_style(tab)[1:(nr0), 7] <- "double"
 
   # add a header
-  tab <- huxtable::insert_row(tab, glue::glue("{get_location_name(argset$location_code)}"), fill = "", colspan = ncol(tab))
+  #tab <- huxtable::insert_row(tab, glue::glue("{get_location_name(argset$location_code)}"), fill = "", colspan = ncol(tab))
+  huxtable_to_png(tab, file = filepath)
 
   # tab
   huxtable_to_png(tab, file = filepath)
