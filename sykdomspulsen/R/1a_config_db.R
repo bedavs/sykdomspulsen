@@ -1183,7 +1183,11 @@ set_db <- function(){
         "pr100" = "DOUBLE",
         "pr100000" = "DOUBLE",
         "manual_extraction" = "BOOLEAN",
-        "n_status" = "TEXT"
+        "n_status" = "TEXT",
+
+        "average_2wks_pr100" = "DOUBLE",
+        "average_2wks_pr100000" = "DOUBLE",
+        "average_2wks_status" = "TEXT"
       ),
       db_load_folder = tempdir(),
       keys =  c(
