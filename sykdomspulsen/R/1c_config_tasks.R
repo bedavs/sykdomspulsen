@@ -42,9 +42,12 @@ set_tasks <- function() {
         data_covid19_msis_by_time_infected_abroad = sc::config$schemas$data_covid19_msis_by_time_infected_abroad,
         data_covid19_msis_by_time_sex_age = sc::config$schemas$data_covid19_msis_by_time_sex_age,
         data_covid19_lab_by_time = sc::config$schemas$data_covid19_lab_by_time,
+        data_covid19_lab_by_time_location = sc::config$schemas$data_covid19_lab_by_time_location,
         data_covid19_hospital_by_time = sc::config$schemas$data_covid19_hospital_by_time,
         data_covid19_deaths = sc::config$schemas$data_covid19_deaths,
-        data_covid19_demographics = sc::config$schemas$data_covid19_demographics
+        data_covid19_demographics = sc::config$schemas$data_covid19_demographics,
+        data_covid19_dynamic_text = sc::config$schemas$data_covid19_dynamic_text
+
       )
     )
   )
@@ -770,13 +773,26 @@ set_tasks <- function() {
   sc::add_task(
     sc::task_from_config(
       name = "ui_norsyss_pdf",
-      type = "data",
+      type = "ui",
+      db_table = "results_norsyss_standard",
+      for_each_plan = list(
+        "border"="x"
+      ),
+      for_each_argset = list(
+        "location_code"="all",
+        "tag" = c("gastro_vk_ot","respiratoryexternal_vk_ot")
+      ),
+      filter = "granularity_geo == 'county'",
       schema=list(input=sc::config$schemas$results_norsyss_standard),
       action="sykdomspulsen::ui_norsyss_pdf",
       args = list(
         tags = c("gastro_vk_ot","respiratoryexternal_vk_ot"),
         name_short = config$def$norsyss$short_names,
-        name_long = config$def$norsyss$long_names
+        name_long = config$def$norsyss$long_names,
+        filename = list(
+          "gastro_vk_ot" = "mage_tarm",
+          "respiratoryexternal_vk_ot" = "luftveis"
+        )
       )
     )
   )
