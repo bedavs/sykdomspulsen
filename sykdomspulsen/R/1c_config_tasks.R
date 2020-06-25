@@ -63,6 +63,7 @@ set_tasks <- function() {
         data_covid19_msis_by_time_infected_abroad = sc::config$schemas$prelim_data_covid19_msis_by_time_infected_abroad,
         data_covid19_msis_by_time_sex_age = sc::config$schemas$prelim_data_covid19_msis_by_time_sex_age,
         data_covid19_lab_by_time = sc::config$schemas$prelim_data_covid19_lab_by_time,
+        data_covid19_lab_by_time_location = sc::config$schemas$prelim_data_covid19_lab_by_time_location,
         data_covid19_hospital_by_time = sc::config$schemas$prelim_data_covid19_hospital_by_time,
         data_covid19_deaths = sc::config$schemas$prelim_data_covid19_deaths,
         data_covid19_demographics = sc::config$schemas$prelim_data_covid19_demographics
