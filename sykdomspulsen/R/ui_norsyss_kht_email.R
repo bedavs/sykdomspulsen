@@ -22,7 +22,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     argset$email <- "riwh@fhi.no"
     #argset$email <- "beva@fhi.no"
-    #argset$email <- "grmg@fhi.no"
+    argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -34,8 +34,11 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.<b><br>",
     #"<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br>",
+
     "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Vi vil i l{fhi::nb$oe}pet av uka inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
+    "- MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} er n{fhi::nb$aa} i ov inkludert i oversiktstabellen (tabell 1) og figur 1 p{fhi::nb$aa} nettsiden.<br>",
+    "- For ca en uke siden fikk dere et sp{fhi::nb$oe}rreskjema ang{fhi::nb$aa}ende Sykdomspulsen for kommunehelsetjenesten sammen med annen informasjon fra FHI til kommunelegene.<br>",
+    " Dersom du ikke har svart p{fhi::nb$aa} sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelsen ber vi deg gj{fhi::nb$oe}re det med {fhi::nb$aa} bruke denne lenken: https://docs.google.com/forms/d/e/1FAIpQLSeImGKJQ9-7MuGJJjSplgPQRNvXpu4S8bi0sFGIPSxT4oWsgQ/viewform<br><br>",
 
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a>.<br><br>"
 
