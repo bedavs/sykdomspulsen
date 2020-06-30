@@ -192,7 +192,7 @@ analysis_covid19_metrics_function_factory <- function(loc){
     retval$d_cases <- d
 
     # tested ----
-    d <- sc::tbl("data_covid19_lab_by_time") %>%
+    d <- sc::tbl("data_covid19_lab_by_time_location") %>%
       dplyr::filter(granularity_time == "day") %>%
       dplyr::filter(location_code %in% !!loc) %>%
       dplyr::select(location_code, date, n_neg, n_pos) %>%

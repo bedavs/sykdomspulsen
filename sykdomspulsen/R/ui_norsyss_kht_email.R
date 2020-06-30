@@ -21,8 +21,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     schema <- sc::tm_get_schema("ui_norsyss_kht_email")
 
     argset$email <- "riwh@fhi.no"
-    #argset$email <- "beva@fhi.no"
-    #argset$email <- "grmg@fhi.no"
+    argset$email <- "beva@fhi.no"
+    argset$email <- "grmg@fhi.no"
   } else {
     # need this so that the email server doesn't die
     Sys.sleep(30)
@@ -32,11 +32,13 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
   email_text_top <- glue::glue(
 
-    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.<b><br>",
-    #"<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br>",
-    "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- Vi vil i l{fhi::nb$oe}pet av uka inkludert MSIS laboratoriedata for covid-19 helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa} i oversiktstabellen (tabell 1) p{fhi::nb$aa} nettsiden.<br><br>",
+    "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br><br>",
 
+    "<u>Nytt fra Sykdomspulsen:</u><br>",
+    "- MSIS laboratoriedata for covid-19  er n{fhi::nb$aa} inkludert i tabell 1 og figur 1 p{fhi::nb$aa} nettsiden -med data helt ned p{fhi::nb$aa} kommuneniv{fhi::nb$aa}.<br>",
+    "- For en uke siden fikk du et sp{fhi::nb$oe}rreskjema ang{fhi::nb$aa}ende 'Sykdomspulsen for kommunehelsetjenesten'  sammen med annen informasjon fra FHI (via fylkesmannen).<br>",
+    " Dette vil brukes til {fhi::nb$aa} videreutvikle og forbedre nettsiden, det er derfor viktig at s{fhi::nb$aa} mange som mulig svarer.",
+    " Dersom du ikke har svart p{fhi::nb$aa} sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelsen {fhi::nb$oe}nsker vi at du gj{fhi::nb$oe}r det ved {fhi::nb$aa} bruke denne lenken: https://docs.google.com/forms/d/e/1FAIpQLSeImGKJQ9-7MuGJJjSplgPQRNvXpu4S8bi0sFGIPSxT4oWsgQ/viewform<br><br>",
     "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a>.<br><br>"
 
 
@@ -60,9 +62,9 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "flere ganger hvis personen kontakter legen flere ganger.<br><br>",
 
 
-    "<u>Varsel om mage-tarminfeksjoner og luftveisinfeksjoner tabellen</u> inkluderer kun NorSySS data (konsultasjoner på legekontor og legevakt)<br>",
-    "- Luftveisinfeksjoner består her av diagnosekodene R05-Hoste, R74-Akutt Øvre Luftveisinfeksjon, R78-Bronkitt/Bronkiolitt og R83-Luftveisinfeksjon IKA.<br>",
-    "- Mage-tarminfeksjoner består her av diagnosekodene D11-Diare, D70-Tarminfeksjon og D73-Tarminfeksjon antatt infeksiøs.<br>",
+    "<u>Varsel om mage-tarminfeksjoner og luftveisinfeksjoner tabellen</u> inkluderer kun NorSySS data (konsultasjoner p{fhi::nb$aa} legekontor og legevakt)<br>",
+    "- Luftveisinfeksjoner best{fhi::nb$aa}r her av diagnosekodene R05-Hoste, R74-Akutt {fhi::nb$oe}vre Luftveisinfeksjon, R78-Bronkitt/Bronkiolitt og R83-Luftveisinfeksjon IKA.<br>",
+    "- Mage-tarminfeksjoner best{fhi::nb$aa}r her av diagnosekodene D11-Diare, D70-Tarminfeksjon og D73-Tarminfeksjon antatt infeksi{fhi::nb$oe}s.<br>",
     "- Antall konsultasjoner: Dette er ikke antall personer da en person kan telles flere ganger om den ",
     "g{fhi::nb$aa}r til legen flere ganger.<br>",
     "- Signalsystem:<br> ",
@@ -79,8 +81,8 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     "av slike signaler har vi n{fhi::nb$aa} lagt inn en nedre grense for gult signal p{fhi::nb$aa} p{fhi::nb$aa} minst tre konsultasjoner og en nedre grense for ",
     "r{fhi::nb$oe}dt signal p{fhi::nb$aa} minst fire konsultasjoner.<br><br>",
 
-    "<u>Kommunen(e) og fylkene du ser</u> i tabellene er basert på det du har valgt i nettsiden.",
-    " Du kan endre de geografiske områdene ved å gå til 'Geografisk område' i nettsiden.<br><br>",
+    "<u>Kommunen(e) og fylkene du ser</u> i tabellene er basert p{fhi::nb$aa} det du har valgt i nettsiden.",
+    " Du kan endre de geografiske omr{fhi::nb$aa}dene ved {fhi::nb$aa} g{fhi::nb$aa} til 'Geografisk omr{fhi::nb$aa}de' i nettsiden.<br><br>",
 
 
     "Vi vet at det er mange som ikke liker v{fhi::nb$aa}r p{fhi::nb$aa}loggingsl{fhi::nb$oe}sning med egen ",
@@ -117,7 +119,7 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
     glue::glue(
       "<h2>Covid-19 oversikt (NorSySS + MSIS)</h2>",
 
-      "Antall konsultasjoner (NorSySS) og positive tilfeller (MSIS) for covid-19 de siste ukene (år-ukenummer). R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
+      "Antall konsultasjoner (NorSySS) og positive tilfeller (MSIS) for covid-19 de siste ukene ({fhi::nb$aa}r-ukenummer). R{fhi::nb$oe}de felt betyr en signifikant {fhi::nb$oe}kning i forhold til de to foreg{fhi::nb$aa}ende ukene.<br><br>",
     ),
 
     norsyss_kht_covid19_overview_table(data = data)
@@ -270,7 +272,7 @@ norsyss_kht_obs_table <- function(results, tag_outcome) {
   nr0 <- nrow(tab) + 1
   tab <- huxtable::add_footnote(tab, glue::glue(
     "NorSySS er forkortelsen for Norwegian Syndromic Surveillance System og refererer her til konsultasjoner hos lege og legevakt",
-    "med ICPC-2 kodene R05-Hoste, R74-Akutt øvre luftveisinfksjon, R78-Bronkitt/Bronkiolitt og R83-Luftveisinfeksjon IKA.<br>",
+    "med ICPC-2 kodene R05-Hoste, R74-Akutt {fhi::nb$oe}vre luftveisinfksjon, R78-Bronkitt/Bronkiolitt og R83-Luftveisinfeksjon IKA.<br>",
     "<sup>1</sup>Differansen mellom antall registrete og {fhi::nb$oe}vre grense for normalt antall (95% prediksjonsintervall)<br>",
     "<sup>2</sup>Z-verdi: antall ganger standardavvik ut fra forventet antall konsultasjoner<br>",
     "Bl{fhi::nb$aa}tt felt: Antall konsultasjoner er som forventet (Z-verdi < 2)<br>",

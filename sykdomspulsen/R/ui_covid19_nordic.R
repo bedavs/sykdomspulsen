@@ -27,6 +27,7 @@ ui_covid19_nordic <- function(data, argset, schema) {
   filepath <- fs::path(folder, filename)
 
   wb <- openxlsx::createWorkbook()
+  openxlsx::addWorksheet(wb, "decisions")
   openxlsx::addWorksheet(wb, "cases pr100000")
   openxlsx::addWorksheet(wb, "tests (positive) pr100")
   openxlsx::addWorksheet(wb, "icu n")
@@ -34,9 +35,164 @@ ui_covid19_nordic <- function(data, argset, schema) {
   openxlsx::addWorksheet(wb, "tests (total) n")
 
   #negStyle <- openxlsx::createStyle(fontColour = "#9C0006", bgFill = "#FFC7CE")
+  style_title <- openxlsx::createStyle(fontSize = 20)
   style_red <- openxlsx::createStyle(fgFill = "peachpuff")
   style_perc <- openxlsx::createStyle(numFmt="0.0%")
   style_1_decimal <- openxlsx::createStyle(numFmt="0.0")
+
+  # decisions main ----
+  yrwks <- fhi::isoyearweek(lubridate::today()-c(14,7))
+
+  openxlsx::freezePane(wb, "decisions", firstActiveRow=3, firstActiveCol=4)
+  openxlsx::setColWidths(wb, "decisions", cols=c(1:3), width="auto", hidden=c(F,T,F))
+  # openxlsx::setColWidths(wb, "decisions", cols=c(4:10), width="auto")
+
+  openxlsx::writeData(
+    wb,
+    "decisions",
+    x = c("Cases/100 000"),
+    startCol = 4,
+    startRow = 1
+  )
+
+  openxlsx::writeData(
+    wb,
+    "decisions",
+    x = c("Positive tests (%)"),
+    startCol = 8,
+    startRow = 1
+  )
+
+  openxlsx::addStyle(
+    wb,
+    sheet = "decisions",
+    style = style_title,
+    rows = 1,
+    cols = 1:10,
+    gridExpand = T,
+    stack = T
+  )
+
+  # decisions cases ----
+  tab <- master[tag_outcome=="cases" & yrwk  %in% yrwks]
+  tab <- dcast.data.table(
+    tab,
+    iso3+location_code ~ yrwk,
+    value.var = c("pr100000", "average_2wks_pr100000")
+  )
+  tab[,5 := NULL]
+
+  tab[, location_name := get_nordic_location_name(location_code)]
+  setcolorder(tab, c("iso3","location_code","location_name"))
+
+  tab1 <- tab
+
+  openxlsx::writeData(
+    wb,
+    sheet = "decisions",
+    x = tab1,
+    startCol = 1,
+    startRow = 2
+  )
+  openxlsx::addStyle(
+    wb,
+    sheet = "decisions",
+    style = style_1_decimal,
+    rows = 1:100,
+    cols = 4:6,
+    gridExpand = T,
+    stack = T
+  )
+
+  # decisions cases alerts ----
+  tab <- master[tag_outcome=="cases" & yrwk  %in% yrwks]
+  alerts <- dcast.data.table(
+    tab,
+    iso3+location_code ~ yrwk,
+    value.var = c("n_status", "average_2wks_status")
+  )
+  alerts[,c(1,2,5) := NULL]
+
+  for(i in 1:ncol(alerts)){
+    rows <- which(alerts[,i,with=F]=="high")
+    if(length(rows)==0) next
+    openxlsx::addStyle(
+      wb,
+      sheet = "decisions",
+      style = style_red,
+      rows = rows+2,
+      cols = i+3,
+      gridExpand = F,
+      stack = T
+    )
+  }
+
+  # decisions test ----
+  tab <- master[tag_outcome=="tests" & yrwk  %in% yrwks]
+  tab[, prop := pr100/100]
+  tab[, average_2wks_prop := average_2wks_pr100/100]
+  tab <- dcast.data.table(
+    tab,
+    iso3+location_code ~ yrwk,
+    value.var = c("prop", "average_2wks_prop")
+  )
+  tab[,5 := NULL]
+
+  tab[, iso3 := NULL]
+  tab[, location_code := NULL]
+
+  tab2 <- tab
+
+  openxlsx::writeData(
+    wb,
+    sheet = "decisions",
+    x = tab2,
+    startCol = 8,
+    startRow = 2
+  )
+  openxlsx::addStyle(
+    wb,
+    sheet = "decisions",
+    style = style_perc,
+    rows = 1:100,
+    cols = 8:10,
+    gridExpand = T,
+    stack = T
+  )
+
+  # decisions tests alerts ----
+  tab <- master[tag_outcome=="tests" & yrwk  %in% yrwks]
+  alerts <- dcast.data.table(
+    tab,
+    iso3+location_code ~ yrwk,
+    value.var = c("n_status", "average_2wks_status")
+  )
+  alerts[,c(1,2,5) := NULL]
+
+  for(i in 1:ncol(alerts)){
+    rows <- which(alerts[,i,with=F]=="high")
+    if(length(rows)==0) next
+    openxlsx::addStyle(
+      wb,
+      sheet = "decisions",
+      style = style_red,
+      rows = rows+2,
+      cols = i+7,
+      gridExpand = F,
+      stack = T
+    )
+  }
+
+  # decisions titles ----
+
+  openxlsx::writeData(
+    wb,
+    "decisions",
+    x = t(c(yrwks, "Average", "     ", yrwks, "Average")),
+    colNames = F,
+    startCol = 4,
+    startRow = 2
+  )
 
   # cases_pr100000 ----
   tab <- master[tag_outcome=="cases" & yrwk >= "2020-20"]

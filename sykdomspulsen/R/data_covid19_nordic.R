@@ -120,7 +120,7 @@ data_pre_covid19_nordic <- function(data, argset, schema){
     )
 
     utils::unzip(zipfile = destfile, exdir = folder_dest)
-    fs::dir_ls(fs::path(destfolder, "xl"))
+    #fs::dir_ls(fs::path(folder_dest, "xl"))
   }
   folder_denmark
 
