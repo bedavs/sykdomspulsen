@@ -32,11 +32,11 @@ ui_norsyss_pdf <- function(data, argset, schema) {
       tag_name_pdf <- "luftvei"
     }
 
-    message(glue::glue("sykdomspulspdf {tag}"))
+  message(glue::glue("sykdomspulspdf {tag}"))
     # setup
-    files <- c("monthly_report.Rmd", "monthly_reportALL.Rmd")
+  files <- c("monthly_report.Rmd", "monthly_reportALL.Rmd")
 
-    for (f in files) {
+  for (f in files) {
       file.copy(
         from = system.file("rmd", "norsyss_pdf",f, package = "sykdomspulsen"),
         to = fs::path(folder, "markdown", f),
@@ -44,16 +44,16 @@ ui_norsyss_pdf <- function(data, argset, schema) {
       )
     }
 
-    file_before <- glue::glue("child_{tag}.Rmd")
-    files_after <- glue::glue("{locs$county_code}_child_{tag}.Rmd")
+  file_before <- glue::glue("child_{tag}.Rmd")
+  files_after <- glue::glue("{locs$county_code}_child_{tag}.Rmd")
 
-    templates <- cbind(locations=locs,
+  templates <- cbind(locations=locs,
                        tag=rep(tag, dim(locs)[1]),
                        out=files_after)
 
 
     index <- grep("_child", dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen")))
-    files <- dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen"))[files]
+    files <- dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen"))[index]
 
     extra_tag <-grep(tag,files)
     if (length(extra_tag)>0) {
@@ -121,7 +121,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
 
     rmarkdown::render(
       input = fs::path(folder,"markdown", "monthly_reportALL.Rmd"),
-      output_file = glue::glue("{tag}_ALL_monthly_report.pdf"),
+      output_file = glue::glue("{tag_name_pdf}_ALL_monthly_report.pdf"),
       output_dir = fs::path(folder, "pdf"),
       params = list(
         tag = tag

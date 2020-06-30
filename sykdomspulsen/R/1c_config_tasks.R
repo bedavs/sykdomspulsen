@@ -773,10 +773,10 @@ set_tasks <- function() {
   sc::add_task(
     sc::task_from_config(
       name = "ui_norsyss_pdf",
-      type = "ui",
+      type = "data",
       db_table = "results_norsyss_standard",
       for_each_plan = list(
-        "border"="x"
+        "border"="all"
       ),
       for_each_argset = list(
         "location_code"="all",
@@ -788,11 +788,7 @@ set_tasks <- function() {
       args = list(
         tags = c("gastro_vk_ot","respiratoryexternal_vk_ot"),
         name_short = config$def$norsyss$short_names,
-        name_long = config$def$norsyss$long_names,
-        filename = list(
-          "gastro_vk_ot" = "mage_tarm",
-          "respiratoryexternal_vk_ot" = "luftveis"
-        )
+        name_long = config$def$norsyss$long_names
       )
     )
   )
