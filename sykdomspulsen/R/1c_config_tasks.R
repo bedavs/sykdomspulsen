@@ -775,15 +775,6 @@ set_tasks <- function() {
     sc::task_from_config(
       name = "ui_norsyss_pdf",
       type = "data",
-      db_table = "results_norsyss_standard",
-      for_each_plan = list(
-        "border"="all"
-      ),
-      for_each_argset = list(
-        "location_code"="all",
-        "tag" = c("gastro_vk_ot","respiratoryexternal_vk_ot")
-      ),
-      filter = "granularity_geo == 'county'",
       schema=list(input=sc::config$schemas$results_norsyss_standard),
       action="sykdomspulsen::ui_norsyss_pdf",
       args = list(
