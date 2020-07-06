@@ -7,6 +7,7 @@ data_pre_covid19_nordic <- function(data, argset, schema){
   # tm_run_task("data_pre_covid19_nordic")
 
   if(plnr::is_run_directly()){
+    # rsync -avh --delete --no-times --exclude 'test' /input/sykdomspulsen_covid19_nordic_input/ /input/sykdomspulsen_covid19_nordic_input/test/
     data <- sc::tm_get_data("data_pre_covid19_nordic")
     argset <- sc::tm_get_argset("data_pre_covid19_nordic")
     schema <- sc::tm_get_schema("data_pre_covid19_nordic")
@@ -136,6 +137,10 @@ data_covid19_nordic <- function(data, argset, schema){
   # tm_run_task("data_covid19_nordic")
 
   if(plnr::is_run_directly()){
+    # rm -rf /input/sykdomspulsen_covid19_nordic_input/test
+    # cp -r /input/sykdomspulsen_covid19_nordic_input /tmp/test
+    # mv /tmp/test /input/sykdomspulsen_covid19_nordic_input/
+    # rsync -avh --delete --no-times --exclude 'test' /input/sykdomspulsen_covid19_nordic_input/ /input/sykdomspulsen_covid19_nordic_input/test/
     data <- sc::tm_get_data("data_covid19_nordic")
     argset <- sc::tm_get_argset("data_covid19_nordic")
     schema <- sc::tm_get_schema("data_covid19_nordic")
@@ -400,7 +405,9 @@ data_covid19_nordic <- function(data, argset, schema){
     retval[[i]] <- d
   }
   retval <- rbindlist(retval)
-  retval <- unique(retval)
+  retval[, id:=.N:1, by=.(Region, yrwk)]
+  retval <- retval[id==1]
+  retval[,id:=NULL]
   retval[, n_tests := as.numeric(stringr::str_remove_all(x_n_tests, " "))]
   retval[, x_n_tests := NULL]
 
