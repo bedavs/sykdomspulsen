@@ -184,6 +184,7 @@ data_covid19_daily_report <- function(data, argset, schema){
       sex == "Mann" ~ "male"
     )
     ]
+  retval <- retval[!is.na(sex)]
 
   skeleton <- expand.grid(
     yrwk = unique(retval$yrwk),
