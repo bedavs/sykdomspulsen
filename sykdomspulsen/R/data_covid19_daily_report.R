@@ -424,24 +424,24 @@ d_county[,granularity_geo:="county"]
 
 
   # data_covid19_dynamic_text ----
-  # master$dynamic_text
-  #
-  # d<-data.table()
-  # d[,tag_outcome:= names(master$dynamic_text)]
-  # d[,value:= sapply(master$dynamic_text, function(x) x[1])]
-  #
-  # d[, granularity_time := "total"]
-  # d[,location_code:="norge"]
-  # d[,n:=1]
-  #
-  #
-  # fill_in_missing(d)
-  #
-  # schema$data_covid19_dynamic_text$db_drop_table()
-  # schema$data_covid19_dynamic_text$db_connect()
-  # schema$data_covid19_dynamic_text$db_drop_constraint()
-  # schema$data_covid19_dynamic_text$db_load_data_infile(d)
-  # schema$data_covid19_dynamic_text$db_add_constraint()
+  master$dynamic_text
+
+  d<-data.table()
+  d[,tag_outcome:= names(master$dynamic_text)]
+  d[,value:= sapply(master$dynamic_text, function(x) x[1])]
+
+  d[, granularity_time := "total"]
+  d[,location_code:="norge"]
+  d[,n:=1]
+
+
+  fill_in_missing(d)
+
+  schema$data_covid19_dynamic_text$db_drop_table()
+  schema$data_covid19_dynamic_text$db_connect()
+  schema$data_covid19_dynamic_text$db_drop_constraint()
+  schema$data_covid19_dynamic_text$db_load_data_infile(d)
+  schema$data_covid19_dynamic_text$db_add_constraint()
 
 
 
