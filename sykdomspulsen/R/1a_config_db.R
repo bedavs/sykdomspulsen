@@ -664,7 +664,7 @@ set_db <- function(){
     )
   )
 
-  # data_covid19_self_reporting ----
+  # prelim_data_covid19_self_reporting ----
   sc::add_schema(
     name = "data_covid19_self_reporting",
     schema = sc::Schema$new(
@@ -735,6 +735,73 @@ set_db <- function(){
       validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
+
+
+  # prelim_data_covid19_dynamic_text ----
+  sc::add_schema(
+    name = "prelim_data_covid19_dynamic_text",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
+      db_table = "prelim_data_covid19_dynamic_text",
+      db_field_types =  c(
+        "tag_outcome" = "TEXT",
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "n" = "INTEGER",
+        "date" = "DATE",
+
+        "value"  = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome"
+      )
+    )
+  )
+
+
+
+
+
+  # data_covid19_dynamic_text ----
+  sc::add_schema(
+    name = "data_covid19_dynamic_text",
+    schema = sc::Schema$new(
+      db_config = sc::config$db_config,
+      db_table = "data_covid19_dynamic_text",
+      db_field_types =  c(
+        "tag_outcome" = "TEXT",
+        "location_code" = "TEXT",
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "season" = "TEXT",
+        "yrwk" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "n" = "INTEGER",
+        "date" = "DATE",
+
+        "value"  = "TEXT"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome"
+      )
+    )
+  )
+
+
 
   # datar ----
   # datar_weather ----
@@ -965,35 +1032,6 @@ set_db <- function(){
   )
 
 
-  # data_covid19_dynamic_text ----
-  sc::add_schema(
-    name = "data_covid19_dynamic_text",
-    schema = sc::Schema$new(
-      db_config = sc::config$db_config,
-      db_table = "data_covid19_dynamic_text",
-      db_field_types =  c(
-        "tag_outcome" = "TEXT",
-        "location_code" = "TEXT",
-        "granularity_time" = "TEXT",
-        "granularity_geo" = "TEXT",
-        "border" = "INTEGER",
-        "age" = "TEXT",
-        "sex" = "TEXT",
-        "season" = "TEXT",
-        "yrwk" = "TEXT",
-        "year" = "INTEGER",
-        "week" = "INTEGER",
-        "n" = "INTEGER",
-        "date" = "DATE",
-
-        "value"  = "TEXT"
-      ),
-      db_load_folder = tempdir(),
-      keys =  c(
-        "tag_outcome"
-      )
-    )
-  )
 
 
 
