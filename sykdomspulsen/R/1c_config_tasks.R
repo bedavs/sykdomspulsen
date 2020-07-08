@@ -741,7 +741,7 @@ set_tasks <- function() {
       for_each_plan = list(tag_outcome = c("influensa_vk_o")),
       args = list(
         tag = "influensa_vk_o",
-        icpc2 = "R60",
+        icpc2 = "R80",
         excludeSeason = c("2009/2010"),
         contactType = "oppmote, telefonkontakt",
         folder_name = "mem_influensa",
