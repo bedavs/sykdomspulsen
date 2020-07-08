@@ -21,7 +21,7 @@ set_permissions <- function() {
     name = "ui_norsyss_kht_email",
     permission = sc::Permission$new(
       key = "ui_norsyss_kht_email",
-      value = fhi::isoyearweek(),
+      value = lubridate::today(), #fhi::isoyearweek(),
       production_days = c(3)
     )
   )
