@@ -24,7 +24,7 @@ Permission <- R6::R6Class(
       value,
       production_days = c(1:7)
       ) {
-      value <<- value
+      value <<- as.character(value)
       production_days <<- production_days
 
       if (is_final()) {
