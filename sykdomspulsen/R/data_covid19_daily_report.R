@@ -392,7 +392,7 @@ d_county[,granularity_geo:="county"]
   schema$data_covid19_hospital_by_time$db_drop_constraint()
   schema$data_covid19_hospital_by_time$db_load_data_infile(retval)
   schema$data_covid19_hospital_by_time$db_add_constraint()
-  sc::tbl("data_covid19_hospital_by_time")
+  #sc::tbl("data_covid19_hospital_by_time")
 
   # data_covid19_hospital_by_time_location ----
   master$data_covid19_hospital_by_time_location
@@ -480,7 +480,7 @@ d_county[,granularity_geo:="county"]
   schema$data_covid19_hospital_by_time_location$db_drop_constraint()
   schema$data_covid19_hospital_by_time_location$db_load_data_infile(retval)
   schema$data_covid19_hospital_by_time_location$db_add_constraint()
-  sc::tbl("data_covid19_hospital_by_time_location")
+  #sc::tbl("data_covid19_hospital_by_time_location")
 
   # data_covid19_deaths ----
   master$data_covid19_deaths
