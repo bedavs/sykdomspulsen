@@ -171,7 +171,7 @@ analysis_covid19_metrics_function_factory <- function(loc){
     retval <- list()
 
     # hospital ----
-    d <- sc::tbl("data_covid19_hospital_by_time_location") %>%
+    d <- sc::tbl("prelim_data_covid19_hospital_by_time_location") %>%
       dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(location_code %in% !!loc) %>%
       dplyr::select(location_code, yrwk, n_hospital_main_cause) %>%
