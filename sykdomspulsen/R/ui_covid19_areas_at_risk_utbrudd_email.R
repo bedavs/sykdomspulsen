@@ -19,16 +19,21 @@ ui_covid19_areas_at_risk_utbrudd_email <- function(data, argset, schema) {
   if(!fs::file_exists(filepath)) return()
 
   html <- glue::glue(
-    "Please find attached the current week's results.<br><br>",
-    "Sincerely,<br><br>",
-    "Sykdompulsen Team"
+    "Vedlagt er dagens signaler for covid-19 fordelt på geografisk område og aldersgrupper.<br>",
+    "Dataene er basert på antall tilfeller fra MSIS og antall konsultasjoner hos lege og legevakt fra NorSySS.<br><br>",
+
+    "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foregående ukene som en terskel for et signal.",
+    " For eksempel brukes uke 2020-26 og 2020-27 som en basis for å beregne terskelverdi for uke 2020-28.<br><br>",
+
+    "Hilsen,<br><br>",
+    "Sykdompulsen teamet (Gry, Richard, Beatriz, Gunnar og Yusman)"
   )
 
   mailr(
       subject = glue::glue("Covid-19 areas at risk {lubridate::today()}"),
       html = html,
       to = e_emails(
-        "utbrudd"
+        "covid19_areas_at_risk"
       ),
       attachments = filepath
     )
