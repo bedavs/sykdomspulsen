@@ -34,13 +34,11 @@ ui_norsyss_kht_email <- function(data, argset, schema) {
 
     "<b>Dette er en ukentlig oversikt fra FHI til kommunelegene basert p{fhi::nb$aa} data fra 'Sykdomspulsen for kommunehelsetjenesten'.</b><br><br>",
 
-    "<u>Nytt fra Sykdomspulsen:</u><br>",
-    "- I l{fhi::nb$oe}pet av denne uken vil data om Sykehusinleggelser v{fhi::nb$ae}re tilgjengelig p{fhi::nb$aa} fylkesniv{fhi::nb$aa} i tabell 1 p{fhi::nb$aa} nettsiden.<br>",
-    "- Vi har dessverre f{fhi::nb$aa}tt sv{fhi::nb$ae}rt f{fhi::nb$aa} svar p{fhi::nb$aa} sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelsen.",
-    " Svarene vil brukes til {fhi::nb$aa} videreutvikle og forbedre nettsiden, det er derfor viktig at s{fhi::nb$aa} mange som mulig svarer.",
-    " Dersom du ikke har svart p{fhi::nb$aa} sp{fhi::nb$oe}rreunders{fhi::nb$oe}kelsen {fhi::nb$oe}nsker vi at du gj{fhi::nb$oe}r det ved {fhi::nb$aa} bruke denne lenken: https://docs.google.com/forms/d/e/1FAIpQLSeImGKJQ9-7MuGJJjSplgPQRNvXpu4S8bi0sFGIPSxT4oWsgQ/viewform<br><br>",
-    "Mer informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a>.<br><br>"
 
+    "Informasjon og nyheter fra Sykdomspulsen finner du under tabellene. Mer data og grafer finnes p{fhi::nb$aa} nettsiden <a href='https://spuls.fhi.no'>https://spuls.fhi.no</a>.<br><br>",
+
+    "God sommer!<br>",
+    "Hilsen Sykdomspulsen teamet (Gry, Richard, Beatriz, Gunnar og Yusman).<br><br>"
 
   )
   email_text_bottom <- glue::glue(
