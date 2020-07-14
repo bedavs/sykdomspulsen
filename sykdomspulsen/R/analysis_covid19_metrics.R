@@ -1,4 +1,4 @@
-#' analysis_covid19_areas_at_risk
+#' analysis_covid19_metrics
 #' @param data a
 #' @param argset a
 #' @param schema a
@@ -12,7 +12,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
 
     index_plan <- 1
     data <- sc::tm_get_data("analysis_covid19_metrics", index_plan=index_plan)
-    argset <- sc::tm_get_argset("analysis_covid19_metrics", index_plan=index_plan, index_argset = 1)
+    argset <- sc::tm_get_argset("analysis_covid19_metrics", index_plan=index_plan, index_argset = 2)
     schema <- sc::tm_get_schema("analysis_covid19_metrics")
   }
 
@@ -20,10 +20,7 @@ analysis_covid19_metrics <- function(data, argset, schema) {
 
   # hospital ----
   d <- data$data$d_hosp[location_code==argset$location_code]
-  d[, yrwk := fhi::isoyearweek(date)]
-  d <- d[, .(
-    value_n_hospital_main_cause = sum(n_hospital_main_cause)
-  ), keyby=.(location_code, yrwk)]
+  setnames(d, "n_hospital_main_cause", "value_n_hospital_main_cause")
   d[, formatted_n_hospital_main_cause := fhiplot::format_nor(value_n_hospital_main_cause)]
   d <- melt.data.table(
     d,
@@ -174,10 +171,10 @@ analysis_covid19_metrics_function_factory <- function(loc){
     retval <- list()
 
     # hospital ----
-    d <- sc::tbl("data_covid19_hospital_by_time") %>%
-      dplyr::filter(granularity_time == "day") %>%
+    d <- sc::tbl("prelim_data_covid19_hospital_by_time_location") %>%
+      dplyr::filter(granularity_time == "week") %>%
       dplyr::filter(location_code %in% !!loc) %>%
-      dplyr::select(location_code, date, n_hospital_main_cause) %>%
+      dplyr::select(location_code, yrwk, n_hospital_main_cause) %>%
       dplyr::collect()
     setDT(d)
     retval$d_hosp <- d

@@ -44,6 +44,7 @@ set_tasks <- function() {
         data_covid19_lab_by_time = sc::config$schemas$data_covid19_lab_by_time,
         data_covid19_lab_by_time_location = sc::config$schemas$data_covid19_lab_by_time_location,
         data_covid19_hospital_by_time = sc::config$schemas$data_covid19_hospital_by_time,
+        data_covid19_hospital_by_time_location = sc::config$schemas$data_covid19_hospital_by_time_location,
         data_covid19_deaths = sc::config$schemas$data_covid19_deaths,
         data_covid19_demographics = sc::config$schemas$data_covid19_demographics,
         data_covid19_dynamic_text = sc::config$schemas$data_covid19_dynamic_text
@@ -65,6 +66,7 @@ set_tasks <- function() {
         data_covid19_lab_by_time = sc::config$schemas$prelim_data_covid19_lab_by_time,
         data_covid19_lab_by_time_location = sc::config$schemas$prelim_data_covid19_lab_by_time_location,
         data_covid19_hospital_by_time = sc::config$schemas$prelim_data_covid19_hospital_by_time,
+        data_covid19_hospital_by_time_location = sc::config$schemas$prelim_data_covid19_hospital_by_time_location,
         data_covid19_deaths = sc::config$schemas$prelim_data_covid19_deaths,
         data_covid19_demographics = sc::config$schemas$prelim_data_covid19_demographics,
         data_covid19_dynamic_text = sc::config$schemas$prelim_data_covid19_dynamic_text
@@ -742,7 +744,7 @@ set_tasks <- function() {
       for_each_plan = list(tag_outcome = c("influensa_vk_o")),
       args = list(
         tag = "influensa_vk_o",
-        icpc2 = "R60",
+        icpc2 = "R80",
         excludeSeason = c("2009/2010"),
         contactType = "oppmote, telefonkontakt",
         folder_name = "mem_influensa",

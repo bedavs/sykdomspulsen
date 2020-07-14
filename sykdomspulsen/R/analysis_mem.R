@@ -136,10 +136,26 @@ analysis_mem <-  function(data, argset, schema){
   # tm_run_task("analysis_norsyss_mem_influensa_vk_ot")
 
   if(plnr::is_run_directly()){
+    index_plan <- 12
     sc::tm_update_plans("analysis_norsyss_mem_influensa_vk_o")
-    data <- sc::tm_get_data("analysis_norsyss_mem_influensa_vk_o")
-    argset <- sc::tm_get_argset("analysis_norsyss_mem_influensa_vk_o")
+    data <- sc::tm_get_data("analysis_norsyss_mem_influensa_vk_o", index_plan=index_plan)
+    argset <- sc::tm_get_argset("analysis_norsyss_mem_influensa_vk_o", index_plan=index_plan)
+    argset
     schema <- sc::tm_get_schema("analysis_norsyss_mem_influensa_vk_o")
+
+    data <- data$data[yrwk %in% "2019-01" & age=="total"]
+    date_from <- min(data$date)
+    date_to <- max(data$date)
+    d <- sc::tbl("data_norsyss") %>%
+      dplyr::filter(date >= !!date_from) %>%
+      dplyr::filter(date <= !!date_to) %>%
+      dplyr::filter(tag_outcome=="influensa_vk_o") %>%
+      dplyr::filter(age=="total") %>%
+      dplyr::filter(location_code=="norge") %>%
+      dplyr::collect()
+    setDT(d)
+    sum(d$consult_with_influenza)
+    sum(data$consult_with_influenza)
   }
 
   if(plnr::is_run_directly()){
