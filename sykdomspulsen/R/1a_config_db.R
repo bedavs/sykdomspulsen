@@ -43,8 +43,6 @@ set_db <- function(){
 
         "tag_outcome" = "TEXT",
         "n" = "INTEGER",
-        "pr100" = "DOUBLE",
-        "pr100000" = "DOUBLE",
         "manual_extraction" = "BOOLEAN"
       ),
       db_load_folder = tempdir(),
@@ -1391,23 +1389,25 @@ set_db <- function(){
 
         "pop" = "INTEGER",
 
-        "tag_outcome" = "TEXT",
-        "n" = "INTEGER",
-        "pr100" = "DOUBLE",
-        "pr100000" = "DOUBLE",
-        "manual_extraction" = "BOOLEAN",
-        "n_status" = "TEXT",
+        "n_cases_lag0" = "INTEGER",
+        "pr100000_cases_lag0" = "DOUBLE",
 
-        "average_2wks_pr100" = "DOUBLE",
-        "average_2wks_pr100000" = "DOUBLE",
-        "average_2wks_status" = "TEXT"
+        "pr100000_cases_lag1" = "DOUBLE",
+
+        "pr100000_cases_lag0_1" = "DOUBLE",
+
+        "denom_tests_lag0" = "INTEGER",
+        "pr100_tests_lag0" = "DOUBLE",
+
+        "pr100_tests_lag1" = "DOUBLE",
+
+        "pr100_tests_lag0_1" = "DOUBLE"
       ),
       db_load_folder = tempdir(),
       keys =  c(
         "granularity_time",
         "location_code",
-        "date",
-        "tag_outcome"
+        "date"
       ),
       validator_field_types = sc::validator_field_types_sykdomspulsen,
       validator_field_contents = sc::validator_field_contents_sykdomspulsen

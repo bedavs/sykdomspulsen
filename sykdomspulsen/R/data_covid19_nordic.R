@@ -208,8 +208,6 @@ data_covid19_nordic <- function(data, argset, schema){
     on="location_code",
     pop := pop
   ]
-  retval[, pr100000 := 100000*n/pop]
-  retval[, pr100 := 100*n/pop]
   retval[, granularity_time := "week"]
   retval[,manual_extraction:=FALSE]
   fill_in_missing(retval)
@@ -251,8 +249,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "cases"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -303,8 +299,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "tests"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -353,8 +347,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "cases"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -384,8 +376,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "icu"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -456,8 +446,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "tests"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -502,8 +490,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
 
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=TRUE]
 
@@ -547,8 +533,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
 
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=TRUE]
 
@@ -592,8 +576,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
 
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=TRUE]
 
@@ -634,20 +616,6 @@ data_covid19_nordic <- function(data, argset, schema){
     on=c("year","location_code"),
     pop := pop
   ]
-
-  skeleton[
-    tag_outcome %in% c(
-      "cases",
-      "icu"
-    ), pr100000 := 100000*n/pop]
-
-  skeleton[
-    skeleton[tag_outcome=="cases"],
-    on=c("location_code","yrwk"),
-    pr100 := 100*i.n/n
-  ]
-
-  skeleton[tag_outcome != "tests", pr100 := NA]
 
   schema$output$db_upsert_load_data_infile(skeleton)
 
