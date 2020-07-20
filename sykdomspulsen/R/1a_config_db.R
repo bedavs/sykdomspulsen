@@ -929,6 +929,50 @@ set_db <- function(){
     )
   )
 
+  # datar_norsyss ----
+  sc::add_schema(
+    name = "datar_norsyss",
+    schema = sc::Schema$new(
+      db_table = "datar_norsyss",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "holiday" = "DOUBLE",
+        "n" = "INTEGER",
+        "pop" = "INTEGER",
+        "consult_with_influenza" = "INTEGER",
+        "consult_without_influenza" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome",
+        "location_code",
+        "year",
+        "date",
+        "age"
+      ),
+      indexes = list(
+        "ind1" = c("year"),
+        "ind2" = c("year", "tag_outcome")
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   # datar_norsyss_kht_email ----
   sc::add_schema(
     name = "datar_norsyss_kht_email",
