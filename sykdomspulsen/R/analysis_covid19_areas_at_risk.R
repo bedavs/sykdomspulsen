@@ -61,7 +61,7 @@ analysis_covid19_areas_at_risk <- function(data, argset, schema) {
 
 
   d[,pr100_baseline := pmax(0.01,100*(n_lag1+n_lag2)/
-                             (consult_with_influenza_lag1+consult_with_influenza_lag2))]
+                              (consult_with_influenza_lag1+consult_with_influenza_lag2))]
   d[, n_baseline_expected := ceiling(pr100_baseline*consult_with_influenza/100)]
 
   d[,n_threshold := qpois(0.975, lambda=n_baseline_expected)]
@@ -111,10 +111,10 @@ analysis_covid19_areas_at_risk <- function(data, argset, schema) {
   schema$output$db_field_types
 
   # this will fill in a lot of standard columns
-    fill_in_missing(retval)
+  fill_in_missing(retval)
 
-    # schema$output$db_upsert_load_data_infile(retval)
-    return(retval)
+  # schema$output$db_upsert_load_data_infile(retval)
+  return(retval)
 }
 
 
@@ -126,7 +126,7 @@ analysis_covid19_areas_at_risk_function_factory <- function(loc){
   function(){
     retval <- list()
 
-    retval$msis <- sc::tbl("prelim_data_covid19_msis_by_time_location") %>%
+    retval$msis <- sc::tbl("data_covid19_msis_by_time_location") %>%
       dplyr::filter(granularity_time=="day") %>%
       dplyr::filter(location_code %in% !!loc) %>%
       dplyr::filter(date >= "2020-03-09") %>%
