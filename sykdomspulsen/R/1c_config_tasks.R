@@ -44,6 +44,7 @@ set_tasks <- function() {
         data_covid19_lab_by_time = sc::config$schemas$data_covid19_lab_by_time,
         data_covid19_lab_by_time_location = sc::config$schemas$data_covid19_lab_by_time_location,
         data_covid19_hospital_by_time = sc::config$schemas$data_covid19_hospital_by_time,
+        data_covid19_hospital_by_time_location = sc::config$schemas$data_covid19_hospital_by_time_location,
         data_covid19_deaths = sc::config$schemas$data_covid19_deaths,
         data_covid19_demographics = sc::config$schemas$data_covid19_demographics,
         data_covid19_dynamic_text = sc::config$schemas$data_covid19_dynamic_text
@@ -65,6 +66,7 @@ set_tasks <- function() {
         data_covid19_lab_by_time = sc::config$schemas$prelim_data_covid19_lab_by_time,
         data_covid19_lab_by_time_location = sc::config$schemas$prelim_data_covid19_lab_by_time_location,
         data_covid19_hospital_by_time = sc::config$schemas$prelim_data_covid19_hospital_by_time,
+        data_covid19_hospital_by_time_location = sc::config$schemas$prelim_data_covid19_hospital_by_time_location,
         data_covid19_deaths = sc::config$schemas$prelim_data_covid19_deaths,
         data_covid19_demographics = sc::config$schemas$prelim_data_covid19_demographics,
         data_covid19_dynamic_text = sc::config$schemas$prelim_data_covid19_dynamic_text
@@ -109,6 +111,74 @@ set_tasks <- function() {
       type = "data",
       action = "sykdomspulsen::datar_normomo_drop",
       schema = list(output = sc::config$schemas$datar_normomo)
+    )
+  )
+
+  # datar_pre_norsyss ----
+  sc::add_task(
+    sc::task_from_config(
+      name = "datar_pre_norsyss",
+      type = "data",
+      action = "sykdomspulsen::datar_pre_norsyss",
+      schema = list(),
+      args = list(
+        date_from = "2006-01-01",
+        diags = list(
+          "influensa" = c("R80"),
+          "gastro" = c("D11", "D70", "D73"),
+          "respiratory" = c("R05", "R74", "R78", "R83"),
+          "respiratoryexternal" = c("R05", "R74", "R78", "R83"),
+          "respiratoryinternal" = c("R05", "R74", "R83"),
+          "lungebetennelse" = c("R81"),
+          "bronkitt" = c("R78"),
+          "skabb" = c("S72"),
+
+          "hoste" = c("R05"),
+          "akkut_ovre_luftveisinfeksjon" = c("R74"),
+          "luftveisinfeksjon_ika" = c("R83"),
+          "luftveissykdom_ika" = c("R99"),
+          "virusinfeksjon_ika" = c("A77"),
+          "rxx_for_covid19" = c(
+            "R01",
+            "R02",
+            "R03",
+            "R04",
+            "R05",
+            "R06",
+            "R07",
+            "R08",
+            "R09",
+            "R21",
+            "R24",
+            "R25",
+            "R27",
+            #"R270000",
+            "R29",
+            #"R71",
+            "R72",
+            "R74",
+            "R75",
+            "R76",
+            "R77",
+            "R78",
+            "R79",
+            "R80",
+            "R81",
+            "R82",
+            "R83",
+            #"R95",
+            #"R96",
+            "R99",
+            "R991"
+            #"R9910000"
+          ),
+
+          "covid19" = c("R991", "R992"),
+          "covid19_r991" = c("R991"),
+          "covid19_r992" = c("R992"),
+          "engstelig_luftveissykdom_ika" = c("R27")
+        )
+      )
     )
   )
 
@@ -742,7 +812,7 @@ set_tasks <- function() {
       for_each_plan = list(tag_outcome = c("influensa_vk_o")),
       args = list(
         tag = "influensa_vk_o",
-        icpc2 = "R60",
+        icpc2 = "R80",
         excludeSeason = c("2009/2010"),
         contactType = "oppmote, telefonkontakt",
         folder_name = "mem_influensa",

@@ -30,7 +30,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
 
     } else if (tag=="respiratoryexternal_vk_ot"){
       tag_name_pdf <- "luftvei"
-    }
+  }
 
   message(glue::glue("sykdomspulspdf {tag}"))
     # setup
@@ -73,7 +73,7 @@ ui_norsyss_pdf <- function(data, argset, schema) {
       )
     }
 
-    fhi::sykdompulspdf_resources_copy(fs::path(folder,"markdown"))
+    norsyss_pdf_resources_copy(fs::path(folder,"markdown"))
 
     # graphs
     q <- sykdomspulspdf_plot_total(table, location_code = "norge", x_tag = tag)
@@ -257,3 +257,26 @@ sykdomspulspdf_plot_ages <- function(table, location_code, x_tag) {
   q <- q + labs(title = title)
   q
 }
+
+norsyss_pdf_resources_copy <- function(output_dir) {
+  dir <- system.file("rmd", "norsyss_pdf","sykdompuls_document","skeleton", package = "sykdomspulsen")
+
+  files <- list.files(dir, pattern = "^_skeleton")
+  for (f in files) {
+    file.copy(
+      from = file.path(dir, f),
+      to = file.path(output_dir, f)
+    )
+  }
+}
+
+norsyss_pdf_resources_remove <- function(output_dir) {
+  dir <- system.file("rmd", "norsyss_pdf","sykdompuls_document","skeleton", package = "sykdomspulsen")
+
+  files <- list.files(dir, pattern = "^_skeleton")
+
+  for (f in files) {
+    file.remove(file.path(output_dir, f))
+  }
+}
+

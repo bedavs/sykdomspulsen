@@ -15,10 +15,10 @@ ui_mem_plots <- function(data, argset, schema){
   }
 
   if(plnr::is_run_directly()){
-    sc::tm_update_plans("ui_norsyss_mem_influensa_vk_oe")
-    data <- sc::tm_get_data("ui_norsyss_mem_influensa_vk_oe")
-    argset <- sc::tm_get_argset("ui_norsyss_mem_influensa_vk_oe")
-    schema <- sc::tm_get_schema("ui_norsyss_mem_influensa_vk_oe")
+    sc::tm_update_plans("ui_norsyss_mem_influensa_vk_ot")
+    data <- sc::tm_get_data("ui_norsyss_mem_influensa_vk_ot")
+    argset <- sc::tm_get_argset("ui_norsyss_mem_influensa_vk_ot")
+    schema <- sc::tm_get_schema("ui_norsyss_mem_influensa_vk_ot")
   }
 
   outputs <- list(

@@ -1,3 +1,7 @@
+# sc 2020.7.9
+
+* Permission key now automatically coerces it to character
+
 # sc 2020.6.12
 
 * validator_field_contents_sykdomspulsen is more verbose when it fails

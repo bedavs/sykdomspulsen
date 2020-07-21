@@ -74,6 +74,13 @@ data_pre_covid19_nordic <- function(data, argset, schema){
   ht <- xml2::read_html("https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/antal-individer-som-har-testats-for-covid-19/")
   d <- ht %>%
     rvest::html_nodes("table") %>%
+    magrittr::extract(1) %>%
+    rvest::html_table()
+  writexl::write_xlsx(d[[1]], fs::path(folder_sweden, "tests_week_number.xlsx"))
+
+  ht <- xml2::read_html("https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/antal-individer-som-har-testats-for-covid-19/")
+  d <- ht %>%
+    rvest::html_nodes("table") %>%
     magrittr::extract(2) %>%
     rvest::html_table()
   writexl::write_xlsx(d[[1]], fs::path(folder_sweden, "tests.xlsx"))
@@ -137,9 +144,7 @@ data_covid19_nordic <- function(data, argset, schema){
   # tm_run_task("data_covid19_nordic")
 
   if(plnr::is_run_directly()){
-    # rm -rf /input/sykdomspulsen_covid19_nordic_input/test
-    # cp -r /input/sykdomspulsen_covid19_nordic_input /tmp/test
-    # mv /tmp/test /input/sykdomspulsen_covid19_nordic_input/
+    # rm -rf /input/sykdomspulsen_covid19_nordic_input/test; cp -r /input/sykdomspulsen_covid19_nordic_input /tmp/test; mv /tmp/test /input/sykdomspulsen_covid19_nordic_input/
     # rsync -avh --delete --no-times --exclude 'test' /input/sykdomspulsen_covid19_nordic_input/ /input/sykdomspulsen_covid19_nordic_input/test/
     data <- sc::tm_get_data("data_covid19_nordic")
     argset <- sc::tm_get_argset("data_covid19_nordic")
@@ -203,8 +208,6 @@ data_covid19_nordic <- function(data, argset, schema){
     on="location_code",
     pop := pop
   ]
-  retval[, pr100000 := 100000*n/pop]
-  retval[, pr100 := 100*n/pop]
   retval[, granularity_time := "week"]
   retval[,manual_extraction:=FALSE]
   fill_in_missing(retval)
@@ -246,8 +249,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "cases"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -298,8 +299,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "tests"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -348,8 +347,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "cases"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -379,8 +376,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "icu"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -393,14 +388,27 @@ data_covid19_nordic <- function(data, argset, schema){
   files <- fs::dir_ls(folder_sweden, regexp="[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
   retval <- vector("list", length=length(files))
   for(i in seq_along(files)){
-    x_date <- stringr::str_extract(files[i], "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+    # load in test data
     d <- readxl::read_excel(
       fs::path(files[i], "tests.xlsx")
     )
     setDT(d)
-    wk <- stringr::str_extract(names(d)[2], "[0-9][0-9]$")
-    setnames(d, c("Region", "x_n_tests", "x"))
-    d[,x:=NULL]
+
+    # it is in two different formats
+    if(file.exists(fs::path(files[i], "tests_week_number.xlsx"))){
+      wk <- readxl::read_excel(
+        fs::path(files[i], "tests_week_number.xlsx")
+      )
+      wk <- wk$Vecka[1]
+      wk <- stringr::str_extract(wk, "[0-9][0-9]$")
+      setnames(d, c("Region", "x_n_tests", "x"))
+      d[,x:=NULL]
+    } else {
+      x_date <- stringr::str_extract(files[i], "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+      wk <- stringr::str_extract(names(d)[2], "[0-9][0-9]$")
+      setnames(d, c("Region", "x_n_tests", "x"))
+      d[,x:=NULL]
+    }
     d[,yrwk := paste0("2020-",wk)]
     retval[[i]] <- d
   }
@@ -412,7 +420,9 @@ data_covid19_nordic <- function(data, argset, schema){
   retval[, x_n_tests := NULL]
 
   retval[Region==glue::glue("J{fhidata::se$ae}mtland/H{fhidata::se$ae}rjedalen"),
-    Region := glue::glue("J{fhidata::se$ae}mtland")]
+         Region := glue::glue("J{fhidata::se$ae}mtland")]
+  retval[Region==glue::glue("J{fhidata::se$ae}mtland/ H{fhidata::se$ae}rjedalen"),
+         Region := glue::glue("J{fhidata::se$ae}mtland")]
 
   retval[
     fhidata::sweden_locations_long_b2020,
@@ -436,8 +446,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
   d[, tag_outcome := "tests"]
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=FALSE]
   fill_in_missing(d)
@@ -482,8 +490,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
 
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=TRUE]
 
@@ -527,8 +533,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
 
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=TRUE]
 
@@ -572,8 +576,6 @@ data_covid19_nordic <- function(data, argset, schema){
     pop := pop
   ]
 
-  d[, pr100000 := 100000*n/pop]
-  d[, pr100 := 100*n/pop]
   d[, granularity_time := "week"]
   d[,manual_extraction:=TRUE]
 
@@ -614,20 +616,6 @@ data_covid19_nordic <- function(data, argset, schema){
     on=c("year","location_code"),
     pop := pop
   ]
-
-  skeleton[
-    tag_outcome %in% c(
-      "cases",
-      "icu"
-    ), pr100000 := 100000*n/pop]
-
-  skeleton[
-    skeleton[tag_outcome=="cases"],
-    on=c("location_code","yrwk"),
-    pr100 := 100*i.n/n
-  ]
-
-  skeleton[tag_outcome != "tests", pr100 := NA]
 
   schema$output$db_upsert_load_data_infile(skeleton)
 

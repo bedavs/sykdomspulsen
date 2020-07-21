@@ -251,7 +251,7 @@ data_covid19_daily_report <- function(data, argset, schema){
 
 
   # data_covid19_lab_by_time_location ----
-
+  master$data_covid19_lab_by_time_location
 
   retval <- copy(master$data_covid19_lab_by_time_location)
   retval <-retval[!is.na(bostedskommunenr)]
@@ -374,21 +374,113 @@ d_county[,granularity_geo:="county"]
   master$data_covid19_hospital_by_time
 
   retval <- copy(master$data_covid19_hospital_by_time)
-  retval[,date:=as.Date(date)]
+  retval[,date:=data.table::as.IDate(date)]
   retval[, granularity_time := "day"]
   retval[,location_code:="norge"]
 
-  fill_in_missing(retval)
-
   # make sure we dont include data from the future
   retval <- retval[date <= date_max]
+  retval_norway_day <- copy(retval) # keep this to use below
+
+  # fill in missing
+  fill_in_missing(retval)
+
+
 
   schema$data_covid19_hospital_by_time$db_drop_table()
   schema$data_covid19_hospital_by_time$db_connect()
   schema$data_covid19_hospital_by_time$db_drop_constraint()
   schema$data_covid19_hospital_by_time$db_load_data_infile(retval)
   schema$data_covid19_hospital_by_time$db_add_constraint()
-  sc::tbl("data_covid19_hospital_by_time")
+  #sc::tbl("data_covid19_hospital_by_time")
+
+  # data_covid19_hospital_by_time_location ----
+  master$data_covid19_hospital_by_time_location
+
+  retval <- copy(master$data_covid19_hospital_by_time_location)
+  setnames(retval, "isoyearweek", "yrwk")
+  retval[, n_icu := as.numeric(NA)]
+  retval[,location_code:=paste0("county",location_code)]
+  retval[, granularity_time := "week"]
+
+  retval_norway_day[, yrwk := fhi::isoyearweek(date)]
+  retval_norway_week <- retval_norway_day[,.(
+    n_icu = sum(n_icu),
+    n_hospital_main_cause = sum(n_hospital_main_cause)
+  ),keyby=.(yrwk, location_code)]
+  retval_norway_week[, granularity_time := "week"]
+
+  fill_in_missing(retval)
+  fill_in_missing(retval_norway_day)
+  fill_in_missing(retval_norway_week)
+
+  retval <- rbind(retval, retval_norway_day, retval_norway_week)
+
+  # make a skeleton for day
+  skeleton_day <- expand.grid(
+    location_code = c(
+      "norge",
+      unique(fhidata::norway_locations_b2020$county_code)
+    ),
+    date = seq.Date(
+      from = min(retval_norway_day$date),
+      to = date_max,
+      by=1
+    ),
+    stringsAsFactors = F
+  )
+  setDT(skeleton_day)
+  skeleton_day[
+    retval[granularity_time=="day"],
+    on=c("location_code","date"),
+    n_icu := n_icu
+  ]
+  skeleton_day[
+    retval[granularity_time=="day"],
+    on=c("location_code","date"),
+    n_hospital_main_cause := n_hospital_main_cause
+  ]
+
+  skeleton_day[, granularity_time := "day"]
+
+  # make a skeleton for week
+  skeleton_week <- expand.grid(
+    location_code = c(
+      "norge",
+      unique(fhidata::norway_locations_b2020$county_code)
+    ),
+    yrwk = unique(retval$yrwk),
+    stringsAsFactors = F
+  )
+  setDT(skeleton_week)
+  skeleton_week[
+    retval[granularity_time=="week"],
+    on=c("location_code","yrwk"),
+    n_icu := n_icu
+  ]
+  skeleton_week[
+    retval[granularity_time=="week"],
+    on=c("location_code","yrwk"),
+    n_hospital_main_cause := n_hospital_main_cause
+  ]
+  skeleton_week[is.na(n_icu), n_icu := 0]
+  skeleton_week[is.na(n_hospital_main_cause), n_hospital_main_cause := 0]
+  skeleton_week[, granularity_time := "week"]
+
+  # put them together
+  fill_in_missing(skeleton_day)
+  skeleton_day[,date:=data.table::as.IDate(date)]
+  fill_in_missing(skeleton_week)
+
+  # make sure we dont include data from the future
+  retval <- rbind(skeleton_day, skeleton_week)
+
+  schema$data_covid19_hospital_by_time_location$db_drop_table()
+  schema$data_covid19_hospital_by_time_location$db_connect()
+  schema$data_covid19_hospital_by_time_location$db_drop_constraint()
+  schema$data_covid19_hospital_by_time_location$db_load_data_infile(retval)
+  schema$data_covid19_hospital_by_time_location$db_add_constraint()
+  #sc::tbl("data_covid19_hospital_by_time_location")
 
   # data_covid19_deaths ----
   master$data_covid19_deaths

@@ -16,6 +16,7 @@ ui_covid19_nordic <- function(data, argset, schema) {
   }
 
   master <- copy(data$data)
+  setorder(master, location_code, yrwk)
   master[
     nordic_locations(),
     on="location_code",
@@ -30,7 +31,7 @@ ui_covid19_nordic <- function(data, argset, schema) {
   openxlsx::addWorksheet(wb, "decisions")
   openxlsx::addWorksheet(wb, "cases pr100000")
   openxlsx::addWorksheet(wb, "tests (positive) pr100")
-  openxlsx::addWorksheet(wb, "icu n")
+  #openxlsx::addWorksheet(wb, "icu n")
   openxlsx::addWorksheet(wb, "cases n")
   openxlsx::addWorksheet(wb, "tests (total) n")
 
@@ -42,9 +43,11 @@ ui_covid19_nordic <- function(data, argset, schema) {
 
   # decisions main ----
   yrwks <- fhi::isoyearweek(lubridate::today()-c(14,7))
+  yrwkx <- fhi::isoyearweek(lubridate::today()-c(7))
+  yrwks_combined <- paste0(yrwks,collapse=" and ")
 
   openxlsx::freezePane(wb, "decisions", firstActiveRow=3, firstActiveCol=4)
-  openxlsx::setColWidths(wb, "decisions", cols=c(1:3), width="auto", hidden=c(F,T,F))
+  openxlsx::setColWidths(wb, "decisions", cols=c(1:3,6,10), width="auto", hidden=c(F,T,F,F,F))
   # openxlsx::setColWidths(wb, "decisions", cols=c(4:10), width="auto")
 
   openxlsx::writeData(
@@ -74,14 +77,16 @@ ui_covid19_nordic <- function(data, argset, schema) {
   )
 
   # decisions cases ----
-  tab <- master[tag_outcome=="cases" & yrwk  %in% yrwks]
-  tab <- dcast.data.table(
-    tab,
-    iso3+location_code ~ yrwk,
-    value.var = c("pr100000", "average_2wks_pr100000")
-  )
-  tab[,5 := NULL]
-
+  tab <- master[
+    yrwk %in% yrwkx,
+    .(
+      iso3,
+      location_code,
+      pr100000_cases_lag1,
+      pr100000_cases_lag0,
+      pr100000_cases_lag0_1
+    )
+  ]
   tab[, location_name := get_nordic_location_name(location_code)]
   setcolorder(tab, c("iso3","location_code","location_name"))
 
@@ -104,43 +109,15 @@ ui_covid19_nordic <- function(data, argset, schema) {
     stack = T
   )
 
-  # decisions cases alerts ----
-  tab <- master[tag_outcome=="cases" & yrwk  %in% yrwks]
-  alerts <- dcast.data.table(
-    tab,
-    iso3+location_code ~ yrwk,
-    value.var = c("n_status", "average_2wks_status")
-  )
-  alerts[,c(1,2,5) := NULL]
-
-  for(i in 1:ncol(alerts)){
-    rows <- which(alerts[,i,with=F]=="high")
-    if(length(rows)==0) next
-    openxlsx::addStyle(
-      wb,
-      sheet = "decisions",
-      style = style_red,
-      rows = rows+2,
-      cols = i+3,
-      gridExpand = F,
-      stack = T
-    )
-  }
-
   # decisions test ----
-  tab <- master[tag_outcome=="tests" & yrwk  %in% yrwks]
-  tab[, prop := pr100/100]
-  tab[, average_2wks_prop := average_2wks_pr100/100]
-  tab <- dcast.data.table(
-    tab,
-    iso3+location_code ~ yrwk,
-    value.var = c("prop", "average_2wks_prop")
-  )
-  tab[,5 := NULL]
-
-  tab[, iso3 := NULL]
-  tab[, location_code := NULL]
-
+  tab <- master[
+    yrwk %in% yrwkx,
+    .(
+      pr1_tests_lag1 = pr100_tests_lag1 / 100,
+      pr1_tests_lag0 = pr100_tests_lag0 / 100,
+      pr1_tests_lag0_1 = pr100_tests_lag0_1 /100
+    )
+  ]
   tab2 <- tab
 
   openxlsx::writeData(
@@ -160,56 +137,34 @@ ui_covid19_nordic <- function(data, argset, schema) {
     stack = T
   )
 
-  # decisions tests alerts ----
-  tab <- master[tag_outcome=="tests" & yrwk  %in% yrwks]
-  alerts <- dcast.data.table(
-    tab,
-    iso3+location_code ~ yrwk,
-    value.var = c("n_status", "average_2wks_status")
-  )
-  alerts[,c(1,2,5) := NULL]
-
-  for(i in 1:ncol(alerts)){
-    rows <- which(alerts[,i,with=F]=="high")
-    if(length(rows)==0) next
-    openxlsx::addStyle(
-      wb,
-      sheet = "decisions",
-      style = style_red,
-      rows = rows+2,
-      cols = i+7,
-      gridExpand = F,
-      stack = T
-    )
-  }
-
   # decisions titles ----
 
   openxlsx::writeData(
     wb,
     "decisions",
-    x = t(c(yrwks, "Average", "     ", yrwks, "Average")),
+    x = t(c(yrwks, yrwks_combined, "     ", yrwks, yrwks_combined)),
     colNames = F,
     startCol = 4,
     startRow = 2
   )
 
   # cases_pr100000 ----
-  tab <- master[tag_outcome=="cases" & yrwk >= "2020-20"]
+  tab <- master[
+    yrwk >= "2020-20",
+    .(
+      iso3,
+      location_code,
+      yrwk,
+      pr100000_cases_lag0
+    )
+  ]
   tab <- dcast.data.table(
     tab,
     iso3+location_code ~ yrwk,
-    value.var = "pr100000"
+    value.var = "pr100000_cases_lag0"
   )
   tab[, location_name := get_nordic_location_name(location_code)]
   setcolorder(tab, c("iso3","location_code","location_name"))
-
-  tab_alert <- master[tag_outcome=="cases" & yrwk >= "2020-20"]
-  tab_alert <- dcast.data.table(
-    tab_alert,
-    iso3+location_code ~ yrwk,
-    value.var = "n_status"
-  )
 
   openxlsx::freezePane(wb, "cases pr100000", firstActiveRow=2, firstActiveCol=4)
   openxlsx::setColWidths(wb, "cases pr100000", cols=c(1:3), width="auto", hidden=c(F,T,F))
@@ -227,24 +182,18 @@ ui_covid19_nordic <- function(data, argset, schema) {
     gridExpand = T,
     stack = T
   )
-  for(i in 1:ncol(tab_alert)){
-    rows <- which(tab_alert[,i,with=F]=="high")
-    if(length(rows)==0) next
-    openxlsx::addStyle(
-      wb,
-      sheet = "cases pr100000",
-      style = style_red,
-      rows = rows+1,
-      cols = i+1,
-      gridExpand = F,
-      stack = T
-    )
-  }
-
 
   # tests_pr100 ----
-  tab <- master[tag_outcome=="tests" & yrwk >= "2020-20"]
-  tab[, prop := pr100/100]
+  tab <- master[
+    yrwk >= "2020-20",
+    .(
+      iso3,
+      location_code,
+      yrwk,
+      pr100_tests_lag0
+    )
+  ]
+  tab[, prop := pr100_tests_lag0/100]
   tab <- dcast.data.table(
     tab,
     iso3+location_code ~ yrwk,
@@ -252,13 +201,6 @@ ui_covid19_nordic <- function(data, argset, schema) {
   )
   tab[, location_name := get_nordic_location_name(location_code)]
   setcolorder(tab, c("iso3","location_code","location_name"))
-
-  tab_alert <- master[tag_outcome=="tests" & yrwk >= "2020-20"]
-  tab_alert <- dcast.data.table(
-    tab_alert,
-    iso3+location_code ~ yrwk,
-    value.var = "n_status"
-  )
 
   openxlsx::freezePane(wb, "tests (positive) pr100", firstActiveRow=2, firstActiveCol=4)
   openxlsx::setColWidths(wb, "tests (positive) pr100", cols=c(1:3), width="auto", hidden=c(F,T,F))
@@ -276,55 +218,22 @@ ui_covid19_nordic <- function(data, argset, schema) {
     gridExpand = T,
     stack = T
   )
-  for(i in 1:ncol(tab_alert)){
-    rows <- which(tab_alert[,i,with=F]=="high")
-    if(length(rows)==0) next
-    openxlsx::addStyle(
-      wb,
-      sheet = "tests (positive) pr100",
-      style = style_red,
-      rows = rows+1,
-      cols = i+1,
-      gridExpand = F,
-      stack = T
-    )
-  }
 
-  # icu_n ----
+  # cases_n ----
   tab <- master[
-    tag_outcome=="icu" &
-      yrwk >= "2020-20" &
-      location_code %in% c(
-        "DK",
-        "FI",
-        "IS",
-        "SE"
-      )
+    yrwk >= "2020-20",
+    .(
+      iso3,
+      location_code,
+      yrwk,
+      n_cases_lag0
+    )
   ]
 
   tab <- dcast.data.table(
     tab,
     iso3+location_code ~ yrwk,
-    value.var = "n"
-  )
-  tab[, location_name := get_nordic_location_name(location_code)]
-  setcolorder(tab, c("iso3","location_code","location_name"))
-
-  openxlsx::freezePane(wb, "icu n", firstActiveRow=2, firstActiveCol=4)
-  openxlsx::setColWidths(wb, "icu n", cols=c(1:3), width="auto", hidden=c(F,T,F))
-  openxlsx::writeData(
-    wb,
-    sheet = "icu n",
-    x = tab
-  )
-
-  # cases_n ----
-  tab <- master[tag_outcome=="cases" & yrwk >= "2020-20"]
-
-  tab <- dcast.data.table(
-    tab,
-    iso3+location_code ~ yrwk,
-    value.var = "n"
+    value.var = "n_cases_lag0"
   )
   tab[, location_name := get_nordic_location_name(location_code)]
   setcolorder(tab, c("iso3","location_code","location_name"))
@@ -340,12 +249,20 @@ ui_covid19_nordic <- function(data, argset, schema) {
 
 
   # tests_n ----
-  tab <- master[tag_outcome=="tests" & yrwk >= "2020-20"]
+  tab <- master[
+    yrwk >= "2020-20",
+    .(
+      iso3,
+      location_code,
+      yrwk,
+      denom_tests_lag0
+    )
+  ]
 
   tab <- dcast.data.table(
     tab,
     iso3+location_code ~ yrwk,
-    value.var = "n"
+    value.var = "denom_tests_lag0"
   )
   tab[, location_name := get_nordic_location_name(location_code)]
   setcolorder(tab, c("iso3","location_code","location_name"))

@@ -13,50 +13,38 @@ analysis_covid19_nordic <- function(data, argset, schema) {
     data <- sc::tm_get_data("analysis_covid19_nordic", index_plan=index_plan)
     argset <- sc::tm_get_argset("analysis_covid19_nordic", index_plan=index_plan, index_argset = 1)
     schema <- sc::tm_get_schema("analysis_covid19_nordic")
+
+    schema$output$db_field_types
   }
 
   # cases ----
-  d <- data$data[tag_outcome=="cases"]
-  d[, average_2wks_pr100 := as.numeric(NA)]
-  d[, average_2wks_pr100000 := as.numeric(NA)]
-  d[, average_2wks_status := as.character(NA)]
+  d <- data$data[tag_outcome %in% c("cases","tests")]
 
-  setorder(d, location_code, yrwk)
-  d[ !is.na(n), n_status := "normal"]
-  d[ pr100000 > 20, n_status := "high"]
+  setnames(d,"n","n_lag0")
+  setorder(d, location_code, tag_outcome, yrwk)
+  d[, n_lag1 := shift(n_lag0), by=.(location_code, tag_outcome)]
+  d[, n_lag0_1 := n_lag0 + n_lag1]
 
-  d[, average_2wks_pr100000 :=  (pr100000 + shift(pr100000)) / 2, by=.(location_code)]
-  d[ !is.na(average_2wks_pr100000), average_2wks_status := "normal"]
-  d[ average_2wks_pr100000 > 20, average_2wks_status := "high"]
+  d <- dcast.data.table(
+    d,
+    location_code+yrwk+pop ~ tag_outcome,
+    value.var = c("n_lag0", "n_lag1", "n_lag0_1")
+  )
 
-  schema$output$db_upsert_load_data_infile(d)
+  d[, n_cases_lag0 := n_lag0_cases]
+  d[, pr100000_cases_lag0 := 100000 * n_lag0_cases / pop]
+  d[, pr100000_cases_lag1 := 100000 * n_lag1_cases / pop]
+  d[, pr100000_cases_lag0_1 := 100000 * n_lag0_1_cases / pop]
 
-  # tests ----
-  d <- data$data[tag_outcome=="tests"]
-  d[, average_2wks_pr100 := as.numeric(NA)]
-  d[, average_2wks_pr100000 := as.numeric(NA)]
-  d[, average_2wks_status := as.character(NA)]
+  d[, denom_tests_lag0 := n_lag0_tests]
+  d[, pr100_tests_lag0 := 100 * n_lag0_cases / n_lag0_tests]
+  d[, pr100_tests_lag1 := 100 * n_lag1_cases / n_lag1_tests]
+  d[, pr100_tests_lag0_1 := 100 * n_lag0_1_cases / n_lag0_1_tests]
 
-  setorder(d, location_code, yrwk)
-  d[ !is.na(n), n_status := "normal"]
-  d[ pr100 > 5, n_status := "high"]
+  d[, granularity_time := "week"]
 
-  d[, average_2wks_pr100 :=  (pr100 + shift(pr100)) / 2, by=.(location_code)]
-  d[ !is.na(average_2wks_pr100), average_2wks_status := "normal"]
-  d[ average_2wks_pr100 > 5, average_2wks_status := "high"]
+  fill_in_missing(d)
 
   schema$output$db_upsert_load_data_infile(d)
-
-  # icu ----
-  d <- data$data[tag_outcome=="icu"]
-  d[, average_2wks_pr100 := as.numeric(NA)]
-  d[, average_2wks_pr100000 := as.numeric(NA)]
-  d[, average_2wks_status := as.character(NA)]
-
-  setorder(d, location_code, yrwk)
-  d[, n_status := NA]
-
-  schema$output$db_upsert_load_data_infile(d)
-
 }
 

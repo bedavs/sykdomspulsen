@@ -43,8 +43,6 @@ set_db <- function(){
 
         "tag_outcome" = "TEXT",
         "n" = "INTEGER",
-        "pr100" = "DOUBLE",
-        "pr100000" = "DOUBLE",
         "manual_extraction" = "BOOLEAN"
       ),
       db_load_folder = tempdir(),
@@ -524,6 +522,74 @@ set_db <- function(){
     )
   )
 
+  # data_covid19_hospital_by_time_location ----
+  sc::add_schema(
+    name = "data_covid19_hospital_by_time_location",
+    schema = sc::Schema$new(
+      db_table = "data_covid19_hospital_by_time_location",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n_icu" = "INTEGER",
+        "n_hospital_main_cause" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
+  # prelim_data_covid19_hospital_by_time_location ----
+  sc::add_schema(
+    name = "prelim_data_covid19_hospital_by_time_location",
+    schema = sc::Schema$new(
+      db_table = "prelim_data_covid19_hospital_by_time_location",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "n_icu" = "INTEGER",
+        "n_hospital_main_cause" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "granularity_time",
+        "location_code",
+        "date"
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
+    )
+  )
+
   # data_covid19_deaths ----
   sc::add_schema(
     name = "data_covid19_deaths",
@@ -860,6 +926,50 @@ set_db <- function(){
       keys =  c(
         "uuid"
       )
+    )
+  )
+
+  # datar_norsyss ----
+  sc::add_schema(
+    name = "datar_norsyss",
+    schema = sc::Schema$new(
+      db_table = "datar_norsyss",
+      db_config = sc::config$db_config,
+      db_field_types =  c(
+        "granularity_time" = "TEXT",
+        "granularity_geo" = "TEXT",
+        "location_code" = "TEXT",
+        "border" = "INTEGER",
+        "age" = "TEXT",
+        "sex" = "TEXT",
+        "year" = "INTEGER",
+        "week" = "INTEGER",
+        "yrwk" = "TEXT",
+        "season" = "TEXT",
+        "x" = "DOUBLE",
+        "date" = "DATE",
+
+        "tag_outcome" = "TEXT",
+        "holiday" = "DOUBLE",
+        "n" = "INTEGER",
+        "pop" = "INTEGER",
+        "consult_with_influenza" = "INTEGER",
+        "consult_without_influenza" = "INTEGER"
+      ),
+      db_load_folder = tempdir(),
+      keys =  c(
+        "tag_outcome",
+        "location_code",
+        "year",
+        "date",
+        "age"
+      ),
+      indexes = list(
+        "ind1" = c("year"),
+        "ind2" = c("year", "tag_outcome")
+      ),
+      validator_field_types = sc::validator_field_types_sykdomspulsen,
+      validator_field_contents = sc::validator_field_contents_sykdomspulsen
     )
   )
 
@@ -1323,23 +1433,25 @@ set_db <- function(){
 
         "pop" = "INTEGER",
 
-        "tag_outcome" = "TEXT",
-        "n" = "INTEGER",
-        "pr100" = "DOUBLE",
-        "pr100000" = "DOUBLE",
-        "manual_extraction" = "BOOLEAN",
-        "n_status" = "TEXT",
+        "n_cases_lag0" = "INTEGER",
+        "pr100000_cases_lag0" = "DOUBLE",
 
-        "average_2wks_pr100" = "DOUBLE",
-        "average_2wks_pr100000" = "DOUBLE",
-        "average_2wks_status" = "TEXT"
+        "pr100000_cases_lag1" = "DOUBLE",
+
+        "pr100000_cases_lag0_1" = "DOUBLE",
+
+        "denom_tests_lag0" = "INTEGER",
+        "pr100_tests_lag0" = "DOUBLE",
+
+        "pr100_tests_lag1" = "DOUBLE",
+
+        "pr100_tests_lag0_1" = "DOUBLE"
       ),
       db_load_folder = tempdir(),
       keys =  c(
         "granularity_time",
         "location_code",
-        "date",
-        "tag_outcome"
+        "date"
       ),
       validator_field_types = sc::validator_field_types_sykdomspulsen,
       validator_field_contents = sc::validator_field_contents_sykdomspulsen
