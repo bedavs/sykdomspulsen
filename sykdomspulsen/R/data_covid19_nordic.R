@@ -460,7 +460,7 @@ data_covid19_nordic <- function(data, argset, schema){
     skip = 1
   )
   setDT(d)
-
+  d <- d[Region!="Iceland border screening"] ## maybe this should add to Iceland total cases
   d <- d[!is.na(location_code)]
   d[, Country := NULL]
   d[, Region := NULL]
@@ -503,6 +503,7 @@ data_covid19_nordic <- function(data, argset, schema){
     skip = 1
   )
   setDT(d)
+  d <- d[Region!="Iceland border screening"] ## maybe this should add to Iceland total cases
 
   d <- d[!is.na(location_code)]
   d[, Country := NULL]
