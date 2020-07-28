@@ -611,6 +611,7 @@ ui_norsyss_kht_email_plans <- function(){
   if(!sc::config$permissions$ui_norsyss_kht_email$is_final()){
     val <- val[
       email %in% c(
+        "kommunelege@flesberg.kommune.no", # only a temporary fix because they want daily updates... will remove soon
         "richardaubrey.white@fhi.no",
         "sykdomspulsen@fhi.no"
       )]
