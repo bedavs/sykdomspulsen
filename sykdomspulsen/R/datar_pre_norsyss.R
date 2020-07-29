@@ -12,7 +12,7 @@ datar_pre_norsyss <- function(data, argset, schema){
     schema <- sc::tm_get_schema("datar_pre_norsyss")
   }
 
-  argset_extra <- sc::tm_get_argset("datar_norsyss")
+  argset_extra <- sc::tm_get_argset("data_norsyss")
 
   if(!identical(
     sort(argset_extra$syndromes$tag_input),
@@ -83,7 +83,7 @@ datar_pre_norsyss <- function(data, argset, schema){
     d <- RODBC::sqlQuery(db, command)
     d <- data.table(d)
     # taskt 1be should only apply to R991
-    d <- d[!(Diagnose!="R991" & Takst=="1be")]
+    d <- d[!(Diagnose!="R991" & Takst=="1be")] ##??
     d <- norsyss_aggregate_raw_data_to_takst(d, diags = diags)
     if (i == 1) {
       utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
@@ -206,37 +206,34 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
   # GET RID OF NORWEGIAN LETTERS; MAKE ALL LOWERCASE
   ### Praksis
 
+
   d[
-    Praksis %in% c(
-      "Fastl\u00F8nnet",
-      "Fastlege"
-    ),
-    Praksis := "legekontor"
+    Praksis == "Fastl\u00F8nnet",
+    Praksis := "fastl\u00F8nnet"
+  ]
+
+  d[
+      Praksis == "Fastlege",
+      Praksis := "fastlege"
     ]
+
   d[
-    Praksis %in% c(
-      "kommunal legevakt",
-      "Legevakt"
-    ),
+    Praksis == "Legevakt",
     Praksis := "legevakt"
-    ]
+  ]
+
   d[
-    Praksis %in% c(
-      "Annet"
-    ),
+    Praksis == "Annet",
     Praksis := "annet"
     ]
 
-  d[, Kontaktype := "ukjent"]
+
   ### BEA, WE NEED YOU TO DELETE "KONTAKTTYPE" AND AGGREAGATE ON TAKSTKODE INSTEAD
   ### Kontaktkode <- BEA, KEEP ALL TAKSTKODER
-  for (takstkode in names(takstkoder)) {
-    d[Takst == takstkode, Kontaktype := takstkoder[takstkode]]
+  for (tk in names(takstkoder)) {
+    d[Takst == tk, takstkode := tk]
   }
 
-  # select "best"?? <- BEA, I THINK WE CAN DELETE THIS
-  dups <- d[, .(n_diff = length(unique(Kontaktype))), by = .(Id)]
-  d <- d[!(Id %in% dups[n_diff >= 2, Id] & Kontaktype == "telefonkontakt")]
 
   ### Kontaktkode <- BEA, KEEP ALL AGE GROUPS, EXCEPT CONVERT TO 5-14
   d[, age := "ukjent"]
@@ -254,12 +251,13 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
   d[PasientAlder == "30-39", age := "30-39"] # 30-39
   d[PasientAlder == "40-49", age := "40-49"] # 40-49
   d[PasientAlder == "50-59", age := "50-59"] # 50-59
-  d[PasientAlder == "60-64", age := "30-64"] # 60-64
-  d[PasientAlder == "65-69", age := "65+"]
-  d[PasientAlder == "60-69", age := "65+"]
-  d[PasientAlder == "70-79", age := "65+"]
-  d[PasientAlder == "80+", age := "65+"]
+  d[PasientAlder == "60-64", age := "60-64"] # 60-64
+  d[PasientAlder == "65-69", age := "65-69"]
+  d[PasientAlder == "60-69", age := "60-69"]
+  d[PasientAlder == "70-79", age := "70-79"]
+  d[PasientAlder == "80+", age := "80+"]
 
+  ages <- unique(d$age)
   # Fixing behandler kommune nummer
   for (old in names(nav_to_freg)) {
     d[as.character(BehandlerKommune) == old, BehandlerKommune := nav_to_freg[old]]
@@ -288,7 +286,7 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
            age, # this will be unaggregated
            Konsultasjonsdato,
            Praksis, # this will be unaggregated
-           Kontaktype # this will be takst
+           takstkode # this will be takst
          ),
          .SDcols = names(diags)
          ]
@@ -302,7 +300,7 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
            age,
            Konsultasjonsdato,
            Praksis,
-           Kontaktype
+           takstkode
          ),
          .SDcols = c(names(diags), "consult")
          ]
@@ -314,12 +312,98 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
 
 
   # step 1. create "norway level" (with skeleton)
-  # step 2. CONVERT current kommune-data TO THE CURRENT KOMMUNESAMMENSLAAING (with skeleton)
-  # norway_municip_merging()
-  # step 3. aggregate up "new kommunedata" to "new fylkedata" (shouldnt need skeleton)
-  # step 4. rbind kommune, fylke, norge data
 
+  d_norway <- d[is_bydel==F, lapply(.SD, sum), ,
+         by = .(
+           age,
+           date,
+           Praksis,
+           takstkode
+         ),
+         .SDcols = c(names(diags), "consult")
+  ]
+
+  d_norway[, location_code := "norge"]
+  d_norway[,granularity_geo:="county"]
+
+  skeleton <- expand.grid(
+    location_code = "norge",
+    date = seq.Date(
+      date_min,
+      date_max,
+      by = 1
+    ),
+    age=ages,
+    stringsAsFactors = FALSE
+  )
+  setDT(skeleton)
+
+  d_norway <-
+    merge(skeleton,
+          d_norway,
+          by = c("location_code", "age", "date"),
+          all.x = TRUE
+    )
+
+  # step 2. CONVERT current kommune-data TO THE CURRENT KOMMUNESAMMENSLAAING (with skeleton)
+
+  d_municip <- d[is_bydel==F, lapply(.SD, sum), ,
+                by = .(
+                  age,
+                  date,
+                  location_code,
+                  Praksis,
+                  takstkode
+                ),
+                .SDcols = c(names(diags), "consult")
+  ]
+  d_municip[,granularity_geo:="municip"]
+
+  skeleton <-
+      data.table(expand.grid(
+        location_code = unique(norway_municip_merging()[
+            municip_code_current %in% unique(d_municip$location_code) |
+              municip_code_original %in% unique(d_municip$location_code)
+          ]$municip_code_original),
+          date = seq.Date(
+            date_min,
+            date_max,
+            by = 1
+          ),
+          age=ages,
+          stringsAsFactors = FALSE
+        ))
+  setDT(skeleton)
+
+  d_municip <-
+    merge(skeleton,
+        d_municip,
+        by = c("location_code", "age", "date"),
+        all.x = TRUE
+  )
+
+  # step 3. aggregate up "new kommunedata" to "new fylkedata" (shouldnt need skeleton)
+  locs <- norway_locations()
+  setnames(locs, "municip_code", "location_code")
+
+  d_county <- merge(d_municip, locs, by="location_code")
+  d_county <- d_county[, lapply(.SD, sum), ,
+                 by = .(
+                   age,
+                   date,
+                   county_code,
+                   Praksis,
+                   takstkode
+                 ),
+                 .SDcols = c(names(diags), "consult")
+  ]
+  d_municip[,granularity_geo:="municip"]
+
+  # step 4. rbind kommune, fylke, norge data
   # final result: 99% clean dataset
+
+  d <- rbind(d_norway, d_county, d_municip)
+
 
   # after this, do datar_norsyss which will load this dataset into the database table datar_norsyss
   # then we will have data_norsyss which will aggregate datar_norsyss into kontakttype (oppmote/telefon/ekons)
