@@ -1,6 +1,6 @@
 Package: sykdomspulsen
 Title: NIPH infectious disease surveillance system
-Version: 2020.7.20
+Version: 2020.7.28
 Authors@R: c(
   person("Richard", "White", email = "hello@rwhite.no", role = c("aut", "cre")),
   person("Gunnar", "R\u00F8", email = "GunnarOyvindIsaksson.Ro@fhi.no", role = c("aut")), 

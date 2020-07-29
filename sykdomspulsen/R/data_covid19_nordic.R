@@ -111,6 +111,8 @@ data_pre_covid19_nordic <- function(data, argset, schema){
   for(i in seq_along(danish_months)){
     d_names <- stringr::str_replace(d_names, glue::glue(". {danish_months[i]} "), glue::glue("-{formatC(i,flag=0,width=2)}-"))
   }
+  d_names <- stringr::str_remove_all(d_names,"\n")
+  d_names <- stringr::str_trim(d_names)
   d_dates <- as.Date(d_names, format="%d-%m-%Y")
   for(i in seq_along(d_dates)){
     folder_dest <- fs::path(folder_denmark, d_dates[i])

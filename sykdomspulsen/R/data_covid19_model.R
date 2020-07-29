@@ -9,9 +9,12 @@
 #' @export
 data_covid19_model <- function(data, argset, schema){
   # tm_run_task("data_covid19_model")
-  # data <- tm_get_data("data_covid19_model")
-  # argset <- tm_get_argset("data_covid19_model")
-  # schema <- tm_get_schema("data_covid19_model")
+
+  if(plnr::is_run_directly()){
+    data <- sc::tm_get_data("data_covid19_model")
+    argset <- sc::tm_get_argset("data_covid19_model")
+    schema <- sc::tm_get_schema("data_covid19_model")
+  }
 
   if(!fs::dir_exists(sc::path("input","sykdomspulsen_covid19_dagsrapport_input"))){
     fs::dir_create(sc::path("input","sykdomspulsen_covid19_dagsrapport_input"))
@@ -19,6 +22,8 @@ data_covid19_model <- function(data, argset, schema){
   file <- fs::dir_ls(sc::path("input","sykdomspulsen_covid19_dagsrapport_input"), regexp="modelling_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].csv")
   file <- max(file)
   d <- fread(file)
+  d <- na.omit(d)
+  d[, date:=as.Date(date)]
 
   setnames(
     d,
