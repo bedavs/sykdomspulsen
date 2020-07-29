@@ -357,7 +357,19 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
                 ),
                 .SDcols = c(names(diags), "consult")
   ]
+  d_municip[,year:=year(date)]
   d_municip[,granularity_geo:="municip"]
+
+  d_municip <-
+    merge(d_municip,
+          norway_municip_merging()[, c("municip_code_original", "year", "municip_code_current", "weighting")],
+          by.x = c("location_code", "year"),
+          by.y = c("municip_code_original", "year"),
+          all.x = T,
+          allow.cartesian = T
+    )
+
+  d_municip <- d_municip[!is.na(municip_code_current)]
 
   skeleton <-
       data.table(expand.grid(
@@ -382,11 +394,24 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
         all.x = TRUE
   )
 
-  # step 3. aggregate up "new kommunedata" to "new fylkedata" (shouldnt need skeleton)
-  locs <- norway_locations()
-  setnames(locs, "municip_code", "location_code")
+  d_municip[,year:=NULL]
+  d_municip[,weighting:=NULL]
 
-  d_county <- merge(d_municip, locs, by="location_code")
+  d_municip <-d_municip[!is.na(municip_code_current)]
+  d_municip[,location_code:=municip_code_current]
+  d_municip[,municip_code_current:=NULL]
+
+  # step 3. aggregate up "new kommunedata" to "new fylkedata" (shouldnt need skeleton)
+
+  d_county <-
+    merge(d_municip,
+          norway_locations()[, c("municip_code", "county_code")],
+          by.x = "location_code",
+          by.y = "municip_code",
+          all.x = T
+    )
+
+
   d_county <- d_county[, lapply(.SD, sum), ,
                  by = .(
                    age,
@@ -397,8 +422,12 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
                  ),
                  .SDcols = c(names(diags), "consult")
   ]
-  d_municip[,granularity_geo:="municip"]
+  d_county[,granularity_geo:="county"]
+  d_county[,location_code:=county_code]
+  d_county[,county_code:=NULL]
 
+
+  setcolorder(d_county, names(d_norway))
   # step 4. rbind kommune, fylke, norge data
   # final result: 99% clean dataset
 
@@ -406,6 +435,7 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
 
 
   # after this, do datar_norsyss which will load this dataset into the database table datar_norsyss
+
   # then we will have data_norsyss which will aggregate datar_norsyss into kontakttype (oppmote/telefon/ekons)
 
 
