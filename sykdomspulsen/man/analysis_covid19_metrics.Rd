@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis_covid19_metrics.R
 \name{analysis_covid19_metrics}
 \alias{analysis_covid19_metrics}
-\title{analysis_covid19_areas_at_risk}
+\title{analysis_covid19_metrics}
 \usage{
 analysis_covid19_metrics(data, argset, schema)
 }
@@ -14,5 +14,5 @@ analysis_covid19_metrics(data, argset, schema)
 \item{schema}{a}
 }
 \description{
-analysis_covid19_areas_at_risk
+analysis_covid19_metrics
 }
