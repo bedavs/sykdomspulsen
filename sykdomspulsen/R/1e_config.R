@@ -1,45 +1,10 @@
 set_config <- function() {
 
-  set_border()
+  set_definitions()
   set_db()
   set_progressr()
   set_email()
   set_git_cred()
-
-  config$def <- list(
-
-    # variables that are common to many tasks
-    smallMunicips = c(
-      "municip1151",
-      "municip1835",
-      "municip1252",
-      "municip1739"
-    ),
-
-    age = list(
-      norsyss=list(
-        "total" = c(0:105),
-        "0-4" = c(0:4),
-        "5-14" = c(5:14),
-        "15-19" = c(15:19),
-        "20-29" = c(20:29),
-        "30-64" = c(30:64),
-        "65+" = c(65:105)
-      )
-    ),
-
-    # norsyss specific things that arent relevant to any other tasks
-    norsyss = list(
-      long_names = list(
-        gastro_vk_ot="Mage-tarminfeksjoner",
-        respiratoryexternal_vk_ot="Luftveisinfeksjoner"
-      ),
-      short_names = list(
-        gastro_vk_ot="Mage-tarm",
-        respiratoryexternal_vk_ot="Luftvei"
-      )
-    )
-  )
 
   packageStartupMessage(glue::glue("sykdomspulsen {utils::packageVersion('sykdomspulsen')}"))
 
@@ -48,15 +13,6 @@ set_config <- function() {
   set_tasks()
   #packageStartupMessage("hi3")
 
-}
-
-
-set_border <- function() {
-  if (sc::config$is_production) {
-    config$border <- 2020
-  } else {
-    config$border <- 2020
-  }
 }
 
 set_progressr <- function(){

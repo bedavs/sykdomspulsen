@@ -12,30 +12,22 @@ datar_pre_norsyss <- function(data, argset, schema){
     schema <- sc::tm_get_schema("datar_pre_norsyss")
   }
 
-  argset_extra <- sc::tm_get_argset("data_norsyss")
-
-  if(!identical(
-    sort(argset_extra$syndromes$tag_input),
-    sort(argset_extra$syndromes$tag_input)
-  )){
-    argset$date_from <- "2006-01-02"
-  } else if(!"data_norsyss" %in% sc::list_tables()){
+  if(!"datar_norsyss" %in% sc::list_tables()){
     argset$date_from <- "2006-01-02"
   } else {
-    date_min <- sc::tbl("data_norsyss") %>%
-      dplyr::summarize(date_min = min(date)) %>%
+    vals <- sc::tbl("data_norsyss") %>%
+      dplyr::summarize(
+        date_min = min(date),
+        date_max = max(date)
+        ) %>%
       dplyr::collect()
-    date_min <- date_min$date_min
-    if(date_min != "2006-01-02"){
+    date_min <- vals$date_min
+    date_max <- vals$date_max
+
+    if(date_min <= "2008-01-01"){
       date_min <- "2006-01-02"
     } else {
-      date_max <- sc::tbl("data_norsyss") %>%
-        dplyr::summarize(date_max = max(date)) %>%
-        dplyr::collect()
-      date_max <- date_max$date_max
-      date_min <-  date_max-365*2
-      year_min <- fhi::isoyear_n(date_min)
-      date_min <- fhidata::days[year==year_min][1]$mon
+      date_min <- date_max - 365
     }
     argset$date_from <- date_min
   }
@@ -47,21 +39,18 @@ datar_pre_norsyss <- function(data, argset, schema){
   overwrite_file <- FALSE
   diags = argset$diags
 
-  file_name <- glue::glue("norsyss_{lubridate::today()}.txt")
-  file_temp <- fs::path(fhi::temp_dir(), file_name)
-  file_permanent <- fs::path(folder, file_name)
-
-  if (overwrite_file == FALSE) {
-    if (file.exists(file_permanent)) {
-      x <- fread(file_permanent)
-      max_date <- as.Date(max(x$date, na.rm = T))
-      # as long as last date in the file is within 2 days of the requested date
-      if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
-        message("file already exists! exiting...")
-        return()
-      }
-    }
-  }
+#
+#   if (overwrite_file == FALSE) {
+#     if (file.exists(file_permanent)) {
+#       x <- fread(file_permanent)
+#       max_date <- as.Date(max(x$date, na.rm = T))
+#       # as long as last date in the file is within 2 days of the requested date
+#       if (abs(as.numeric(difftime(date_to, max_date, units = "days"))) <= 2) {
+#         message("file already exists! exiting...")
+#         return()
+#       }
+#     }
+#   }
 
   db <- RODBC::odbcDriverConnect("driver={ODBC Driver 17 for SQL Server};server=dm-prod;database=SykdomspulsenAnalyse; trusted_connection=yes")
 
@@ -69,30 +58,42 @@ datar_pre_norsyss <- function(data, argset, schema){
   datesToExtract <- data.table(from = seq(as.Date(date_from), by = "month", length.out = 300), to = seq(as.Date(date_from), by = "month", length.out = 301)[-1] - 1)
   # Remove future dates
   datesToExtract <- datesToExtract[from <= date_to]
+  datesToExtract[to > date_to, to := date_to]
 
   for (i in 1:nrow(datesToExtract)) {
-    cat(i, "/", nrow(datesToExtract), "\n")
+
+    date_from <- datesToExtract[i]$from
+    date_to <- datesToExtract[i]$to
+
+    file_name <- glue::glue("norsyss_raw_{lubridate::today()}_{date_from}_{date_to}.RDS")
+    #filepath_temp <- fs::path(tempdir(), file_name)
+    filepath <- fs::path(folder, file_name)
+
+    message(glue::glue("{i}/{nrow(datesToExtract)} - {date_from} to {date_to} | {lubridate::now()}"), "\n")
+
 
     command <- paste0(
       "select Id,Diagnose,PasientAlder,PasientKommune,BehandlerKommune,Konsultasjonsdato,Takst,Praksis from Konsultasjon join KonsultasjonDiagnose on Id=KonsultasjonId join KonsultasjonTakst on Id=KonsultasjonTakst.KonsultasjonId where Konsultasjonsdato >='",
-      datesToExtract[i]$from,
+      date_from,
       "' AND Konsultasjonsdato <= '",
-      datesToExtract[i]$to,
+      date_to,
       "'"
     )
     d <- RODBC::sqlQuery(db, command)
     d <- data.table(d)
     # taskt 1be should only apply to R991
     d <- d[!(Diagnose!="R991" & Takst=="1be")] ##??
-    d <- norsyss_aggregate_raw_data_to_takst(d, diags = diags)
-    if (i == 1) {
-      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = TRUE, append = FALSE)
-    } else {
-      utils::write.table(d, file_temp, sep = "\t", row.names = FALSE, col.names = FALSE, append = TRUE)
-    }
+    d <- norsyss_aggregate_raw_data_to_takst(
+      d = d,
+      diags = diags,
+      date_from = date_from,
+      date_to = date_to
+    )
+    saveRDS(d, filepath)
+    #system2("mv", args=c(filepath_temp, filepath))
+
   }
   #pb$terminate()
-  system(glue::glue("mv {file_temp} {file_permanent}"))
 
   get_n_doctors(sc::path("input", "sykdomspulsen_norsyss_input"))
   return(TRUE)
@@ -191,7 +192,12 @@ nav_to_freg_bydel <- data.table(
   freg = nav_to_freg_bydel
 )
 
-norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
+norsyss_aggregate_raw_data_to_takst <- function(
+  d,
+  diags,
+  date_from,
+  date_to
+  ) {
   . <- BehandlerKommune <- Diagnose <- Id <-
     Konsultasjonsdato <- Kontaktype <- PasientAlder <-
     Praksis <- Takst <- age <- consult <- from <-
@@ -202,38 +208,54 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
     d[Diagnose %in% diags[[i]], (names(diags)[i]) := 1]
   }
 
-  # BEA, PLEASE UNAGGREAGATE "PRAKSIS"
-  # GET RID OF NORWEGIAN LETTERS; MAKE ALL LOWERCASE
+  practices <- c(
+    "legekontor",
+    "legevakt",
+    "annet"
+  )
+
+  ages <- c(
+    "ukjent",
+    "0-4",
+    "5-14",
+    "15-19",
+    "20-29",
+    "30-39",
+    "40-49",
+    "50-59",
+    "60-64",
+    "65-69",
+    "70-79",
+    "80+"
+  )
+
   ### Praksis
 
-
   d[
-    Praksis == "Fastl\u00F8nnet",
-    Praksis := "fastl\u00F8nnet"
+    Praksis %in% c(
+      "Fastl\u00F8nnet",
+      "Fastlege"
+    ),
+    Praksis := "legekontor"
   ]
-
   d[
-      Praksis == "Fastlege",
-      Praksis := "fastlege"
-    ]
-
-  d[
-    Praksis == "Legevakt",
+    Praksis %in% c(
+      "kommunal legevakt",
+      "Legevakt"
+    ),
     Praksis := "legevakt"
   ]
-
   d[
-    Praksis == "Annet",
+    Praksis %in% c(
+      "Annet"
+    ),
     Praksis := "annet"
-    ]
+  ]
 
 
   ### BEA, WE NEED YOU TO DELETE "KONTAKTTYPE" AND AGGREAGATE ON TAKSTKODE INSTEAD
   ### Kontaktkode <- BEA, KEEP ALL TAKSTKODER
-  for (tk in names(takstkoder)) {
-    d[Takst == tk, takstkode := tk]
-  }
-
+  setnames(d, "Takst", "takstkode")
 
   ### Kontaktkode <- BEA, KEEP ALL AGE GROUPS, EXCEPT CONVERT TO 5-14
   d[, age := "ukjent"]
@@ -243,6 +265,7 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
   d[PasientAlder == "5-9", age := "5-14"] # -> 5-14
   d[PasientAlder == "0-9", age := "5-14"] # -> 5-14 # for kommune with <500 people
   d[PasientAlder == "10-14", age := "5-14"] # -> 5-14
+
   d[PasientAlder == "10-19", age := "15-19"] # -> 15-19 # for kommune with <500 people
   d[PasientAlder == "15-19", age := "15-19"] # -> 15-19
 
@@ -253,7 +276,7 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
   d[PasientAlder == "50-59", age := "50-59"] # 50-59
   d[PasientAlder == "60-64", age := "60-64"] # 60-64
   d[PasientAlder == "65-69", age := "65-69"]
-  d[PasientAlder == "60-69", age := "60-69"]
+  d[PasientAlder == "60-69", age := "65-69"]
   d[PasientAlder == "70-79", age := "70-79"]
   d[PasientAlder == "80+", age := "80+"]
 
@@ -309,7 +332,8 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
   d[is_bydel==T, location_code := paste0("ward", formatC(BehandlerKommune, width = 6, flag = 0, format="fg"))]
   d[, BehandlerKommune := NULL]
   setnames(d, "Konsultasjonsdato", "date")
-
+  setnames(d, "Praksis", "practice")
+  setnames(d, "takstkode", "tariff")
 
   # step 1. create "norway level" (with skeleton)
 
@@ -317,33 +341,17 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
          by = .(
            age,
            date,
-           Praksis,
-           takstkode
+           practice,
+           tariff
          ),
          .SDcols = c(names(diags), "consult")
   ]
 
   d_norway[, location_code := "norge"]
-  d_norway[,granularity_geo:="county"]
 
-  skeleton <- expand.grid(
-    location_code = "norge",
-    date = seq.Date(
-      date_min,
-      date_max,
-      by = 1
-    ),
-    age=ages,
-    stringsAsFactors = FALSE
-  )
-  setDT(skeleton)
-
-  d_norway <-
-    merge(skeleton,
-          d_norway,
-          by = c("location_code", "age", "date"),
-          all.x = TRUE
-    )
+  # step 2. create d_bydel
+  d_ward <- d[is_bydel==T]
+  d_ward[, is_bydel := NULL]
 
   # step 2. CONVERT current kommune-data TO THE CURRENT KOMMUNESAMMENSLAAING (with skeleton)
 
@@ -351,14 +359,13 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
                 by = .(
                   age,
                   date,
-                  location_code,
-                  Praksis,
-                  takstkode
+                  practice,
+                  tariff,
+                  location_code
                 ),
                 .SDcols = c(names(diags), "consult")
   ]
   d_municip[,year:=year(date)]
-  d_municip[,granularity_geo:="municip"]
 
   d_municip <-
     merge(d_municip,
@@ -368,47 +375,27 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
           all.x = T,
           allow.cartesian = T
     )
-
   d_municip <- d_municip[!is.na(municip_code_current)]
 
-  skeleton <-
-      data.table(expand.grid(
-        location_code = unique(norway_municip_merging()[
-            municip_code_current %in% unique(d_municip$location_code) |
-              municip_code_original %in% unique(d_municip$location_code)
-          ]$municip_code_original),
-          date = seq.Date(
-            date_min,
-            date_max,
-            by = 1
-          ),
-          age=ages,
-          stringsAsFactors = FALSE
-        ))
-  setDT(skeleton)
-
-  d_municip <-
-    merge(skeleton,
-        d_municip,
-        by = c("location_code", "age", "date"),
-        all.x = TRUE
-  )
-
-  d_municip[,year:=NULL]
-  d_municip[,weighting:=NULL]
-
-  d_municip <-d_municip[!is.na(municip_code_current)]
-  d_municip[,location_code:=municip_code_current]
-  d_municip[,municip_code_current:=NULL]
-
+  for(i in c(names(diags), "consult")) d_municip[, (i) := get(i)*weighting]
+  d_municip <- d_municip[, lapply(.SD, function(x) round(sum(x))),
+                by = .(
+                  age,
+                  date,
+                  practice,
+                  tariff,
+                  municip_code_current
+                ),
+                .SDcols = c(names(diags), "consult")
+  ]
+  setnames(d_municip, "municip_code_current", "location_code")
   # step 3. aggregate up "new kommunedata" to "new fylkedata" (shouldnt need skeleton)
 
   d_county <-
     merge(d_municip,
           norway_locations()[, c("municip_code", "county_code")],
           by.x = "location_code",
-          by.y = "municip_code",
-          all.x = T
+          by.y = "municip_code"
     )
 
 
@@ -416,23 +403,70 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
                  by = .(
                    age,
                    date,
-                   county_code,
-                   Praksis,
-                   takstkode
+                   practice,
+                   tariff,
+                   county_code
                  ),
                  .SDcols = c(names(diags), "consult")
   ]
-  d_county[,granularity_geo:="county"]
-  d_county[,location_code:=county_code]
-  d_county[,county_code:=NULL]
+  setnames(d_county, "county_code", "location_code")
+
 
 
   setcolorder(d_county, names(d_norway))
   # step 4. rbind kommune, fylke, norge data
   # final result: 99% clean dataset
 
-  d <- rbind(d_norway, d_county, d_municip)
+  d <- rbind(d_norway, d_county, d_municip, d_ward)
 
+  # create a skeleton
+  skeleton <-
+    expand.grid(
+      location_code = norway_locations_long()$location_code,
+      date = seq(
+        date_from,
+        date_to,
+        by=1
+      ),
+      practice = practices,
+      tariff = names(takstkoder),
+      age = ages,
+      stringsAsFactors = FALSE
+    )
+  setDT(skeleton)
+  dx <- merge(
+    skeleton,
+    d,
+    by = c(
+      "location_code",
+      "date",
+      "practice",
+      "tariff",
+      "age"
+    ),
+    all.x = T
+  )
+  rm("skeleton")
+  for(i in c(names(diags), "consult")) dx[is.na(get(i)), (i) := 0]
+
+  # create "total age"
+  dx_total <- dx[, lapply(.SD, sum), ,
+         by = .(
+           location_code,
+           date,
+           practice,
+           tariff
+         ),
+         .SDcols = c(names(diags), "consult")
+  ]
+  dx_total[, age:="total"]
+  dx <- rbind(dx[age!="ukjent"], dx_total)
+  rm("dx_total")
+
+  dx[, n_consult_without_influenza := consult - influensa]
+  setnames(dx, "consult", "n_consult_with_influenza")
+
+  for(i in names(diags)) setnames(dx, i, paste0("n_",i))
 
   # after this, do datar_norsyss which will load this dataset into the database table datar_norsyss
 
@@ -448,6 +482,6 @@ norsyss_aggregate_raw_data_to_takst <- function(d, diags) {
   # datar_norsyss reads this into database
   # data_norsyss aggregates datar_norsyss
 
-  return(d)
+  return(dx)
 }
 

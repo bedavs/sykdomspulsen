@@ -178,8 +178,8 @@ data_covid19_nordic <- function(data, argset, schema){
   retval[, n_tests := as.numeric(stringr::str_remove_all(Testede, "\\."))]
   retval[, n_cases := as.numeric(stringr::str_remove_all(Positive, "\\."))]
   setorder(retval, Region, date)
-  retval[, n_tests := n_tests - shift(n_tests), by=.(Region)]
-  retval[, n_cases := n_cases - shift(n_cases), by=.(Region)]
+  retval[, n_tests := shift(n_tests, type="lead") - n_tests, by=.(Region)]
+  retval[, n_cases := shift(n_cases, type="lead") - n_cases, by=.(Region)]
 
   retval[
     fhidata::denmark_locations_long_b2020,

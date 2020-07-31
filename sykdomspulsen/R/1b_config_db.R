@@ -930,6 +930,9 @@ set_db <- function(){
   )
 
   # datar_norsyss ----
+  diags <- rep("INTEGER", length = length(config$def$norsyss$diags))
+  names(diags) <- paste0("n_",names(config$def$norsyss$diags))
+
   sc::add_schema(
     name = "datar_norsyss",
     schema = sc::Schema$new(
@@ -949,24 +952,20 @@ set_db <- function(){
         "x" = "DOUBLE",
         "date" = "DATE",
 
-        "tag_outcome" = "TEXT",
-        "holiday" = "DOUBLE",
-        "n" = "INTEGER",
-        "pop" = "INTEGER",
-        "consult_with_influenza" = "INTEGER",
-        "consult_without_influenza" = "INTEGER"
+        "practice" = "TEXT",
+        "tariff" = "TEXT",
+        diags,
+        "n_consult_with_influenza" = "INTEGER",
+        "n_consult_without_influenza" = "INTEGER"
       ),
       db_load_folder = tempdir(),
       keys =  c(
-        "tag_outcome",
+        "practice",
+        "tariff",
         "location_code",
         "year",
         "date",
         "age"
-      ),
-      indexes = list(
-        "ind1" = c("year"),
-        "ind2" = c("year", "tag_outcome")
       ),
       validator_field_types = sc::validator_field_types_sykdomspulsen,
       validator_field_contents = sc::validator_field_contents_sykdomspulsen
