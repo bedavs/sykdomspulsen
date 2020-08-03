@@ -19,11 +19,12 @@ ui_covid19_areas_at_risk_utbrudd_email <- function(data, argset, schema) {
   if(!fs::file_exists(filepath)) return()
 
   html <- glue::glue(
-    "Vedlagt er dagens signaler for covid-19 fordelt på geografisk område og aldersgrupper.<br>",
-    "Dataene er basert på antall tilfeller fra MSIS og antall konsultasjoner hos lege og legevakt fra NorSySS.<br><br>",
+    "Vedlagt er dagens signaler for covid-19 fordelt p{fhidata::nb$aa} geografisk omr{fhidata::nb$aa}de og aldersgrupper.<br>",
+    "Resultater er tilgjengelig p{fhi::nb$aa} <a href='file:///N:/sykdomspulsen_covid19_areas_at_risk_output/{argset$today}'>N:/sykdomspulsen_covid19_areas_at_risk_output/{argset$today}</a> (tilgangsbegrenset)<br>",
+    "Dataene er basert p{fhidata::nb$aa} antall tilfeller fra MSIS og antall konsultasjoner hos lege og legevakt fra NorSySS.<br><br>",
 
-    "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foregående ukene som en terskel for et signal.",
-    " For eksempel brukes uke 2020-26 og 2020-27 som en basis for å beregne terskelverdi for uke 2020-28.<br><br>",
+    "Signalsystemet bruker gjennomsnittet og 95% konfidensintervall for de to foreg{fhidata::nb$aa}ende ukene som en terskel for et signal. ",
+    "For eksempel brukes uke 2020-26 og 2020-27 som en basis for {fhidata::nb$aa} beregne terskelverdi for uke 2020-28.<br><br>",
 
     "Hilsen,<br><br>",
     "Sykdompulsen teamet (Gry, Richard, Beatriz, Gunnar og Yusman)"

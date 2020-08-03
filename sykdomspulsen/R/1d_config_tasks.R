@@ -826,7 +826,7 @@ set_tasks <- function() {
       for_each_plan = list("border" = config$border),
       filter = "location_code != 'municip0301'",
       args = list(
-        folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
+        folder = "sykdomspulsen_covid19_areas_at_risk_output/{argset$today}",
         filename = "covid19_areas_at_risk_{argset$today}.docx"
       )
     )
@@ -840,7 +840,7 @@ set_tasks <- function() {
       action = "sykdomspulsen::ui_covid19_areas_at_risk_utbrudd_email",
       schema = list(input=sc::config$schemas$results_normomo_standard),
       args = list(
-        folder = "sykdomspulsen_norsyss_restricted_output/covid19_at_risk/{argset$today}",
+        folder = "sykdomspulsen_covid19_areas_at_risk_output/covid19_at_risk/{argset$today}",
         filename = "covid19_areas_at_risk_{argset$today}.docx"
       )
     )
