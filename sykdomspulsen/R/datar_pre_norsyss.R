@@ -15,7 +15,7 @@ datar_pre_norsyss <- function(data, argset, schema){
   if(!"datar_norsyss" %in% sc::list_tables()){
     argset$date_from <- "2006-01-02"
   } else {
-    vals <- sc::tbl("data_norsyss") %>%
+    vals <- sc::tbl("datar_norsyss") %>%
       dplyr::summarize(
         date_min = min(date),
         date_max = max(date)
@@ -24,7 +24,7 @@ datar_pre_norsyss <- function(data, argset, schema){
     date_min <- vals$date_min
     date_max <- vals$date_max
 
-    if(date_min <= "2008-01-01"){
+    if(date_min != "2006-01-02" | date_max <= "2008-01-01"){
       date_min <- "2006-01-02"
     } else {
       date_min <- date_max - 365
