@@ -55,12 +55,15 @@ ui_norsyss_pdf <- function(data, argset, schema) {
     index <- grep("_child", dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen")))
     files <- dir(system.file("rmd", "norsyss_pdf", package = "sykdomspulsen"))[index]
 
+    extra_locs=NULL
     extra_tag <-grep(tag,files)
     if (length(extra_tag)>0) {
       extra_locs <- cbind(locations.county_code=substr(files,1, 8),inrmd=files[extra_tag])
+      template <-merge(templates,extra_locs,by="locations.county_code", all=T)
+      template[is.na(inrmd),inrmd:=file_before]
+    } else {
+      template[, inrmd:=file_before]
     }
-    template <-merge(templates,extra_locs,by="locations.county_code", all=T)
-    template[is.na(inrmd),inrmd:=file_before]
 
     template <- template[!is.na(locations.county_name)]
 
