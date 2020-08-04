@@ -42,8 +42,8 @@ analysis_covid19_nordic <- function(data, argset, schema) {
   #d[, pr100_tests_lag0_1 := 100 * n_lag0_1_cases / n_lag0_1_tests]
 
   ########
-  d[, pr100_tests_lag0_1 := 100 * ((n_lag0_cases / n_lag0_tests) +
-                                  (n_lag1_cases / n_lag1_tests)) ]
+  d[, pr100_tests_lag0_1 := 100 * (((n_lag0_cases / n_lag0_tests) +
+                                  (n_lag1_cases / n_lag1_tests))/2) ]
 
   ########
   d[, granularity_time := "week"]
